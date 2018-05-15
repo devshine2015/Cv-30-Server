@@ -1,0 +1,9 @@
+{
+    "apps" : [{
+        "name"        : "SwabitAPI",
+        "script"      : "./dist/server.js",
+        "watch"       : true,
+        "exec_interpreter" : "babel-node",
+        "exec_mode"        : "fork"
+    }]
+}
