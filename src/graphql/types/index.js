@@ -32,6 +32,7 @@ const Query = `
 			password: String!
 		): StandardResponse
 		storeCard( details: CardInput ): Card
+		activateAccount (token: String!): StandardResponse
 	}
 `;
 

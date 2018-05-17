@@ -32,6 +32,11 @@ export default {
 			token,
 			password
 		}, context) => authResolvers.forgotPasswordUpdate(token, password, context),
+		activateAccount: (_, {
+			token
+		}, context) => authResolvers.activateAccount(token, context)
 		// storeCard: (_, { details }, context) => cardResolvers.store(details, context)
 	}
 };
+
+//TODO: send activation email on registration; forgot password;
