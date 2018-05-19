@@ -19,7 +19,7 @@ dotenv.config();
 
 if (cluster.isMaster) {
     console.log(`Master ${process.pid} is running`);
-    migrate(db,() => {
+    migrate(db, () => {
         for (let i = 0; i < numCPUs.cpus().length; i++) {
             cluster.fork();
         }
@@ -39,11 +39,14 @@ if (cluster.isMaster) {
     app.use(cors());
     app.use('/graphql', bodyParser.json(), graphqlExpress(async req => {
         const { user, models } = await getContext(req);
+        console.log(user);
         return {
             schema,
             context: { user, models },
             graphiql: true,
-            formatError,
+            // formatError: error => {
+            //     console.log(error)
+            // },
             debug: true
         };
     }));
@@ -51,7 +54,7 @@ if (cluster.isMaster) {
         endpointURL: '/graphql'
     }));
 
-    app.get('*', (req, res) => res.send('') );
+    app.get('*', (req, res) => res.send(''));
 
     ioLoad(io);
 

@@ -138,68 +138,51 @@ const attemptLogin = async (email, password, {
     models
 }) => {
     let response = {
-        token: null,
-        refreshToken: null
+        token: '',
+        refreshToken: '',
+        error: ''
     }
     email = email.trim();
     if (email.length > 100) {
-        return {
-            error: 'Email address is longer than 100 characters'
-        };
+        response.error = 'Email address is longer than 100 characters';
+        return response;
+
     } else if (!validator.isEmail(email)) {
-        return {
-            error: 'Invalid email address'
-        };
+        response.error = 'Invalid email address';
+        console.log(`!email: ${JSON.stringify(response, null, 2)}`);
+        return response;
+
     }
+    console.log(email);
 
     if (password.length > 30) {
-        return {
-            error: 'Password is longer than 30 characters'
-        };
+        response.error = 'Password is longer than 30 characters';
+        return response;
     }
 
     const user = await models.user.findOne({
         where: {
-            email: email
-            /*,
-                         status: 'active'*/
+            email: email,
+            status: 'active'
         }
     });
 
     if (!user) {
-        return {
-            error: 'Invalid credentials'
-        };
+        response.error = 'Invalid credentials';
+        console.log(`!user: ${JSON.stringify(response, null, 2)}`);
+        return response;
     }
 
     const valid = await bcrypt.compare(password, user.hash);
     if (!valid) {
-        return {
-            error: 'Invalid credentials'
-        };
+        response.error = 'Invalid credentials';
+        console.log(`!valid: ${JSON.stringify(response, null, 2)}`);
+        return response;
     }
-
-    if (user.status !== 'active') {
-        switch (user.status) {
-            case 'pending':
-                return {
-                    error: 'Account is not activated yet'
-                }
-                break;
-            case 'suspended':
-                return {
-                    error: 'Account is suspended'
-                };
-                break;
-            case 'deleted':
-                return {
-                    error: 'Account has been terminated.'
-                }
-                break;
-        }
-    }
-
-    return _createTokens(user);
+    let tokens =
+        _createTokens(user);
+    console.log(tokens);
+    return tokens;
 }
 
 const checkTokens = async (token, refreshToken, {
@@ -377,19 +360,19 @@ const forgotPasswordCheckToken = async (token, {
 
 const _createTokens = (user) => {
     const token = jwt.sign({
-            data: _encrypt(JSON.stringify({
-                id: user.id
-            }))
-        },
+        data: _encrypt(JSON.stringify({
+            id: user.id
+        }))
+    },
         user.salt + process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_LIFETIME
         }
     );
     const refreshToken = jwt.sign({
-            data: _encrypt(JSON.stringify({
-                id: user.id
-            }))
-        },
+        data: _encrypt(JSON.stringify({
+            id: user.id
+        }))
+    },
         user.salt + process.env.JWT_REFRESH_SECRET, {
             expiresIn: process.env.JWT_REFRESH_LIFETIME
         }
