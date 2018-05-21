@@ -11,9 +11,7 @@ import {
 
 import uuid from 'uuidv4';
 
-const createAccount = async (nickname, email, password, {
-    models
-}) => {
+const createAccount = async (nickname, email, password, { models }) => {
     let response = {
         status: false,
         error: ''
@@ -57,8 +55,7 @@ const createAccount = async (nickname, email, password, {
         salt: await bcrypt.hash("" + new Date().getTime(), 12),
         status: 'pending',
         activationToken: uuid(),
-        hash: await bcrypt.hash(password, 12),
-        status: 'active'
+        hash: await bcrypt.hash(password, 12)
     }, {});
 
     if (!user) {
@@ -66,12 +63,24 @@ const createAccount = async (nickname, email, password, {
         return response;
     }
 
+    const activationButton = `
+    <table>
+        <tr>
+            <td style="background-color: #4ecdc4;border-color: #4c5764;border: 2px solid #45b7af;padding: 10px;text-align: center;">
+                <a style="display: block;color: #ffffff;font-size: 12px;text-decoration: none;text-transform: uppercase;" href="http://voetbal.io/activate/${user.activationToken}">
+                Activate Account
+                </a>
+            </td>
+        </tr>
+    </table>
+    `;
+
     const mailParams = {
         from: process.env.SMTP_EMAIL,
         to: user.email,
         subject: 'Activation',
         text: `token: ${user.activationToken}`,
-        html: `token: <b>${user.activationToken}</b>`
+        html: activationButton
     };
 
     let emailHandle = await _sendEmail(
@@ -84,7 +93,7 @@ const createAccount = async (nickname, email, password, {
         /*text: */
         `token: ${user.activationToken}`,
         /*html: */
-        `token: <b>${user.activationToken}</b>`
+        activationButton
     );
 
     if (emailHandle.err) {
@@ -97,18 +106,17 @@ const createAccount = async (nickname, email, password, {
     }
 };
 
-const activateAccount = async (token, {
-    models
-}) => {
+const activateAccount = async (token, { models }) => {
     let response = {
         status: false,
         error: null
     };
 
-    if (!token)
-        return {
-            error: 'No token provided.'
-        }
+    if (!token) {
+        response.error = 'No token provided.'
+        return response;
+
+    }
 
     const user = await models.user.findOne({
         where: {
@@ -134,9 +142,7 @@ const activateAccount = async (token, {
     return response;
 };
 
-const attemptLogin = async (email, password, {
-    models
-}) => {
+const attemptLogin = async (email, password, { models }) => {
     let response = {
         token: '',
         refreshToken: '',
@@ -149,7 +155,6 @@ const attemptLogin = async (email, password, {
 
     } else if (!validator.isEmail(email)) {
         response.error = 'Invalid email address';
-        console.log(`!email: ${JSON.stringify(response, null, 2)}`);
         return response;
 
     }
@@ -169,25 +174,20 @@ const attemptLogin = async (email, password, {
 
     if (!user) {
         response.error = 'Invalid credentials';
-        console.log(`!user: ${JSON.stringify(response, null, 2)}`);
         return response;
     }
 
     const valid = await bcrypt.compare(password, user.hash);
     if (!valid) {
         response.error = 'Invalid credentials';
-        console.log(`!valid: ${JSON.stringify(response, null, 2)}`);
         return response;
     }
     let tokens =
         _createTokens(user);
-    console.log(tokens);
     return tokens;
 }
 
-const checkTokens = async (token, refreshToken, {
-    models
-}) => {
+const checkTokens = async (token, refreshToken, { models }) => {
     let decodedToken;
     let decodedRefreshToken;
     let user;
@@ -211,9 +211,9 @@ const checkTokens = async (token, refreshToken, {
         decodedRefreshToken = await jwt.verify(refreshToken, user.salt + process.env.JWT_REFRESH_SECRET);
     } catch (err) {
         if (err.name === 'TokenExpiredError') {
-            // const { token, refreshToken } = _createTokens(user);
-            // response.token = token;
-            // response.refreshToken = refreshToken;
+            const { token, refreshToken } = _createTokens(user);
+            response.token = token;
+            response.refreshToken = refreshToken;
             response.status = false;
             return response;
         } else {
@@ -226,9 +226,7 @@ const checkTokens = async (token, refreshToken, {
     return response;
 }
 
-const forgotPasswordSendCode = async (email, {
-    models
-}) => {
+const forgotPasswordSendCode = async (email, { models }) => {
     let response = {
         status: false,
         error: null
@@ -238,8 +236,6 @@ const forgotPasswordSendCode = async (email, {
 
     email = email.trim();
     if (email.length > 100) {
-
-
         response.error = 'Email is longer than 100 characters';
         return response;
     } else if (!validator.isEmail(email)) {
@@ -253,7 +249,6 @@ const forgotPasswordSendCode = async (email, {
             }
         });
     } catch (err) {
-        console.log(err);
         response.error = err;
         return response;
     }
@@ -286,13 +281,10 @@ const forgotPasswordSendCode = async (email, {
         return response;
     }
 
-
     return response;
 }
 
-const forgotPasswordUpdate = async (token, password, {
-    models
-}) => {
+const forgotPasswordUpdate = async (token, password, { models }) => {
     let response = {
         status: false,
         error: null
@@ -328,9 +320,7 @@ const forgotPasswordUpdate = async (token, password, {
     return response;
 }
 
-const forgotPasswordCheckToken = async (token, {
-    models
-}) => {
+const forgotPasswordCheckToken = async (token, { models }) => {
     let status = false;
     let user = null;
     let error = [];
