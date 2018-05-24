@@ -1,5 +1,4 @@
 import authResolvers from './auth';
-import cardResolvers from './card';
 
 export default {
 	Query: {
@@ -35,7 +34,6 @@ export default {
 		activateAccount: (_, {
 			token
 		}, context) => authResolvers.activateAccount(token, context)
-		// storeCard: (_, { details }, context) => cardResolvers.store(details, context)
 	}
 };
 

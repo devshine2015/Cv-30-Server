@@ -91,7 +91,6 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.role, {
             through: Sequelize.define('UserRoles', {})
         })
-        User.hasMany(models.card);
     }
     return User;
 };

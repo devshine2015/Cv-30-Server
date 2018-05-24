@@ -1,11 +1,10 @@
-import Card from './card';
 import User from './user';
 import Response from './response';
 
 const Query = `
 	type Query {
-		cards: [Card]
-		card(id: Int!): Card
+		users: [User]
+		user(id: Int!): User
 	}
 	type Mutation {
 		register (
@@ -31,7 +30,6 @@ const Query = `
 			token: String!
 			password: String!
 		): StandardResponse
-		storeCard( details: CardInput ): Card
 		activateAccount (token: String!): StandardResponse
 	}
 `;
@@ -43,4 +41,4 @@ const SchemaDefinition = `
  	}
 `;
 
-export default [SchemaDefinition, Query, Card, User, Response];
+export default [SchemaDefinition, Query, User, Response];

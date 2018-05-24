@@ -1,4 +1,3 @@
-import Card from './card';
 import Scalars from './scalars';
 
 const User = `
@@ -10,10 +9,9 @@ const User = `
         nickname: String!
         firstName: String
         lastName: String
-        cards: [Card]
         updatedAt: Date!
         createdAt: Date!
   	}
 `;
 
-export default () => [User, Card, Scalars];
+export default () => [User, Scalars];
