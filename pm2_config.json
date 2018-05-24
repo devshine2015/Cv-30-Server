@@ -1,6 +1,6 @@
 {
     "apps" : [{
-        "name"        : "SwabitAPI",
+        "name"        : "CV30API",
         "script"      : "./dist/server.js",
         "watch"       : true,
         "exec_interpreter" : "babel-node",

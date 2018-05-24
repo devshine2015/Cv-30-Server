@@ -1,7 +1,7 @@
 {
-  "name": "swabit.server",
+  "name": "cv30.server",
   "version": "1.0.0",
-  "description": "Swabit GraphQL server running on Express and Apollo Server",
+  "description": "CV30 GraphQL server running on Express and Apollo Server",
   "main": "src/server.js",
   "scripts": {
     "watch": "babel -w src/ -d dist/",

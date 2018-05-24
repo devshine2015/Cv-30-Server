@@ -13,14 +13,14 @@ import jwt from 'jsonwebtoken';
 import models from './models/';
 import crypto from 'crypto';
 
-const SWABIT_TOKEN_HEADER            = 'swt-token';
-const SWABIT_REFRESH_TOKEN_HEADER    = 'swt-refresh-token';
+const CV30_TOKEN_HEADER            = 'swt-token';
+const CV30_REFRESH_TOKEN_HEADER    = 'swt-refresh-token';
 
 export default async ({headers}) => {
     let authorization = null;
     let refreshToken = null;
-    if (headers[SWABIT_TOKEN_HEADER]) authorization = headers[SWABIT_TOKEN_HEADER];
-    if (headers[SWABIT_REFRESH_TOKEN_HEADER]) refreshToken = headers[SWABIT_REFRESH_TOKEN_HEADER];
+    if (headers[CV30_TOKEN_HEADER]) authorization = headers[CV30_TOKEN_HEADER];
+    if (headers[CV30_REFRESH_TOKEN_HEADER]) refreshToken = headers[CV30_REFRESH_TOKEN_HEADER];
     if (authorization) {
         const bearerLength = "Bearer ".length;
         if (authorization && authorization.length > bearerLength) {
