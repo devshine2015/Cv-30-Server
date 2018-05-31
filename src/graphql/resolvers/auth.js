@@ -5,9 +5,9 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import validator from 'validator';
 import uniqid from 'uniqid';
-import {
-    AuthenticationError
-} from './errors';
+// import {
+//     AuthenticationError
+// } from './errors';
 
 import uuid from 'uuidv4';
 
@@ -67,7 +67,7 @@ const createAccount = async (nickname, email, password, { models }) => {
     <table>
         <tr>
             <td style="background-color: #4ecdc4;border-color: #4c5764;border: 2px solid #45b7af;padding: 10px;text-align: center;">
-                <a style="display: block;color: #ffffff;font-size: 12px;text-decoration: none;text-transform: uppercase;" href="http://voetbal.io/activate/${user.activationToken}">
+                <a style="display: block;color: #ffffff;font-size: 12px;text-decoration: none;text-transform: uppercase;" href="https://v2.cv30.co/activate/${user.activationToken}">
                 Activate Account
                 </a>
             </td>
