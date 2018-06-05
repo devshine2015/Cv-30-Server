@@ -1,0 +1,45 @@
+version: '3'
+services:
+  db:
+    image: mysql:latest
+    networks:
+      - wowzaaa
+    restart: always
+    entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
+    volumes:
+      - cv30DB:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_USER: "${DB_USER}"
+    ports:
+      - "3306:3306"
+  proxy:
+    image: nginx:latest
+    ports:
+      - "80"
+    networks:
+      - wowzaaa
+    depends_on:
+      - db
+  app:
+    # image: node:latest
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    # environment: 
+    #   NODE_ENV: production
+    # working_dir: /usr/src/app
+    restart: always
+    volumes:
+      - .:/usr/src/app
+      - cv30NpmModules:/usr/src/app/node_modules
+    depends_on:
+      - proxy
+    # command: "npm run serve"
+    # command: "node ./dist/server.js"
+networks:
+  wowzaaa:
+volumes:
+  cv30DB:
+  cv30NpmModules:
