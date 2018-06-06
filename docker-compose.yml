@@ -17,7 +17,7 @@ services:
   proxy:
     image: nginx:latest
     ports:
-      - "80"
+      - "80:80"
     networks:
       - wowzaaa
     depends_on:
@@ -28,13 +28,20 @@ services:
       context: ./
       dockerfile: app.dockerfile
     # environment: 
+    #   DB_PASSWORD: "${DB_PASSWORD}"
+    #   DB_DATABASE: "${DB_DATABASE}"
+    #   DB_USER: "${DB_USER}"
+    #   DB_HOST: "${DB_HOST}"
     #   NODE_ENV: production
     # working_dir: /usr/src/app
     restart: always
+    networks:
+      - wowzaaa
     volumes:
       - .:/usr/src/app
       - cv30NpmModules:/usr/src/app/node_modules
     depends_on:
+      - db
       - proxy
     # command: "npm run serve"
     # command: "node ./dist/server.js"
