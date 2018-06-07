@@ -1,9 +1,0 @@
-{
-    "apps" : [{
-        "name"        : "CV30API",
-        "script"      : "./dist/server.js",
-        "watch"       : true,
-        "exec_interpreter" : "babel-node",
-        "exec_mode"        : "fork"
-    }]
-}

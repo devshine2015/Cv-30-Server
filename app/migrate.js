@@ -1,6 +1,6 @@
 'use strict';
 
-import Umzug from 'umzug';
+const Umzug = require('umzug');
 
 module.exports = function(db, done) {
     var umzug = new Umzug({
@@ -12,7 +12,7 @@ module.exports = function(db, done) {
             params: [db.sequelize.getQueryInterface(), db.sequelize.constructor, function() {
                 throw new Error('Migration tried to use old style "done" callback. Please upgrade to "umzug" and return a promise instead.');
             }],
-            path: './src/migrations',
+            path: './app/migrations',
             pattern: /\.js$/
         }
     });

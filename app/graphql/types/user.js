@@ -1,4 +1,4 @@
-import Scalars from './scalars';
+const Scalars = require('./scalars');
 
 const User = `
 	type User {
@@ -14,4 +14,4 @@ const User = `
   	}
 `;
 
-export default () => [User, Scalars];
+module.exports = () => [User, Scalars];

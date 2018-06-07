@@ -1,6 +1,6 @@
-import authResolvers from './auth';
+const authResolvers = require('./auth');
 
-export default {
+module.exports = {
 	Query: {
 		// cards: (_, args, context) => cardResolvers.list(args, context),
 		// card: (_, args, {user, models}) => {

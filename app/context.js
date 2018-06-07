@@ -9,14 +9,14 @@ decodedToken = await jwt.verify(token, user.salt + process.env.JWT_SECRET);
 decodedRefreshToken = await jwt.verify(refreshToken, user.salt + process.env.JWT_REFRESH_SECRET);
 
 */
-import jwt from 'jsonwebtoken';
-import models from './models/';
-import crypto from 'crypto';
+const jwt = require('jsonwebtoken');
+const models = require('./models/');
+const crypto = require('crypto');
 
 const CV30_TOKEN_HEADER            = 'swt-token';
 const CV30_REFRESH_TOKEN_HEADER    = 'swt-refresh-token';
 
-export default async ({headers}) => {
+module.exports = async ({headers}) => {
     let authorization = null;
     let refreshToken = null;
     if (headers[CV30_TOKEN_HEADER]) authorization = headers[CV30_TOKEN_HEADER];

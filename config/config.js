@@ -1,7 +1,6 @@
 'use strict';
 
-var dotenv = require('dotenv').config();
-
+// var dotenv = require('dotenv').config();
 module.exports = {
 	development: {
 		database: process.env.DB_DATABASE,

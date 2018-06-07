@@ -1,5 +1,5 @@
-import User from './user';
-import Response from './response';
+const User = require('./user');
+const Response = require('./response');
 
 const Query = `
 	type Query {
@@ -41,4 +41,4 @@ const SchemaDefinition = `
  	}
 `;
 
-export default [SchemaDefinition, Query, User, Response];
+module.exports = [SchemaDefinition, Query, User, Response];

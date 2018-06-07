@@ -1,19 +1,18 @@
-import debug from 'debug';
-import cluster from 'cluster';
-import numCPUs from 'os';
-import express from 'express';
-import ioServer from 'socket.io';
-import http from 'http';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import schema from './graphql';
-import db from './models';
-import ioLoad from './io';
-import dotenv from 'dotenv';
-import migrate from './migrate';
-import getContext from './context';
-import { formatError } from 'apollo-errors';
+const debug = require('debug');
+const cluster = require('cluster');
+const numCPUs = require('os');
+const express = require('express');
+// const ioServer = require('socket.io');
+const http = require('http');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const apolloServer = require('apollo-server-express');
+const schema = require('./graphql');
+const db = require('./models');
+// const ioLoad = require('./io');
+const dotenv = require('dotenv');
+const migrate = require('./migrate');
+const getContext = require('./context');
 
 dotenv.config();
 
@@ -32,12 +31,12 @@ if (cluster.isMaster) {
 } else {
     const app = express();
     const server = http.createServer(app);
-    const io = ioServer.listen(server);
+    // const io = ioServer.listen(server);
 
     app.set('models', db);
-    app.set('io', io);
+    // app.set('io', io);
     app.use(cors());
-    app.use('/graphql', bodyParser.json(), graphqlExpress(async req => {
+    app.use('/graphql', bodyParser.json(), apolloServer.graphqlExpress(async req => {
         const { user, models } = await getContext(req);
         console.log(user);
         return {
@@ -50,13 +49,13 @@ if (cluster.isMaster) {
             debug: true
         };
     }));
-    app.use('/graphiql', graphiqlExpress({
+    app.use('/graphiql', apolloServer.graphiqlExpress({
         endpointURL: '/graphql'
     }));
 
     app.get('*', (req, res) => res.send(''));
 
-    ioLoad(io);
+    // ioLoad(io);
 
     server.listen(process.env.PORT, () => {
         console.log('Express server listening on port ' + server.address().port);
