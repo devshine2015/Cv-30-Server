@@ -1,0 +1,30 @@
+version: '3'
+services:
+  proxy:
+    image: cv30:proxy
+    build:
+      context: ./
+      dockerfile: proxy.prod.dockerfile
+    networks:
+      - wowzaaa
+    ports:
+      - 80:80
+    depends_on:
+      - app
+  app:
+    image: cv30:api
+    build:
+      context: ./
+      dockerfile: app.prod.dockerfile
+    environment: 
+      DB_PASSWORD: "${RDS_PASSWORD}"
+      DB_DATABASE: "${RDS_DATABASE}"
+      DB_USER: "${RDS_USER}"
+      DB_HOST: "${RDS_ENDPOINT}"
+      APP_HOST: "${APP_HOST}"
+      NODE_ENV: production
+    restart: always
+    networks:
+      - wowzaaa
+networks:
+  wowzaaa:
