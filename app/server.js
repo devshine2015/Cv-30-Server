@@ -35,7 +35,11 @@ if (cluster.isMaster) {
 
     app.set('models', db);
     // app.set('io', io);
-    app.use(cors());
+    app.use(cors({
+        // origin: '<insert uri of front-end domain>',
+        credentials: true
+    }));
+    // app.use(cors());
     app.use('/graphql', bodyParser.json(), apolloServer.graphqlExpress(async req => {
         const { user, models } = await getContext(req);
         console.log(user);
