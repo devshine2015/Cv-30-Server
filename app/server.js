@@ -2,14 +2,13 @@ const debug = require('debug');
 const cluster = require('cluster');
 const numCPUs = require('os');
 const express = require('express');
-// const ioServer = require('socket.io');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const apolloServer = require('apollo-server-express');
+const cookieParser = require('cookie-parser');
 const schema = require('./graphql');
 const db = require('./models');
-// const ioLoad = require('./io');
 const dotenv = require('dotenv');
 const migrate = require('./migrate');
 const getContext = require('./context');
@@ -31,28 +30,28 @@ if (cluster.isMaster) {
 } else {
     const app = express();
     const server = http.createServer(app);
-    // const io = ioServer.listen(server);
 
     app.set('models', db);
-    // app.set('io', io);
     app.use(cors({
         // origin: '<insert uri of front-end domain>',
+        origin: '*',
         credentials: true
     }));
-    // app.use(cors());
-    app.use('/graphql', bodyParser.json(), apolloServer.graphqlExpress(async req => {
-        const { user, models } = await getContext(req);
-        console.log(user);
-        return {
-            schema,
-            context: { user, models },
-            graphiql: true,
-            // formatError: error => {
-            //     console.log(error)
-            // },
-            debug: true
-        };
-    }));
+    app.use(
+        '/graphql',
+        bodyParser.json(),
+        cookieParser(process.env.COOKIE_SECRET, {}),
+        apolloServer.graphqlExpress(async req => {
+            const { user, models } = await getContext(req);
+            console.log(req.cookies);
+            return {
+                schema,
+                context: { user, models },
+                graphiql: true,
+                debug: true
+            };
+        })
+    );
     app.use('/graphiql', apolloServer.graphiqlExpress({
         endpointURL: '/graphql'
     }));
