@@ -16,6 +16,7 @@ const Query = `
 			email: String!
 			password: String!
 		): LoginResponse
+		logout: StandardResponse
 		checkTokens (
 			token: String
 			refreshToken: String

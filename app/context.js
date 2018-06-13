@@ -13,14 +13,13 @@ const jwt = require('jsonwebtoken');
 const models = require('./models/');
 const crypto = require('crypto');
 
-const CV30_TOKEN_HEADER            = 'swt-token';
-const CV30_REFRESH_TOKEN_HEADER    = 'swt-refresh-token';
-
-module.exports = async ({headers}) => {
+module.exports = async ({headers, cookies}) => {
     let authorization = null;
     let refreshToken = null;
-    if (headers[CV30_TOKEN_HEADER]) authorization = headers[CV30_TOKEN_HEADER];
-    if (headers[CV30_REFRESH_TOKEN_HEADER]) refreshToken = headers[CV30_REFRESH_TOKEN_HEADER];
+    if (cookies[process.env.TOKEN_NAME]) authorization = cookies[process.env.TOKEN_NAME];
+    if (cookies[process.env.REFRESH_TOKEN_NAME]) refreshToken = cookies[process.env.REFRESH_TOKEN_NAME];
+    if (!authorization && headers[process.env.TOKEN_NAME]) authorization = headers[process.env.TOKEN_NAME];
+    if (!refreshToken && headers[process.env.REFRESH_TOKEN_NAME]) refreshToken = headers[process.env.REFRESH_TOKEN_NAME];
     if (authorization) {
         const bearerLength = "Bearer ".length;
         if (authorization && authorization.length > bearerLength) {
@@ -50,7 +49,6 @@ module.exports = async ({headers}) => {
                         models
                     };
                 } else {
-                    console.error(result);
                     return {
                         user: null,
                         models

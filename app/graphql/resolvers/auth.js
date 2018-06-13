@@ -138,7 +138,16 @@ const activateAccount = async (token, { models }) => {
     return response;
 };
 
-const attemptLogin = async (email, password, { models }) => {
+const attemptLogout = async ({ res }) => {
+    res.clearCookie(process.env.TOKEN_NAME);
+    res.clearCookie(process.env.REFRESH_TOKEN_NAME);
+    return {
+        status: true,
+        error: null
+    };
+}
+
+const attemptLogin = async (email, password, { models, res }) => {
     let response = {
         token: '',
         refreshToken: '',
@@ -154,7 +163,6 @@ const attemptLogin = async (email, password, { models }) => {
         return response;
 
     }
-    console.log(email);
 
     if (password.length > 30) {
         response.error = 'Password is longer than 30 characters';
@@ -178,8 +186,19 @@ const attemptLogin = async (email, password, { models }) => {
         response.error = 'Invalid credentials';
         return response;
     }
-    let tokens =
-        _createTokens(user);
+    let tokens = _createTokens(user);
+    res.cookie(process.env.TOKEN_NAME, tokens.token, {
+        path: '/',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    });
+    res.cookie(process.env.REFRESH_TOKEN_NAME, tokens.refreshToken, {
+        path: '/',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    });
     return tokens;
 }
 
@@ -406,6 +425,7 @@ const _sendEmail = async (sender, destination, subject, text, html) => {
 module.exports = {
     createAccount,
     attemptLogin,
+    attemptLogout,
     checkTokens,
     forgotPasswordSendCode,
     forgotPasswordUpdate,

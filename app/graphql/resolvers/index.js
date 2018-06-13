@@ -17,6 +17,7 @@ module.exports = {
 			email,
 			password
 		}, context) => authResolvers.attemptLogin(email, password, context),
+		logout: (_, __, context) => authResolvers.attemptLogout(context),
 		checkTokens: (_, {
 			token,
 			refreshToken

@@ -34,23 +34,23 @@ if (cluster.isMaster) {
     app.set('models', db);
     app.use(cors({
         // origin: '<insert uri of front-end domain>',
-        origin: '*',
+        origin: 'http://localhost:3000',
         credentials: true
     }));
     app.use(
         '/graphql',
         bodyParser.json(),
         cookieParser(process.env.COOKIE_SECRET, {}),
-        apolloServer.graphqlExpress(async req => {
-            const { user, models } = await getContext(req);
-            console.log(req.cookies);
-            return {
-                schema,
-                context: { user, models },
-                graphiql: true,
-                debug: true
-            };
-        })
+        apolloServer.graphqlExpress(async (req, res) => {
+                const { user, models } = await getContext(req);
+                // console.log(req.cookies);
+                return {
+                    schema,
+                    context: { user, models, res },
+                    graphiql: true,
+                    debug: true
+                };
+            })
     );
     app.use('/graphiql', apolloServer.graphiqlExpress({
         endpointURL: '/graphql'
