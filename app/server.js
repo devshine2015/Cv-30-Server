@@ -33,8 +33,7 @@ if (cluster.isMaster) {
 
     app.set('models', db);
     app.use(cors({
-        // origin: '<insert uri of front-end domain>',
-        origin: 'http://localhost:3000',
+        origin: process.env.NODE_ENV === 'production' ? process.env.APP_HOST : 'http://localhost:3000',
         credentials: true
     }));
     app.use(
@@ -42,23 +41,20 @@ if (cluster.isMaster) {
         bodyParser.json(),
         cookieParser(process.env.COOKIE_SECRET, {}),
         apolloServer.graphqlExpress(async (req, res) => {
-                const { user, models } = await getContext(req);
-                // console.log(req.cookies);
-                return {
-                    schema,
-                    context: { user, models, res },
-                    graphiql: true,
-                    debug: true
-                };
-            })
+            const { user, models } = await getContext(req);
+            return {
+                schema,
+                context: { user, models, res },
+                graphiql: true,
+                debug: true
+            };
+        })
     );
     app.use('/graphiql', apolloServer.graphiqlExpress({
         endpointURL: '/graphql'
     }));
 
     app.get('*', (req, res) => res.send(''));
-
-    // ioLoad(io);
 
     server.listen(process.env.PORT, () => {
         console.log('Express server listening on port ' + server.address().port);
