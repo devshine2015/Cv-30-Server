@@ -9,7 +9,7 @@ module.exports = (Sequelize, DataTypes) => {
         },
         uid: {
             type: DataTypes.STRING(18),
-            allowNull: false,
+            allowNull: true,
             validate: {
                 len: [14, 18]
             }
@@ -90,7 +90,15 @@ module.exports = (Sequelize, DataTypes) => {
     User.associate = models => {
         User.belongsToMany(models.role, {
             through: Sequelize.define('UserRoles', {})
-        })
+        });
+        User.belongsToMany(models.skill, {
+            through: Sequelize.define('UserSkills', {})
+        });
+        User.belongsToMany(models.value, {
+            through: Sequelize.define('UserValues', {})
+        });
+        User.hasMany(models.article, { as: 'articles' });
+        User.hasMany(models.experience, { as: 'experiences' });
     }
     return User;
 };
