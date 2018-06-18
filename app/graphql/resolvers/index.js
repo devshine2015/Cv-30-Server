@@ -1,11 +1,14 @@
 const authResolvers = require('./auth');
+const userResolvers = require('./user');
 
 module.exports = {
 	Query: {
-		// cards: (_, args, context) => cardResolvers.list(args, context),
-		// card: (_, args, {user, models}) => {
-		// 	if (!user) return {};
-		// }
+		profile: (_, __, context) => userResolvers.profile(context),
+		// profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
+		// userSkills: (_, __, context) => userResolvers.userSkills(context),
+		// userValues: (_, __, context) => userResolvers.userValues(context),
+		// userExperience: (_, __, context) => userResolvers.userExperience(context),
+		// userProjects: (_, __, context) => userResolvers.userProjects(context)
 	},
 	Mutation: {
 		register: (_, {

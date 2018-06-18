@@ -1,7 +1,19 @@
 module.exports = `
     scalar Date
+    enum VideoTarget {
+        article
+        profile_cover
+        company_cover
+    }
+    enum ImageTarget {
+        article
+        profile
+        profile_cover
+        company_cover
+    }
     enum LanguageCodeType {
         en
+        ro
     }
     enum UserStatus {
         active

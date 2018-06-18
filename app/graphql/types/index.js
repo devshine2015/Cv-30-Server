@@ -1,10 +1,10 @@
 const User = require('./user');
 const Response = require('./response');
+const Profile = require('./profile');
 
 const Query = `
 	type Query {
-		users: [User]
-		user(id: Int!): User
+		profile: Profile
 	}
 	type Mutation {
 		register (
@@ -42,4 +42,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, User, Response];
+module.exports = [SchemaDefinition, Query, User, Profile, Response];

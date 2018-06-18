@@ -16,6 +16,7 @@ const crypto = require('crypto');
 module.exports = async ({headers, cookies}) => {
     let authorization = null;
     let refreshToken = null;
+    let user = null;
     if (cookies[process.env.TOKEN_NAME]) authorization = cookies[process.env.TOKEN_NAME];
     if (cookies[process.env.REFRESH_TOKEN_NAME]) refreshToken = cookies[process.env.REFRESH_TOKEN_NAME];
     if (!authorization && headers[process.env.TOKEN_NAME]) authorization = headers[process.env.TOKEN_NAME];
@@ -25,8 +26,10 @@ module.exports = async ({headers, cookies}) => {
         if (authorization && authorization.length > bearerLength) {
             const token = authorization.slice(bearerLength);
             const decodedToken = await jwt.decode(token);
-            decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
-            const user = await models.user.findOne({ where: {id: decodedToken.data.id} });
+            if (decodedToken) {
+                decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
+                user = await models.user.findOne({ where: {id: decodedToken.data.id} });
+            }
             if (user) {
                 const { ok, result } = await new Promise(function(resolve) {
                     jwt.verify(token, user.salt + process.env.JWT_SECRET, function(err, result) {
