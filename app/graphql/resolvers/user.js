@@ -20,9 +20,35 @@ const profile = (id, language, { user, models }) => {
     //         { model: models.profile, as: 'profile' }
     //     ]
     // });
+}
 
+const setAvatar = (status, { user, models }) => {
+    const errors = [];
+    if (!user) {
+        errors.push({
+            name: 'Forbidden',
+            message: 'Not allowed',
+            statusCode: 403
+        });
+
+    }
+    if (errors.length)
+        throw new Error(errors);
+    user.profile.has_avatar = status;
+    if (user.profile.save()) {
+        return {
+            status: true,
+            error: ""
+        };
+    } else {
+        return {
+            status: false,
+            error: "We did not manage to store your profile picture"
+        };
+    }
 }
 
 module.exports = {
-    profile
+    profile,
+    setAvatar
 };

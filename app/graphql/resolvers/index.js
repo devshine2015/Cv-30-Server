@@ -13,6 +13,7 @@ module.exports = {
 		// userProjects: (_, __, context) => userResolvers.userProjects(context)
 	},
 	Mutation: {
+		avatar: (_, { status }, context) => userResolvers.setAvatar(status, context),
 		register: (_, {
 			nickname,
 			email,
