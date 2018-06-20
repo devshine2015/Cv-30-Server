@@ -1,10 +1,24 @@
 const User = require('./user');
 const Response = require('./response');
 const Profile = require('./profile');
+const Error = require('./error');
 
 const Query = `
 	type Query {
-		profile: Profile
+		profile(
+			id: Int
+			language: LanguageCodeType!
+		): Profile
+		articles(
+			language: LanguageCodeType!
+		): [Article]
+		article(
+			id: Int!
+			language: LanguageCodeType!
+		): Article
+		profiles(
+			language: LanguageCodeType!
+		): [Profile]
 	}
 	type Mutation {
 		register (
@@ -42,4 +56,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, User, Profile, Response];
+module.exports = [SchemaDefinition, Query, User, Profile, Response, Error];

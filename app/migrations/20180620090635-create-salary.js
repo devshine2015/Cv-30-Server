@@ -1,31 +1,35 @@
 'use strict';
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return queryInterface
-		.createTable('profiles', {
+		return queryInterface.createTable('salaries', {
+			id: {
+				allowNull: false,
+				autoIncrement: true,
+				primaryKey: true,
+				type: Sequelize.INTEGER
+			},
 			userId: {
 				allowNull: false,
-				primaryKey: true,
 				type: Sequelize.INTEGER,
 				field: 'user_id'
 			},
-			hasAvatar: {
+			isPublic: {
 				allowNull: true,
 				defaultValue: false,
 				type: Sequelize.BOOLEAN,
-				field: 'has_avatar'
+				field: 'is_public'
 			},
-			hasProfileCover: {
+			currency: {
 				allowNull: true,
-				defaultValue: false,
-				type: Sequelize.BOOLEAN,
-				field: 'has_profile_cover'
+				defaultValue: 'ron',
+				type: Sequelize.ENUM('eur', 'ron'),
+				field: 'currency'
 			},
-			coverBackground: {
+			amount: {
 				allowNull: true,
-				defaultValue: '',
-				type: Sequelize.STRING(100),
-				field: 'cover_background'
+				defaultValue: 0,
+				type: Sequelize.DOUBLE(14,2),
+				field: 'amount'
 			},
 			createdAt: {
 				allowNull: false,
@@ -37,13 +41,10 @@ module.exports = {
 				type: Sequelize.DATE,
 				field: 'updated_at'
 			}
-		}, {
-			timestamps: true,
-			updatedAt: 'updated_at',
-			createdAt: 'created_at'
-		});
+		})
+		.then(() => queryInterface.addIndex('salaries', { fields: ['user_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
-		return queryInterface.dropTable('profiles');
+		return queryInterface.dropTable('salaries');
 	}
 };

@@ -1,5 +1,9 @@
 module.exports = `
     scalar Date
+    enum Currency {
+        eur
+        ron
+    }
     enum VideoTarget {
         article
         profile_cover

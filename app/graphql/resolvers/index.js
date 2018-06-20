@@ -3,7 +3,9 @@ const userResolvers = require('./user');
 
 module.exports = {
 	Query: {
-		profile: (_, __, context) => userResolvers.profile(context),
+		profile: (_, { language, id = 0 }, context) => userResolvers.profile(id, language, context),
+		// articles: (_, { language }, context) => articleResolvers.many(language, context),
+		// article: (_, { id, language }, context) => articleResolvers.one(id, language, context)
 		// profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
 		// userSkills: (_, __, context) => userResolvers.userSkills(context),
 		// userValues: (_, __, context) => userResolvers.userValues(context),

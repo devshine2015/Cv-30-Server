@@ -7,17 +7,23 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.INTEGER,
 			field: 'user_id'
 		},
-		isSalaryPublic: {
+		hasAvatar: {
 			allowNull: true,
 			defaultValue: false,
 			type: DataTypes.BOOLEAN,
-			field: 'is_salary_public'
+			field: 'has_avatar'
 		},
-		desiredSalary: {
+		hasProfileCover: {
 			allowNull: true,
-			defaultValue: 0,
-			type: DataTypes.DOUBLE(14,2),
-			field: 'desired_salary'
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'has_profile_cover'
+		},
+		coverBackground: {
+			allowNull: true,
+			defaultValue: '',
+			type: DataTypes.STRING(100),
+			field: 'cover_background'
 		},
 		createdAt: {
 			allowNull: false,
@@ -36,6 +42,7 @@ module.exports = (Sequelize, DataTypes) => {
 	});
 	Profile.associate = models => {
 		Profile.belongsTo(models.user, { as: 'owner' });
+		Profile.hasOne(models.salary, { as: 'salary', foreignKey: 'user_id' });
 	};
 	return Profile;
 };

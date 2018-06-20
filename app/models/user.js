@@ -97,6 +97,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.value, {
             through: Sequelize.define('UserValues', {})
         });
+        User.hasOne(models.profile, { as: 'profile' });
         User.hasMany(models.article, { as: 'articles' });
         User.hasMany(models.experience, { as: 'experiences' });
     }

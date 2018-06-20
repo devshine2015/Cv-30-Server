@@ -14,7 +14,6 @@ const Video = `
         filename: String
         createdAt: Date
         updatedAt: Date
-        
     }
 `;
 
