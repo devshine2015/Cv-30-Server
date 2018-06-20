@@ -1,5 +1,6 @@
 
 const profile = (id, language, { user, models }) => {
+    console.log(user);
     const errors = [];
     if (!user) {
         errors.push({
@@ -7,8 +8,11 @@ const profile = (id, language, { user, models }) => {
             message: 'Not allowed',
             statusCode: 403
         });
-        return errors;
+
     }
+    if (errors.length)
+        throw new Error(errors);
+
     return models.user.findOne({
         where: {
             id: user

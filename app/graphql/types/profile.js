@@ -11,7 +11,6 @@ const Error = require('./error');
 
 const Profile = `
     type Profile {
-        avatar: Image
         firstName: String
         lastName: String
         featuredArticles: [Article]
