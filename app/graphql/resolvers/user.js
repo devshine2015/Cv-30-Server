@@ -1,5 +1,5 @@
 
-const profile = async (id, language, { user, models }) => {
+const profile = (id, language, { user, models }) => {
     const errors = [];
     if (!user) {
         errors.push({
@@ -9,11 +9,15 @@ const profile = async (id, language, { user, models }) => {
         });
         return errors;
     }
-    user = await models.user.findOne({
+    return models.user.findOne({
         where: {
             id: user
-        }
+        },
+        include: [
+            { model: models.profile, as: 'profile' }
+        ]
     });
+
 }
 
 module.exports = {
