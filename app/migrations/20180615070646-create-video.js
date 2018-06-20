@@ -1,30 +1,34 @@
+const uuid = require('uuidv4');
+
 'use strict';
+
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('videos', {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
-			uid: {
-				type: Sequelize.STRING(36),
-				allowNull: true,
+				type: Sequelize.UUID,
+				defaultValue: uuid(),
 				validate: {
 					isUUID: 4
 				},
-				field: 'uid'
+				primaryKey: true
 			},
 			userId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 				field: 'user_id'
 			},
 			sourceId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 				field: 'source_id'
 			},
 			target: {
@@ -58,7 +62,6 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		})
-		.then(() => queryInterface.addIndex('videos', { unique: true, fields: ['uid'] }))
 		.then(() => queryInterface.addIndex('videos', { fields: ['user_id'] }))
 		.then(() => queryInterface.addIndex('videos', { fields: ['source_id'] }))
 		.then(() => queryInterface.addIndex('videos', { fields: ['target'] }))

@@ -6,10 +6,14 @@ module.exports = {
 			userId: {
 				primaryKey: true,
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
 				field: 'user_id'
 			},
 			languageId: {
+				primaryKey: true,
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,
@@ -38,8 +42,7 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
 		})
-		.then(() => queryInterface.addIndex('stories', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('stories', { unique: true, fields: ['user_id', 'language_id'] }));
+		.then(() => queryInterface.addIndex('stories', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('stories');

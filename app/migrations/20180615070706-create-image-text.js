@@ -3,22 +3,21 @@ module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('image_i18n', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			imageId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
-				field: 'image_id'
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
+				field: 'image_id',
+				primaryKey: true
 			},
 			languageId: {
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,
-				field: 'language_id'
+				field: 'language_id',
+				primaryKey: true
 			},
 			title: {
 				type: Sequelize.TEXT,
@@ -46,8 +45,7 @@ module.exports = {
 			tableName: 'image_i18n'
 		})
 		.then(() => queryInterface.addIndex('image_i18n', { fields: ['image_id'] }))
-		.then(() => queryInterface.addIndex('image_i18n', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('image_i18n', { unique: true, fields: ['image_id', 'language_id'] }));
+		.then(() => queryInterface.addIndex('image_i18n', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('image_i18n');

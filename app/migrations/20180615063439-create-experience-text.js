@@ -3,18 +3,17 @@ module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('experience_i18n', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			experienceId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				primaryKey: true,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+				},
 				field: 'experience_id'
 			},
 			languageId: {
+				primaryKey: true,
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,
@@ -46,8 +45,7 @@ module.exports = {
 			tableName: 'experience_i18n'
 		})
 		.then(() => queryInterface.addIndex('experience_i18n', { fields: ['experience_id'] }))
-		.then(() => queryInterface.addIndex('experience_i18n', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('experience_i18n', { fields: ['experience_id', 'language_id'] }));
+		.then(() => queryInterface.addIndex('experience_i18n', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('experience_i18n');

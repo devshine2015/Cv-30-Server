@@ -2,9 +2,11 @@
 module.exports = (Sequelize, DataTypes) => {
     var User = Sequelize.define('user', {
         id: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
             allowNull: false,
-            autoIncrement: true,
             primaryKey: true
         },
         uid: {
@@ -53,7 +55,7 @@ module.exports = (Sequelize, DataTypes) => {
             field: 'last_name'
         },
         rememberToken: {
-            type: DataTypes.STRING(36),
+            type: DataTypes.UUID,
             allowNull: true,
             validate: {
                 isUUID: 4
@@ -61,7 +63,7 @@ module.exports = (Sequelize, DataTypes) => {
             field: 'remember_token'
         },
         passwordResetToken: {
-            type: DataTypes.STRING(36),
+            type: DataTypes.UUID,
             allowNull: true,
             validate: {
                 isUUID: 4
@@ -69,7 +71,7 @@ module.exports = (Sequelize, DataTypes) => {
             field: 'password_reset_token'
         },
         activationToken: {
-            type: DataTypes.STRING(36),
+            type: DataTypes.UUID,
             allowNull: true,
             validate: {
                 isUUID: 4

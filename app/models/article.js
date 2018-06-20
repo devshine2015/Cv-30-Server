@@ -2,22 +2,20 @@
 module.exports = (Sequelize, DataTypes) => {
 	var Article = Sequelize.define('article', {
     	id: {
-			allowNull: false,
-			autoIncrement: true,
 			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
-		uid: {
-			type: DataTypes.STRING(36),
+			type: DataTypes.UUID,
             allowNull: false,
             validate: {
                 isUUID: 4
             },
-            field: 'uid'
+            field: 'id'
 		},
 		userId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
             field: 'user_id'
 		},
 		is_featured: {
@@ -41,7 +39,6 @@ module.exports = (Sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		indexes: [
-			{ unique: true, fields: ['uid'] },
 			{ fields: ['user_id'] },
 			{ fields: ['user_id', 'is_featured'] }
 		]

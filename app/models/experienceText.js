@@ -1,22 +1,21 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
 	var ExperienceText = Sequelize.define('experienceText', {
-		id: {
-			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
 		experienceId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
-			field: 'experience_id'
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
+			field: 'experience_id',
+			primaryKey: true
 		},
 		languageId: {
 			allowNull: false,
 			defaultValue: 1,
 			type: DataTypes.INTEGER,
-            field: 'language_id'
+			field: 'language_id',
+			primaryKey: true
 		},
 		title: {
 			type: DataTypes.STRING(255),
@@ -42,8 +41,7 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at',
 		indexes: [
 			{ fields: ['experience_id'] },
-			{ fields: ['language_id'] },
-			{ unique: true, fields: ['experience_id', 'language_id'] }
+			{ fields: ['language_id'] }
 		],
 		freezeTableName: true,
 		tableName: 'experience_i18n'

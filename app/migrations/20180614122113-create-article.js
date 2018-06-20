@@ -1,25 +1,26 @@
+const uuid = require('uuidv4');
+
 'use strict';
+
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('articles', {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
 				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
-			uid: {
-				type: Sequelize.STRING(36),
-				allowNull: false,
-				validate: {
-					isUUID: 4
-				},
-				field: 'uid'
+				defaultValue: uuid(),
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 			},
 			author: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 				field: 'user_id'
 			},
 			is_featured: {
@@ -44,8 +45,7 @@ module.exports = {
 			createdAt: 'created_at'
 		})
 		.then(() => queryInterface.addIndex('articles', ['user_id']))
-		.then(() => queryInterface.addIndex('articles', ['user_id', 'is_featured']))
-		.then(() => queryInterface.addIndex('articles', { unique: true, fields: ['uid'] }));
+		.then(() => queryInterface.addIndex('articles', ['user_id', 'is_featured']));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('articles');

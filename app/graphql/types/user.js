@@ -2,8 +2,7 @@ const Scalars = require('./scalars');
 
 const User = `
 	type User {
-    	id: Int!
-        uid: String!
+    	id: String!
         email: String!
         status: UserStatus!
         nickname: String!

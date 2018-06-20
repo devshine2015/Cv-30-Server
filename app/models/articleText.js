@@ -1,18 +1,17 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
 	var ArticleText = Sequelize.define('articleText', {
-    	id: {
-			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
     	articleId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			primaryKey: true,
+			validate: {
+                isUUID: 4
+            },
+			type: DataTypes.UUID,
 			field: 'article_id'
 		},
 		languageId: {
+			primaryKey: true,
 			allowNull: false,
 			defaultValue: 1,
 			type: DataTypes.INTEGER,
@@ -49,7 +48,6 @@ module.exports = (Sequelize, DataTypes) => {
 			{ fields: ['slug'] },
 			{ fields: ['article_id'] },
 			{ fields: ['language_id'] },
-			{ unique: true, fields: ['article_id', 'language_id'] },
 			{ unique: true, fields: ['slug', 'language_id'] }
 		],
 		freezeTableName: true,

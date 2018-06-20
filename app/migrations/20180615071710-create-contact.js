@@ -6,7 +6,10 @@ module.exports = {
 			userId: {
 				allowNull: false,
 				primaryKey: true,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
 				field: 'user_id',
 			},
 			phone: {

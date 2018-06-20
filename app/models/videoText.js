@@ -1,18 +1,17 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
 	var VideoText = Sequelize.define('videoText', {
-		id: {
-			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
 		videoId: {
+			primaryKey: true,
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
 			field: 'video_id'
 		},
 		languageId: {
+			primaryKey: true,
 			allowNull: false,
 			defaultValue: 1,
 			type: DataTypes.INTEGER,
@@ -42,8 +41,7 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at',
 		indexes: [
 			{ fields: ['video_id'] },
-			{ fields: ['language_id'] },
-			{ unique: true, fields: ['video_id', 'language_id'] }
+			{ fields: ['language_id'] }
 		],
 		freezeTableName: true,
 		tableName: 'video_i18n'

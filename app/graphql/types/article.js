@@ -3,6 +3,7 @@ const Video = require('./video');
 
 const Article = `
     type Article {
+        id: String
         author: User
         image: Image
         video: Video

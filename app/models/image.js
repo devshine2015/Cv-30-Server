@@ -2,22 +2,20 @@
 module.exports = (Sequelize, DataTypes) => {
 	var Image = Sequelize.define('image', {
     	id: {
+			type: DataTypes.UUID,
 			allowNull: false,
-			autoIncrement: true,
 			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
-		uid: {
-			type: DataTypes.STRING(36),
-            allowNull: true,
             validate: {
                 isUUID: 4
             },
-            field: 'uid'
+            field: 'id'
 		},
 		userId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
             field: 'user_id'
 		},
 		sourceId: {
@@ -42,7 +40,7 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'path'
 		},
 		originalFilename: {
-			type: DataTypes.STRING(36),
+			type: DataTypes.STRING(255),
 			allowNull: false,
             field: 'original_filename'
 		},
@@ -69,7 +67,6 @@ module.exports = (Sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		indexes: [
-			{ unique: true, fields: ['uid'] },
 			{ fields: ['user_id'] },
 			{ fields: ['source_id'] },
 			{ fields: ['target'] },

@@ -1,8 +1,7 @@
 const Video = `
     union VideoSource = Article | Profile
     type Video {
-        id: Int
-        uid: String
+        id: String
         author: User
         title: String
         description: String

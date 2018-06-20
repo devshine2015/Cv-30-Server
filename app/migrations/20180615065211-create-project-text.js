@@ -1,23 +1,25 @@
+const uuid = require('uuidv4');
+
 'use strict';
+
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('project_i18n', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			projectId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+				},
+				primaryKey: true,
 				field: 'project_id'
 			},
 			languageId: {
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,
+				primaryKey: true,
 				field: 'language_id'
 			},
 			description: {
@@ -42,8 +44,7 @@ module.exports = {
 			tableName: 'project_i18n'
 		})
 		.then(() => queryInterface.addIndex('project_i18n', { fields: ['project_id'] }))
-		.then(() => queryInterface.addIndex('project_i18n', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('project_i18n', { unique: true, fields: ['project_id', 'language_id'] }));
+		.then(() => queryInterface.addIndex('project_i18n', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
     	return queryInterface.dropTable('project_i18n');

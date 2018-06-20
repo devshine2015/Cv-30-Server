@@ -1,23 +1,25 @@
+const uuid = require('uuidv4');
+
 'use strict';
+
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('article_i18n', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			articleId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+				},
+				primaryKey: true,
 				field: 'article_id'
 			},
 			languageId: {
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,
+				primaryKey: true,
 				field: 'language_id'
 			},
 			title: {
@@ -60,7 +62,6 @@ module.exports = {
 		.then(() => queryInterface.addIndex('article_i18n', { fields: ['slug'] }))
 		.then(() => queryInterface.addIndex('article_i18n', { fields: ['article_id'] }))
 		.then(() => queryInterface.addIndex('article_i18n', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('article_i18n', { unique: true, fields: ['article_id', 'language_id'] }))
 		.then(() => queryInterface.addIndex('article_i18n', { unique: true, fields: ['slug', 'language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {

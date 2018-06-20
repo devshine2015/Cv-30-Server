@@ -1,18 +1,17 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
 	var ProjectText = Sequelize.define('projectText', {
-		id: {
-			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
 		projectId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			primaryKey: true,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
 			field: 'project_id'
 		},
 		languageId: {
+			primaryKey: true,
 			allowNull: false,
 			defaultValue: 1,
 			type: DataTypes.INTEGER,
@@ -38,8 +37,7 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at',
 		indexes: [
 			{ fields: ['project_id'] },
-			{ fields: ['language_id'] },
-			{ unique: true, fields: ['project_id', 'language_id'] }
+			{ fields: ['language_id'] }
 		],
 		freezeTableName: true,
 		tableName: 'project_i18n'

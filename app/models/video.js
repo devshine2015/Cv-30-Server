@@ -3,21 +3,18 @@ module.exports = (Sequelize, DataTypes) => {
 	var Video = Sequelize.define('video', {
 		id: {
 			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
-		uid: {
-			type: DataTypes.STRING(36),
-            allowNull: true,
-            validate: {
+			type: DataTypes.UUID,
+			validate: {
                 isUUID: 4
             },
-            field: 'uid'
+			primaryKey: true
 		},
 		userId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+            validate: {
+                isUUID: 4
+			},
             field: 'user_id'
 		},
 		sourceId: {
@@ -56,7 +53,6 @@ module.exports = (Sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		indexes: [
-			{ unique: true, fields: ['uid'] },
 			{ fields: ['user_id'] },
 			{ fields: ['source_id'] },
 			{ fields: ['target'] },

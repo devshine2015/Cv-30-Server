@@ -2,15 +2,13 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.createTable('salaries', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			userId: {
+				primaryKey: true,
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
 				field: 'user_id'
 			},
 			isPublic: {
@@ -41,8 +39,7 @@ module.exports = {
 				type: Sequelize.DATE,
 				field: 'updated_at'
 			}
-		})
-		.then(() => queryInterface.addIndex('salaries', { fields: ['user_id'] }));
+		});
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('salaries');

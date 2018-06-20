@@ -32,10 +32,10 @@ const setAvatar = (status, { user, models }) => {
         });
 
     }
-    if (errors.length)
-        throw new Error(errors);
-    user.profile.has_avatar = status;
-    if (user.profile.save()) {
+    if (errors.length) throw new Error(errors);
+    // user.profile.has_avatar = status;
+    // if (user.profile.save()) {
+    if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
         return {
             status: true,
             error: ""

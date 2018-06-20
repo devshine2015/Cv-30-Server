@@ -45,6 +45,7 @@ const createAccount = async (nickname, email, password, { models }) => {
     }
 
     user = await models.user.create({
+        id: uuid(),
         uid: uniqid(),
         nickname,
         email,
@@ -173,7 +174,10 @@ const attemptLogin = async (email, password, { models, res }) => {
         where: {
             email: email,
             status: 'active'
-        }
+        },
+        include: [
+            { model: models.profile, as: 'profile' }
+        ]
     });
 
     if (!user) {
@@ -199,6 +203,11 @@ const attemptLogin = async (email, password, { models, res }) => {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true
     });
+    tokens.id = user.id;
+    tokens.email = user.email;
+    tokens.firstName = user.firstName;
+    tokens.lastName = user.lastName;
+    tokens.hasAvatar = user.profile && user.profile.hasAvatar;
     return tokens;
 }
 

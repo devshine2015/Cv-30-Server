@@ -1,30 +1,34 @@
+const uuid = require('uuidv4');
+
 'use strict';
+
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
 		.createTable('images', {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
 				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
-			uid: {
-				type: Sequelize.STRING(36),
-				allowNull: true,
-				validate: {
-					isUUID: 4
-				},
-				field: 'uid'
+				defaultValue: uuid(),
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 			},
 			userId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 				field: 'user_id'
 			},
 			sourceId: {
 				allowNull: false,
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
 				field: 'source_id'
 			},
 			target: {
@@ -44,7 +48,7 @@ module.exports = {
 				field: 'path'
 			},
 			originalFilename: {
-				type: Sequelize.STRING(36),
+				type: Sequelize.STRING(255),
 				allowNull: false,
 				field: 'original_filename'
 			},
@@ -71,7 +75,6 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		})
-		.then(() => queryInterface.addIndex('images', { unique: true, fields: ['uid'] }))
 		.then(() => queryInterface.addIndex('images', { fields: ['user_id']}))
 		.then(() => queryInterface.addIndex('images', { fields: ['source_id']}))
 		.then(() => queryInterface.addIndex('images', { fields: ['target'] }))

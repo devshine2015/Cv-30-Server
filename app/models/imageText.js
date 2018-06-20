@@ -1,20 +1,19 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
 	var ImageText = Sequelize.define('imageText', {
-		id: {
-			allowNull: false,
-			autoIncrement: true,
-			primaryKey: true,
-			type: DataTypes.INTEGER
-		},
 		imageId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			primaryKey: true,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
 			field: 'image_id'
 		},
 		languageId: {
 			allowNull: false,
 			defaultValue: 1,
+			primaryKey: true,
 			type: DataTypes.INTEGER,
             field: 'language_id'
 		},
@@ -42,8 +41,7 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at',
 		indexes: [
 			{ fields: ['image_id'] },
-			{ fields: ['language_id'] },
-			{ unique: true, fields: ['image_id', 'language_id'] }
+			{ fields: ['language_id'] }
 		],
 		freezeTableName: true,
 		tableName: 'image_i18n'

@@ -3,13 +3,18 @@ module.exports = (Sequelize, DataTypes) => {
 	var Project = Sequelize.define('project', {
 		id: {
 			allowNull: false,
-			autoIncrement: true,
 			primaryKey: true,
-			type: DataTypes.INTEGER
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
 		},
 		userId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+            },
 			field: 'user_id'
 		},
 		locationId: {

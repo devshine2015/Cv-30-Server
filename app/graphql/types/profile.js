@@ -11,6 +11,8 @@ const Error = require('./error');
 
 const Profile = `
     type Profile {
+        id: String
+        email: String
         firstName: String
         lastName: String
         featuredArticles: [Article]

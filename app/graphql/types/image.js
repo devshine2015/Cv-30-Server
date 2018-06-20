@@ -1,8 +1,7 @@
 const Image = `
     union ImageSource = Article | Profile
     type Image {
-        id: Int
-        uid: String
+        id: String
         author: User
         title: String
         description: String
