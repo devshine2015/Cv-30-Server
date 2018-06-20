@@ -21,7 +21,7 @@ const Query = `
 		): [Profile]
 	}
 	type Mutation {
-		setAvatar (
+		avatar (
 			status: Boolean
 		): StandardResponse
 		register (
