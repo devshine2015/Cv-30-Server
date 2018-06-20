@@ -1,6 +1,5 @@
 
 const profile = (id, language, { user, models }) => {
-    console.log(user);
     const errors = [];
     if (!user) {
         errors.push({
@@ -12,15 +11,15 @@ const profile = (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
-
-    return models.user.findOne({
-        where: {
-            id: user
-        },
-        include: [
-            { model: models.profile, as: 'profile' }
-        ]
-    });
+    return user;
+    // return models.user.findOne({
+    //     where: {
+    //         id: user.id
+    //     },
+    //     include: [
+    //         { model: models.profile, as: 'profile' }
+    //     ]
+    // });
 
 }
 

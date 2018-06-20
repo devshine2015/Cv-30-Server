@@ -36,12 +36,12 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'updated_at'
 		}
 	}, {
-		timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at'
-	});
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at'
+		});
 	Profile.associate = models => {
-		Profile.belongsTo(models.user, { as: 'owner' });
+		Profile.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		Profile.hasOne(models.salary, { as: 'salary', foreignKey: 'user_id' });
 	};
 	return Profile;

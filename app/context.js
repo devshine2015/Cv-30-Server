@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
 const models = require('./models/');
 const crypto = require('crypto');
 
-module.exports = async ({headers, cookies}) => {
+module.exports = async ({ headers, cookies }) => {
     let authorization = null;
     let refreshToken = null;
     let user = null;
@@ -30,11 +30,16 @@ module.exports = async ({headers, cookies}) => {
         const decodedToken = await jwt.decode(token);
         if (decodedToken) {
             decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
-            user = await models.user.findOne({ where: {id: decodedToken.data.id} });
+            user = await models.user.findOne({
+                where: { id: decodedToken.data.id },
+                include: [
+                    { model: models.profile, as: 'profile' }
+                ]
+            });
         }
         if (user) {
-            const { ok, result } = await new Promise(function(resolve) {
-                jwt.verify(token, user.salt + process.env.JWT_SECRET, function(err, result) {
+            const { ok, result } = await new Promise(function (resolve) {
+                jwt.verify(token, user.salt + process.env.JWT_SECRET, function (err, result) {
                     if (err) {
                         resolve({
                             ok: false,

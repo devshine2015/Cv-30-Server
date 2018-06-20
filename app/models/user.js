@@ -76,17 +76,17 @@ module.exports = (Sequelize, DataTypes) => {
             },
             field: 'activation_token'
         }
-    }, { 
-        timestamps: true,
-        updatedAt: 'updated_at',
-        createdAt: 'created_at',
-        indexes: [
-            {
-                unique: true,
-                fields: ['email']
-            }
-        ]
-    });
+    }, {
+            timestamps: true,
+            updatedAt: 'updated_at',
+            createdAt: 'created_at',
+            indexes: [
+                {
+                    unique: true,
+                    fields: ['email']
+                }
+            ]
+        });
     User.associate = models => {
         User.belongsToMany(models.role, {
             through: Sequelize.define('UserRoles', {})
@@ -97,7 +97,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.value, {
             through: Sequelize.define('UserValues', {})
         });
-        User.hasOne(models.profile, { as: 'profile' });
+        User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
         User.hasMany(models.article, { as: 'articles' });
         User.hasMany(models.experience, { as: 'experiences' });
     }
