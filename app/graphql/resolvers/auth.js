@@ -207,7 +207,7 @@ const attemptLogin = async (email, password, { models, res }) => {
     tokens.email = user.email;
     tokens.firstName = user.firstName;
     tokens.lastName = user.lastName;
-    tokens.hasAvatar = user.profile && user.profile.hasAvatar;
+    tokens.hasAvatar = !!(user.profile && user.profile.hasAvatar)
     return tokens;
 }
 
