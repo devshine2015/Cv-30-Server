@@ -90,18 +90,14 @@ module.exports = (Sequelize, DataTypes) => {
             ]
         });
     User.associate = models => {
-        User.belongsToMany(models.role, {
-            through: Sequelize.define('UserRoles', {})
-        });
-        User.belongsToMany(models.skill, {
-            through: Sequelize.define('UserSkills', {})
-        });
-        User.belongsToMany(models.value, {
-            through: Sequelize.define('UserValues', {})
-        });
+        User.belongsToMany(models.role, { through: 'user_roles' });
+        User.belongsToMany(models.skill, { through: 'user_skills' });
+        User.belongsToMany(models.value, { through: 'user_values' });
         User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
         User.hasMany(models.article, { as: 'articles' });
         User.hasMany(models.experience, { as: 'experiences' });
+        User.hasMany(models.project, { as: 'projects' });
+        User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
     }
     return User;
 };

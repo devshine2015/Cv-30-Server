@@ -58,7 +58,7 @@ module.exports = (Sequelize, DataTypes) => {
 		indexes: [ { fields: ['user_id'] } ]
 	});
 	Project.associate = function(models) {
-		Project.belongsTo(models.user, { as: 'owner' });
+		Project.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		// Project.belongsTo(models.location, { as: 'location' });
 	};
 	return Project;

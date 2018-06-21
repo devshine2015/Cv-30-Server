@@ -64,7 +64,7 @@ module.exports = (Sequelize, DataTypes) => {
 		tableName: 'experience'
 	});
   	Experience.associate = models => {
-		Experience.belongsTo(models.user, { as: 'owner' });
+		Experience.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		// Experience.belongsTo(models.location, { as: 'location' });
   	};
   	return Experience;

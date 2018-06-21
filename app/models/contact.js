@@ -44,7 +44,7 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at'
 	});
 	Contact.associate = function(models) {
-		Contact.belongsTo(models.user, { as: 'owner' });
+		Contact.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 	};
 	return Contact;
 };

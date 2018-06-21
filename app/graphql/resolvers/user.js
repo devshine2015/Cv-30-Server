@@ -13,7 +13,13 @@ const profile = (id, language, { user, models }) => {
         throw new Error(errors);
     let result = {
         ...user.get(),
-        ...user.profile.get()
+        ...user.profile.get(),
+        featuredArticles: user.getArticles(),
+        skills: user.getSkills(),
+        values: user.getValues(),
+        experience: user.getExperiences(),
+        projects: user.getProjects(),
+        contacts: user.getContact()
     };
 
     return result;
