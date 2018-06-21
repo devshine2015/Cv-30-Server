@@ -68,7 +68,7 @@ const setHasProfileCover = (status, { user, models }) => {
     }
 }
 
-const setCoverBackground = (coverBackground, { user, models }) => {
+const setCoverBackground = (color, { user, models }) => {
     const errors = [];
     if (!user) {
         errors.push({
@@ -79,7 +79,7 @@ const setCoverBackground = (coverBackground, { user, models }) => {
 
     }
     if (errors.length) throw new Error(errors);
-    if (models.profile.upsert({ userId: user.id, coverBackground })) {
+    if (models.profile.upsert({ userId: user.id, color })) {
         return {
             status: true,
             error: ""
