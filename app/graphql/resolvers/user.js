@@ -11,9 +11,10 @@ const profile = (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
+    let profile = user.profile ? user.profile.get() : {};
     let result = {
         ...user.get(),
-        ...user.profile.get(),
+        ...profile,
         featuredArticles: user.getArticles(),
         skills: user.getSkills(),
         values: user.getValues(),
