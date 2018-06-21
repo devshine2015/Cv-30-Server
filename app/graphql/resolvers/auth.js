@@ -72,14 +72,6 @@ const createAccount = async (nickname, email, password, { models }) => {
     </table>
     `;
 
-    const mailParams = {
-        from: process.env.SMTP_EMAIL,
-        to: user.email,
-        subject: 'Activation',
-        text: `token: ${user.activationToken}`,
-        html: activationButton
-    };
-
     let emailHandle = await _sendEmail(
         /*from: */
         process.env.SMTP_EMAIL,
