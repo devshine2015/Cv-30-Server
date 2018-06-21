@@ -85,8 +85,10 @@ const setCoverBackground = (color, { user, models }) => {
         });
 
     }
+
     if (errors.length) throw new Error(errors);
-    if (models.profile.upsert({ userId: user.id, color })) {
+
+    if (models.profile.upsert({ userId: user.id, coverBackground: color })) {
         return {
             status: true,
             error: ""
