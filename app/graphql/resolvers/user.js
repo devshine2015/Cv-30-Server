@@ -11,19 +11,17 @@ const profile = (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
-    return user;
-    // return models.user.findOne({
-    //     where: {
-    //         id: user.id
-    //     },
-    //     include: [
-    //         { model: models.profile, as: 'profile' }
-    //     ]
-    // });
+    let result = {
+        ...user.get(),
+        ...user.profile.get()
+    };
+
+    return result;
 }
 
 const setAvatar = (status, { user, models }) => {
     const errors = [];
+
     if (!user) {
         errors.push({
             name: 'Forbidden',

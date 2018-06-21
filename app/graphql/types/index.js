@@ -21,9 +21,9 @@ const Query = `
 		): [Profile]
 	}
 	type Mutation {
-		avatar (
-			status: Boolean
-		): StandardResponse
+		avatar (status: Boolean): StandardResponse
+		profileCover (status: Boolean): StandardResponse
+		hasCoverBackground (coverBackground: String): StandardResponse
 		register (
 			nickname: String!
 			email: String!
