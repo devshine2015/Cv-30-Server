@@ -14,6 +14,8 @@ module.exports = {
 	},
 	Mutation: {
 		avatar: (_, { status }, context) => userResolvers.setAvatar(status, context),
+		profileCover: (_, { status }, context) => userResolvers.setHasProfileCover(status, context),
+		hasCoverBackground: (_, { coverBackground }, context) => userResolvers.setCoverBackground(coverBackground, context),
 		register: (_, {
 			nickname,
 			email,
