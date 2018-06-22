@@ -11,19 +11,8 @@ const profile = (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
-    let profile = user.profile ? user.profile.get() : {};
-    let result = {
-        ...user.get(),
-        ...profile,
-        featuredArticles: user.getArticles(),
-        skills: user.getSkills(),
-        values: user.getValues(),
-        experience: user.getExperiences(),
-        projects: user.getProjects(),
-        contacts: user.getContact()
-    };
-
-    return result;
+    
+    return createProfileResponse(user);
 }
 
 const setAvatar = (status, { user, models }) => {
@@ -39,10 +28,7 @@ const setAvatar = (status, { user, models }) => {
     }
     if (errors.length) throw new Error(errors);
     if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
-        return {
-            status: true,
-            error: ""
-        };
+        return createProfileResponse(user);
     } else {
         return {
             status: false,
@@ -63,10 +49,7 @@ const setHasProfileCover = (status, { user, models }) => {
     }
     if (errors.length) throw new Error(errors);
     if (models.profile.upsert({ userId: user.id, hasProfileCover: status })) {
-        return {
-            status: true,
-            error: ""
-        };
+        return createProfileResponse(user);
     } else {
         return {
             status: false,
@@ -89,16 +72,29 @@ const setCoverBackground = (color, { user, models }) => {
     if (errors.length) throw new Error(errors);
 
     if (models.profile.upsert({ userId: user.id, coverBackground: color })) {
-        return {
-            status: true,
-            error: ""
-        };
+        return createProfileResponse(user);
     } else {
         return {
             status: false,
             error: "We did not manage to store your profile picture"
         };
     }
+}
+
+const createProfileResponse = (user) => {
+    let profile = user.profile ? user.profile.get() : {};
+    let result = {
+        ...user.get(),
+        ...profile,
+        featuredArticles: user.getArticles(),
+        skills: user.getSkills(),
+        values: user.getValues(),
+        experience: user.getExperiences(),
+        projects: user.getProjects(),
+        contacts: user.getContact()
+    };
+
+    return result;
 }
 
 module.exports = {
