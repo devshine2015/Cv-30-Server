@@ -47,6 +47,7 @@ services:
       - cv30NpmModules:/usr/src/app/node_modules
     depends_on:
       - db
+    command: nodemon -L --watch ./ -e js ./app/server.js
 networks:
   wowzaaa:
 volumes:
