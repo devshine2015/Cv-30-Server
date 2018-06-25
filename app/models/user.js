@@ -3,7 +3,7 @@ module.exports = (Sequelize, DataTypes) => {
     var User = Sequelize.define('user', {
         id: {
             type: DataTypes.UUID,
-			validate: {
+            validate: {
                 isUUID: 4
             },
             allowNull: false,
@@ -90,13 +90,13 @@ module.exports = (Sequelize, DataTypes) => {
             ]
         });
     User.associate = models => {
-        User.belongsToMany(models.role, { through: 'user_roles' });
-        User.belongsToMany(models.skill, { through: 'user_skills' });
-        User.belongsToMany(models.value, { through: 'user_values' });
+        User.belongsToMany(models.role, { through: 'user_roles', as: 'roles' });
+        User.belongsToMany(models.skill, { through: 'user_skills', as: 'skills' });
+        User.belongsToMany(models.value, { through: 'user_values', as: 'values' });
         User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
-        User.hasMany(models.article, { as: 'articles' });
-        User.hasMany(models.experience, { as: 'experiences' });
-        User.hasMany(models.project, { as: 'projects' });
+        User.hasMany(models.article, { as: 'articles', foreignKey: 'user_id' });
+        User.hasMany(models.experience, { as: 'experience', foreignKey: 'user_id' });
+        User.hasMany(models.project, { as: 'projects', foreignKey: 'user_id' });
         User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
     }
     return User;
