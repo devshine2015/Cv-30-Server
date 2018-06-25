@@ -83,7 +83,6 @@ const setCoverBackground = async (color, { user, models }) => {
 }
 
 const createProfileResponse = async (user, models) => {
-    // let profile = user.profile ? await user.profile.get() : {};
     const newUser = await models.user.findOne({
         where: {
             id: user.id
@@ -98,25 +97,13 @@ const createProfileResponse = async (user, models) => {
             { association: 'contact' }
         ]
     });
-    /*let result = {
-        ...newUser,
-        ...profile
-    };*/
-    // console.log();
+
     return {
         ...newUser.get(),
         ...newUser.profile.get()
     };
 }
-/*
-User.belongsToMany(models.role, { through: 'user_roles' });
-        User.belongsToMany(models.skill, { through: 'user_skills' });
-        User.belongsToMany(models.value, { through: 'user_values' });
-        User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
-        User.hasMany(models.article, { as: 'articles' });
-        User.hasMany(models.experience, { as: 'experiences' });
-        User.hasMany(models.project, { as: 'projects' });
-        User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });*/
+
 module.exports = {
     profile,
     setAvatar,
