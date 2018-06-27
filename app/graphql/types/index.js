@@ -24,6 +24,20 @@ const Query = `
 		avatar (status: Boolean): Profile
 		profileCover (status: Boolean): Profile
 		setCoverBackground (color: String): Profile
+		setValues (
+			values: [String!]!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeValue (
+			id: Int
+		): StandardResponse
+		setSkills (
+			skills: [String!]!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeSkill (
+			id: Int
+		): StandardResponse
 		register (
 			nickname: String!
 			email: String!

@@ -1,5 +1,6 @@
+const schema = require('../validation');
 
-const profile = (id, language, { user, models }) => {
+const profile = async (id, language, { user, models }) => {
     const errors = [];
     if (!user) {
         errors.push({
@@ -12,10 +13,10 @@ const profile = (id, language, { user, models }) => {
     if (errors.length)
         throw new Error(errors);
 
-    return createProfileResponse(user, models);
+    return await createProfileResponse(user, models);
 }
 
-const setAvatar = (status, { user, models }) => {
+const setAvatar = async (status, { user, models }) => {
     const errors = [];
 
     if (!user) {
@@ -28,7 +29,7 @@ const setAvatar = (status, { user, models }) => {
     }
     if (errors.length) throw new Error(errors);
     if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
-        return createProfileResponse(user, models);
+        return await createProfileResponse(user, models);
     } else {
         return {
             status: false,
@@ -50,7 +51,7 @@ const setHasProfileCover = async (status, { user, models }) => {
     console.log(user);
     if (errors.length) throw new Error(errors);
     if (await models.profile.upsert({ userId: user.id, hasProfileCover: status })) {
-        return createProfileResponse(user, models);
+        return await createProfileResponse(user, models);
     } else {
         return {
             status: false,
@@ -73,7 +74,7 @@ const setCoverBackground = async (color, { user, models }) => {
     if (errors.length) throw new Error(errors);
 
     if (await models.profile.upsert({ userId: user.id, coverBackground: color })) {
-        return createProfileResponse(user, models);
+        return await createProfileResponse(user, models);
     } else {
         return {
             status: false,
@@ -82,14 +83,224 @@ const setCoverBackground = async (color, { user, models }) => {
     }
 }
 
+const setValues = async (values, language, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    try {
+        schema.user.values.validateSync({
+            language,
+            values
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+    // Get existing values
+    const languageModel = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    const cleanedInputValues = values.map(item => item.trim().toLowerCase());
+    
+    const existingValues = await models.value.findAll({
+        include: [ {
+            association: 'i18n',
+            where: {
+                languageId: languageModel.dataValues.id,
+                title: {
+                    [models.Sequelize.Op.in]: cleanedInputValues
+                }
+            },
+        }]
+    });
+
+    let newValues = [];
+    if (!existingValues.length) newValues = cleanedInputValues
+    else newValues = cleanedInputValues.filter(item => !existingValues.find(el => el.i18n[0].title == item));
+
+    if (newValues.length || existingValues.length) {
+        await models.sequelize.transaction(async t => {
+            if (newValues.length) {
+                const createdValues = await models.value.bulkCreate(newValues.map(_ => {}), { transaction: t });
+                
+                // Create value texts - need value_id from values
+                const mappedValueTexts = newValues.map(( title, i) => {
+                    return {
+                        valueId: createdValues[i].dataValues.id,
+                        languageId: 1,
+                        title,
+                    };
+                });
+
+                await models.valueText.bulkCreate(mappedValueTexts, { transaction: t });
+                // Add new values to user
+                if (createdValues.length) await user.addValues(createdValues, { transaction: t});
+            }
+
+            // Add existing values to user
+            if (existingValues.length) await user.addValues(existingValues, { transaction: t});
+        });
+    }
+    response.status = true;
+    return response;
+}
+
+const removeValue = async (id, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    if (await models.userValues.destroy({
+        where: {
+            value_id: id, 
+            user_id: user.id
+        }
+    })) {
+        response.status = true;
+    } else {
+        response.error = 'Value not found';
+    }
+
+    return response;
+}
+
+const setSkills = async (skills, language, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    try {
+        schema.user.skills.validateSync({
+            language,
+            skills
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+    // Get existing values
+    const languageModel = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
+    
+    const existingSkills = await models.skill.findAll({
+        include: [ {
+            association: 'i18n',
+            where: {
+                languageId: languageModel.dataValues.id,
+                title: {
+                    [models.Sequelize.Op.in]: cleanedInputSkills
+                }
+            },
+        }]
+    });
+
+    let newSkills = [];
+    if (!existingSkills.length) newSkills = cleanedInputSkills
+    else newSkills = cleanedInputSkills.filter(item => !existingSkills.find(el => el.i18n[0].title == item));
+
+    if (newSkills.length || existingSkills.length) {
+        await models.sequelize.transaction(async t => {
+            if (newSkills.length) {
+                const createdSkills = await models.skill.bulkCreate(newSkills.map(_ => {}), { transaction: t });
+                
+                // Create skill texts - need skill_id from skills
+                const mappedSkillTexts = newSkills.map(( title, i) => {
+                    return {
+                        skillId: createdSkills[i].dataValues.id,
+                        languageId: 1,
+                        title,
+                    };
+                });
+
+                await models.skillText.bulkCreate(mappedSkillTexts, { transaction: t });
+                // Add new skills to user
+                if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t});
+            }
+
+            // Add existing values to user
+            if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t});
+        });
+    }
+    response.status = true;
+    return response;
+}
+
+const removeSkill = async (id, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    if (await models.userSkills.destroy({
+        where: {
+            skill_id: id, 
+            user_id: user.id
+        }
+    })) {
+        response.status = true;
+    } else {
+        response.error = 'Skill not found';
+    }
+
+    return response;
+}
+
+const validateUser = (user) => {
+    const errors = [];
+
+    if (!user) {
+        errors.push({
+            name: 'Forbidden',
+            message: 'Not allowed',
+            statusCode: 403
+        });
+
+    }
+    if (errors.length) throw new Error(errors);
+}
+
 const createProfileResponse = async (user, models) => {
     const newUser = await models.user.findOne({
         where: {
             id: user.id
         },
         include: [
-            { association: 'skills' },
-            { association: 'values' },
+            { association: 'skills', include: [{ association: 'i18n' }] },
+            { association: 'values', include: [{ association: 'i18n' }] },
             { association: 'profile' },
             { association: 'articles' },
             { association: 'experience' },
@@ -99,8 +310,8 @@ const createProfileResponse = async (user, models) => {
     });
 
     return {
-        ...newUser.get(),
-        ...newUser.profile.get()
+        ...newUser,
+        ...newUser.profile
     };
 }
 
@@ -108,5 +319,9 @@ module.exports = {
     profile,
     setAvatar,
     setHasProfileCover,
-    setCoverBackground
+    setCoverBackground,
+    setValues,
+    removeValue,
+    setSkills,
+    removeSkill
 };

@@ -26,6 +26,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Value.belongsToMany(models.user, {
 			through: Sequelize.define('UserValues', {})
 		});
+		Value.hasMany(models.valueText, { as: 'i18n', foreignKey: 'value_id' } );
 	};
 	return Value;
 };

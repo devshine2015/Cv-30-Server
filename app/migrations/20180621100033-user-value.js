@@ -9,8 +9,11 @@ module.exports = {
 				type: Sequelize.INTEGER
 			},
 			user_id: {
-				type: Sequelize.INTEGER,
-				allowNull: false,
+				type: Sequelize.UUID,
+                validate: {
+                    isUUID: 4
+                },
+                allowNull: false
 			},
 			value_id: {
 				type: Sequelize.INTEGER,

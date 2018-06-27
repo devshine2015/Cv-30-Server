@@ -8,7 +8,7 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.INTEGER
 		},
 		skillId: {
-			allowNull: false,
+			allowNull: true,
 			type: DataTypes.INTEGER,
 			field: 'skill_id'
 		},

@@ -26,6 +26,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Skill.belongsToMany(models.user, {
 			through: Sequelize.define('UserSkills', {})
 		});
+		Skill.hasMany(models.skillText, { as: 'i18n', foreignKey: 'skill_id' } );
     };
     return Skill;
 };
