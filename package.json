@@ -4,7 +4,7 @@
   "description": "CV30 GraphQL server running on Express and Apollo Server",
   "main": "index",
   "scripts": {
-    "up": "docker-compose up",
+    "start": "docker-compose up",
     "upd": "docker-compose up -d",
     "down": "docker-compose down",
     "test": "echo \"Error: no test specified\" && exit 1",
