@@ -6,8 +6,8 @@ module.exports = (Sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.UUID,
 			validate: {
-                isUUID: 4
-            },
+				isUUID: 4
+			},
 			field: 'user_id',
 		},
 		phone: {
@@ -19,7 +19,7 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: true,
 			type: DataTypes.STRING(255)
 		},
-		fb: {
+		facebook: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
 			field: 'facebook'
@@ -39,11 +39,11 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'updated_at'
 		}
 	}, {
-		timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at'
-	});
-	Contact.associate = function(models) {
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at'
+		});
+	Contact.associate = function (models) {
 		Contact.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 	};
 	return Contact;

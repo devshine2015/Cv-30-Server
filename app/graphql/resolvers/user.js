@@ -12,7 +12,7 @@ const profile = async (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
-console.log(await createProfileResponse(user, models))
+    console.log(await createProfileResponse(user, models))
     return await createProfileResponse(user, models);
 }
 
@@ -115,9 +115,9 @@ const setValues = async (values, language, { user, models }) => {
     });
 
     const cleanedInputValues = values.map(item => item.trim().toLowerCase());
-    
+
     const existingValues = await models.value.findAll({
-        include: [ {
+        include: [{
             association: 'i18n',
             where: {
                 languageId: languageModel.dataValues.id,
@@ -135,10 +135,10 @@ const setValues = async (values, language, { user, models }) => {
     if (newValues.length || existingValues.length) {
         await models.sequelize.transaction(async t => {
             if (newValues.length) {
-                const createdValues = await models.value.bulkCreate(newValues.map(_ => {}), { transaction: t });
-                
+                const createdValues = await models.value.bulkCreate(newValues.map(_ => { }), { transaction: t });
+
                 // Create value texts - need value_id from values
-                const mappedValueTexts = newValues.map(( title, i) => {
+                const mappedValueTexts = newValues.map((title, i) => {
                     return {
                         valueId: createdValues[i].dataValues.id,
                         languageId: 1,
@@ -148,11 +148,11 @@ const setValues = async (values, language, { user, models }) => {
 
                 await models.valueText.bulkCreate(mappedValueTexts, { transaction: t });
                 // Add new values to user
-                if (createdValues.length) await user.addValues(createdValues, { transaction: t});
+                if (createdValues.length) await user.addValues(createdValues, { transaction: t });
             }
 
             // Add existing values to user
-            if (existingValues.length) await user.addValues(existingValues, { transaction: t});
+            if (existingValues.length) await user.addValues(existingValues, { transaction: t });
         });
     }
     response.status = true;
@@ -169,7 +169,7 @@ const removeValue = async (id, { user, models }) => {
 
     if (await models.userValues.destroy({
         where: {
-            value_id: id, 
+            value_id: id,
             user_id: user.id
         }
     })) {
@@ -213,9 +213,9 @@ const setSkills = async (skills, language, { user, models }) => {
     });
 
     const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
-    
+
     const existingSkills = await models.skill.findAll({
-        include: [ {
+        include: [{
             association: 'i18n',
             where: {
                 languageId: languageModel.dataValues.id,
@@ -233,10 +233,10 @@ const setSkills = async (skills, language, { user, models }) => {
     if (newSkills.length || existingSkills.length) {
         await models.sequelize.transaction(async t => {
             if (newSkills.length) {
-                const createdSkills = await models.skill.bulkCreate(newSkills.map(_ => {}), { transaction: t });
-                
+                const createdSkills = await models.skill.bulkCreate(newSkills.map(_ => { }), { transaction: t });
+
                 // Create skill texts - need skill_id from skills
-                const mappedSkillTexts = newSkills.map(( title, i) => {
+                const mappedSkillTexts = newSkills.map((title, i) => {
                     return {
                         skillId: createdSkills[i].dataValues.id,
                         languageId: 1,
@@ -246,11 +246,11 @@ const setSkills = async (skills, language, { user, models }) => {
 
                 await models.skillText.bulkCreate(mappedSkillTexts, { transaction: t });
                 // Add new skills to user
-                if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t});
+                if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t });
             }
 
             // Add existing values to user
-            if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t});
+            if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t });
         });
     }
     response.status = true;
@@ -267,7 +267,7 @@ const removeSkill = async (id, { user, models }) => {
 
     if (await models.userSkills.destroy({
         where: {
-            skill_id: id, 
+            skill_id: id,
             user_id: user.id
         }
     })) {
@@ -279,19 +279,19 @@ const removeSkill = async (id, { user, models }) => {
     return response;
 }
 
-const setContact = async (phone, email, fb, linkedin, { user, models }) => {
+const setContact = async (phone, email, facebook, linkedin, { user, models }) => {
     validateUser(user);
 
     let response = {
         status: false,
         error: ''
     };
-    
+
     try {
         schema.user.contact.validateSync({
             phone,
             email,
-            fb,
+            facebook,
             linkedin
         }, { abortEarly: false });
     } catch (error) {
@@ -308,19 +308,19 @@ const setContact = async (phone, email, fb, linkedin, { user, models }) => {
 
     await models.contact.upsert({
         userId: user.id,
-        phone: phone.trim(),
-        email: email.trim(),
-        fb: fb.trim(),
-        linkedin: linkedin.trim()
+        phone: phone ? phone.trim() : null,
+        email: email ? email.trim() : null,
+        facebook: facebook ? facebook.trim() : null,
+        linkedin: linkedin ? linkedin.trim() : null
     });
 
     response.status = true;
     return response;
 }
 
-const setProject = async(id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
+const setProject = async (id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
     validateUser(user);
-    
+
     let response = {
         status: false,
         error: ''
@@ -357,7 +357,7 @@ const setProject = async(id, location, isCurrent, position, company, startDate, 
         startDate: new Date(startDate),
         endDate: new Date(endDate)
     });
-    
+
     response.status = true
     return response;
 }
@@ -379,9 +379,9 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async(id, location, isCurrent, position, company, startDate, endDate,  { user, models }) => {
+const setExperience = async (id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
     validateUser(user);
-    
+
     let response = {
         status: false,
         error: ''
@@ -397,6 +397,7 @@ const setExperience = async(id, location, isCurrent, position, company, startDat
             endDate
         }, { abortEarly: false });
     } catch (error) {
+        console.log(error);
         throw new Error(
             JSON.stringify(
                 error.inner.map(err => ({
@@ -418,7 +419,7 @@ const setExperience = async(id, location, isCurrent, position, company, startDat
         startDate: new Date(startDate),
         endDate: new Date(endDate)
     });
-    
+
     response.status = true
     return response;
 }
@@ -484,7 +485,10 @@ const validateUser = (user) => {
         });
 
     }
-    if (errors.length) throw new Error(errors);
+    if (errors.length) {
+        console.log(errors);
+        throw new Error(errors);
+    }
 }
 
 const createProfileResponse = async (user, models) => {
