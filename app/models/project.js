@@ -6,15 +6,15 @@ module.exports = (Sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.UUID,
 			validate: {
-                isUUID: 4
-            },
+				isUUID: 4
+			},
 		},
 		userId: {
 			allowNull: false,
 			type: DataTypes.UUID,
 			validate: {
-                isUUID: 4
-            },
+				isUUID: 4
+			},
 			field: 'user_id'
 		},
 		locationId: {
@@ -57,12 +57,12 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'updated_at'
 		}
 	}, {
-		timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at',
-		indexes: [ { fields: ['user_id'] } ]
-	});
-	Project.associate = function(models) {
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at',
+			indexes: [{ fields: ['user_id'] }]
+		});
+	Project.associate = function (models) {
 		Project.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		// Project.belongsTo(models.location, { as: 'location' });
 	};
