@@ -3,6 +3,27 @@ const Response = require('./response');
 const Profile = require('./profile');
 const Error = require('./error');
 
+const ArticleInput = `
+	input ArticleInput {
+		id: String
+		img: String
+		title: String
+		text: String
+	}
+`;
+
+const TeamInput = `
+	input TeamInput {
+		id: String
+	}
+`;
+
+const QAInput = `
+	input QAInput {
+		id: String
+	}
+`;
+
 const Query = `
 	type Query {
 		profile(
@@ -68,6 +89,15 @@ const Query = `
 		removeExperience (
 			id: String
 		): StandardResponse
+		handleArticle (
+			article: ArticleInput
+		): StandardResponse
+		handleTeam (
+			team: TeamInput
+		): StandardResponse
+		handleQA (
+			qa: QAInput
+		): StandardResponse
 		register (
 			nickname: String!
 			email: String!
@@ -103,4 +133,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, User, Profile, Response, Error];
+module.exports = [SchemaDefinition, Query, User, Profile, Response, ArticleInput, TeamInput, QAInput, Error];

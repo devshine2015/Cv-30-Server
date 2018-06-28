@@ -25,6 +25,9 @@ module.exports = {
 		removeProject: (_, { id }, context) => userResolvers.removeProject(id, context),
 		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
+		handleArticle: (_, { article }, context) => userResolvers.handleArticle(article, context),   
+		handleTeam: (_, { team }, context) => userResolvers.handleTeam(team, context),
+    	handleQA: (_, { qa }, context) => userResolvers.handleQA(qa, context),
 		register: (_, {
 			nickname,
 			email,

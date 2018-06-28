@@ -440,6 +440,39 @@ const removeExperience = async (id, { user, models }) => {
     return response;
 }
 
+const handleArticle = async (article, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    return response;
+}
+
+const handleTeam = async (team, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    return response;
+}
+
+const handleQA = async (qa, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    return response;
+}
+
 const validateUser = (user) => {
     const errors = [];
 
@@ -489,5 +522,8 @@ module.exports = {
     setProject,
     removeProject,
     setExperience,
-    removeExperience
+    removeExperience,
+    handleArticle,
+    handleQA,
+    handleTeam
 };
