@@ -51,6 +51,7 @@ const Query = `
 			position: String
 			company: String
 			startDate: Date
+			endDate: Date
 		): StandardResponse
 		removeProject (
 			id: String
@@ -61,7 +62,8 @@ const Query = `
 			isCurrent: Boolean
 			position: String
 			company: String
-			startDate: String
+			startDate: Date
+			endDate: Date
 		): StandardResponse
 		removeExperience (
 			id: String

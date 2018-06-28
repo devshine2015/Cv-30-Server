@@ -21,9 +21,9 @@ module.exports = {
 		setSkills: (_, { skills, language }, context) => userResolvers.setSkills(skills, language, context),
 		removeSkill: (_, { id }, context) => userResolvers.removeSkill(id, context),
 		setContact: (_, { phone, email, facebook, linkedin }, context) => userResolvers.setContact(phone, email, facebook, linkedin, context),
-		setProject: (_, { id, location, isCurrent, position, company, startDate }, context) => userResolvers.setProject(id, location, isCurrent, position, company, startDate, context),
+		setProject: (_, { id, location, isCurrent, position, company, startDate, endDate }, context) => userResolvers.setProject(id, location, isCurrent, position, company, startDate, endDate, context),
 		removeProject: (_, { id }, context) => userResolvers.removeProject(id, context),
-		setExperience: (_, { id, location, isCurrent, position, company, startDate }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, context),
+		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 		register: (_, {
 			nickname,

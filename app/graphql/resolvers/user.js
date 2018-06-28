@@ -318,7 +318,7 @@ const setContact = async (phone, email, fb, linkedin, { user, models }) => {
     return response;
 }
 
-const setProject = async(id, location, isCurrent, position, company, startDate, { user, models }) => {
+const setProject = async(id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
     validateUser(user);
     
     let response = {
@@ -332,7 +332,8 @@ const setProject = async(id, location, isCurrent, position, company, startDate, 
             isCurrent,
             position,
             company,
-            startDate
+            startDate,
+            endDate
         }, { abortEarly: false });
     } catch (error) {
         throw new Error(
@@ -353,7 +354,8 @@ const setProject = async(id, location, isCurrent, position, company, startDate, 
         isCurrent,
         position,
         company,
-        startDate: new Date(startDate)
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
     });
     
     response.status = true
@@ -377,7 +379,7 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async(id, location, isCurrent, position, company, startDate, { user, models }) => {
+const setExperience = async(id, location, isCurrent, position, company, startDate, endDate,  { user, models }) => {
     validateUser(user);
     
     let response = {
@@ -391,7 +393,8 @@ const setExperience = async(id, location, isCurrent, position, company, startDat
             isCurrent,
             position,
             company,
-            startDate
+            startDate,
+            endDate
         }, { abortEarly: false });
     } catch (error) {
         throw new Error(
@@ -412,7 +415,8 @@ const setExperience = async(id, location, isCurrent, position, company, startDat
         isCurrent,
         position,
         company,
-        startDate: new Date(startDate)
+        startDate: new Date(startDate),
+        endDate: new Date(endDate)
     });
     
     response.status = true
