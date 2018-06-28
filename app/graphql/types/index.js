@@ -38,6 +38,34 @@ const Query = `
 		removeSkill (
 			id: Int
 		): StandardResponse
+		setContact (
+			phone: String
+			email: String
+			facebook: String
+			linkedin: String
+		): StandardResponse
+		setProject (
+			id: String 
+			location: Int
+			isCurrent: Boolean
+			position: String
+			company: String
+			startDate: Date
+		): StandardResponse
+		removeProject (
+			id: String
+		): StandardResponse
+		setExperience (
+			id: String
+			location: Int
+			isCurrent: Boolean
+			position: String
+			company: String
+			startDate: String
+		): StandardResponse
+		removeExperience (
+			id: String
+		): StandardResponse
 		register (
 			nickname: String!
 			email: String!

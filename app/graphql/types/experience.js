@@ -8,7 +8,7 @@ const Experience = `
         description: String
         startDate: Date
         endDate: Date
-        stillWorkThere: Boolean
+        isCurrent: Boolean
     }
 `;
 

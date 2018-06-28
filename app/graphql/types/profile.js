@@ -20,7 +20,7 @@ const Profile = `
         values: [Value]
         experience: [Experience]
         projects: [Project]
-        contacts: [Contact]
+        contact: Contact
         hasAvatar: Boolean
         hasProfileCover: Boolean
         coverBackground: String

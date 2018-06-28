@@ -1,3 +1,4 @@
+const uuid = require('uuidv4');
 const schema = require('../validation');
 
 const profile = async (id, language, { user, models }) => {
@@ -8,7 +9,6 @@ const profile = async (id, language, { user, models }) => {
             message: 'Not allowed',
             statusCode: 403
         });
-
     }
     if (errors.length)
         throw new Error(errors);
@@ -279,6 +279,163 @@ const removeSkill = async (id, { user, models }) => {
     return response;
 }
 
+const setContact = async (phone, email, fb, linkedin, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+    
+    try {
+        schema.user.contact.validateSync({
+            phone,
+            email,
+            fb,
+            linkedin
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+
+    await models.contact.upsert({
+        userId: user.id,
+        phone: phone.trim(),
+        email: email.trim(),
+        fb: fb.trim(),
+        linkedin: linkedin.trim()
+    });
+
+    response.status = true;
+    return response;
+}
+
+const setProject = async(id, location, isCurrent, position, company, startDate, { user, models }) => {
+    validateUser(user);
+    
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    try {
+        schema.user.project.validateSync({
+            location,
+            isCurrent,
+            position,
+            company,
+            startDate
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+
+    await models.project.upsert({
+        id: id ? id : uuid(),
+        userId: user.id,
+        locationId: location,
+        isCurrent,
+        position,
+        company,
+        startDate: new Date(startDate)
+    });
+    
+    response.status = true
+    return response;
+}
+
+const removeProject = async (id, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    if (await models.project.destroy({ where: { id } })) {
+        response.status = true;
+    } else {
+        response.error = 'Project not found';
+    }
+
+    return response;
+}
+
+const setExperience = async(id, location, isCurrent, position, company, startDate, { user, models }) => {
+    validateUser(user);
+    
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    try {
+        schema.user.experience.validateSync({
+            location,
+            isCurrent,
+            position,
+            company,
+            startDate
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+
+    await models.experience.upsert({
+        id: id ? id : uuid(),
+        userId: user.id,
+        locationId: location,
+        isCurrent,
+        position,
+        company,
+        startDate: new Date(startDate)
+    });
+    
+    response.status = true
+    return response;
+}
+
+const removeExperience = async (id, { user, models }) => {
+    validateUser(user);
+
+    let response = {
+        status: false,
+        error: ''
+    };
+
+    if (await models.experience.destroy({ where: { id } })) {
+        response.status = true;
+    } else {
+        response.error = 'Experience not found';
+    }
+
+    return response;
+}
+
 const validateUser = (user) => {
     const errors = [];
 
@@ -323,5 +480,10 @@ module.exports = {
     setValues,
     removeValue,
     setSkills,
-    removeSkill
+    removeSkill,
+    setContact,
+    setProject,
+    removeProject,
+    setExperience,
+    removeExperience
 };

@@ -1,7 +1,9 @@
 const Contact = `
     type Contact {
-        name: String
-        value: String
+        phone: String
+        email: String
+        facebook: String
+        linkedin: String
     }
 `;
 
