@@ -24,7 +24,7 @@ module.exports = {
 				field: 'user_id'
 			},
 			locationId: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.INTEGER,
 				field: 'location_id'
 			},
@@ -46,6 +46,11 @@ module.exports = {
 				allowNull: false,
 				type: Sequelize.DATE,
 				field: 'start_date'
+			},
+			endDate: {
+				allowNull: false,
+				type: Sequelize.DATE,
+				field: 'end_date'
 			},
 			createdAt: {
 				allowNull: false,

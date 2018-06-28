@@ -18,7 +18,7 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'user_id'
 		},
 		locationId: {
-			allowNull: false,
+			allowNull: true,
 			type: DataTypes.INTEGER,
 			field: 'location_id'
 		},

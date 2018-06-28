@@ -4,6 +4,6 @@ module.exports = (Sequelize, DataTypes) => {
     }, {
         tableName: 'user_skills'
     });
-
+    UserSkills.associate = models => {}
     return UserSkills;
 };

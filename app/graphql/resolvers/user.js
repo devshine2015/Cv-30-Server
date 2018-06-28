@@ -12,7 +12,7 @@ const profile = async (id, language, { user, models }) => {
     }
     if (errors.length)
         throw new Error(errors);
-
+console.log(await createProfileResponse(user, models))
     return await createProfileResponse(user, models);
 }
 
@@ -467,8 +467,8 @@ const createProfileResponse = async (user, models) => {
     });
 
     return {
-        ...newUser,
-        ...newUser.profile
+        ...newUser.get(),
+        ...newUser.getProfile()
     };
 }
 

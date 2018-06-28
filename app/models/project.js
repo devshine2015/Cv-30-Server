@@ -18,7 +18,7 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'user_id'
 		},
 		locationId: {
-			allowNull: false,
+			allowNull: true,
 			type: DataTypes.INTEGER,
 			field: 'location_id'
 		},
@@ -40,6 +40,11 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: false,
 			type: DataTypes.DATE,
 			field: 'start_date'
+		},
+		endDate: {
+			allowNull: false,
+			type: DataTypes.DATE,
+			field: 'end_date'
 		},
 		createdAt: {
 			allowNull: false,
