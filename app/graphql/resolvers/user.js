@@ -467,8 +467,8 @@ const createProfileResponse = async (user, models) => {
     });
 
     return {
-        ...newUser.get(),
-        ...newUser.getProfile()
+        ...await newUser.get(),
+        ...await newUser.profile.get()
     };
 }
 
