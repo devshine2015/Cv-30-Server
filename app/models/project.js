@@ -64,6 +64,7 @@ module.exports = (Sequelize, DataTypes) => {
 		});
 	Project.associate = function (models) {
 		Project.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
+		Project.hasMany(models.projectText, { as: 'i18n', foreignKey: 'project_id' });
 		// Project.belongsTo(models.location, { as: 'location' });
 	};
 	return Project;

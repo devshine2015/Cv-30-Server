@@ -8,8 +8,16 @@ const Project = `
         description: String
         startDate: Date
         endDate: Date
-        isCurrent: Boolean
+        isCurrent: Boolean,
+        i18n: [ProjectText]
     }
 `;
 
-module.exports = () => [Project];
+const ProjectText = `
+    type ProjectText {
+        title: String
+        description: String
+    }
+`;
+
+module.exports = () => [Project, ProjectText];

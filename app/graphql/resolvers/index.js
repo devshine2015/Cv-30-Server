@@ -22,9 +22,11 @@ module.exports = {
 		setSkills: (_, { skills, language }, context) => userResolvers.setSkills(skills, language, context),
 		removeSkill: (_, { id }, context) => userResolvers.removeSkill(id, context),
 		setContact: (_, { phone, email, facebook, linkedin }, context) => userResolvers.setContact(phone, email, facebook, linkedin, context),
-		setProject: (_, { id, location, isCurrent, position, company, startDate, endDate }, context) => userResolvers.setProject(id, location, isCurrent, position, company, startDate, endDate, context),
+
+		setProject: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setProject(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
 		removeProject: (_, { id }, context) => userResolvers.removeProject(id, context),
-		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, context),
+		
+		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 		handleArticle: (_, { article }, context) => companyResolvers.handleArticle(article, context),   
 		handleTeam: (_, { team }, context) => companyResolvers.handleTeam(team, context),

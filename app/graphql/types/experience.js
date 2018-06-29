@@ -8,8 +8,16 @@ const Experience = `
         description: String
         startDate: Date
         endDate: Date
-        isCurrent: Boolean
+        isCurrent: Boolean,
+        i18n: [ExperienceText]
     }
 `;
 
-module.exports = () => [Experience];
+const ExperienceText = `
+    type ExperienceText {
+        title: String
+        description: String
+    }
+`;
+
+module.exports = () => [Experience, ExperienceText];

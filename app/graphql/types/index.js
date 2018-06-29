@@ -73,6 +73,9 @@ const Query = `
 			company: String
 			startDate: Date
 			endDate: Date
+			title: String
+			description: String
+			language: LanguageCodeType!
 		): StandardResponse
 		removeProject (
 			id: String
@@ -85,6 +88,9 @@ const Query = `
 			company: String
 			startDate: Date
 			endDate: Date
+			title: String
+			description: String
+			language: LanguageCodeType!
 		): StandardResponse
 		removeExperience (
 			id: String

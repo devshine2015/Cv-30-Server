@@ -318,7 +318,7 @@ const setContact = async (phone, email, facebook, linkedin, { user, models }) =>
     return response;
 }
 
-const setProject = async (id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
+const setProject = async (id, location, isCurrent, position, company, startDate, endDate, title, description, language, { user, models }) => {
     validateUser(user);
 
     let response = {
@@ -333,7 +333,10 @@ const setProject = async (id, location, isCurrent, position, company, startDate,
             position,
             company,
             startDate,
-            endDate
+            endDate,
+            title,
+            description,
+            language
         }, { abortEarly: false });
     } catch (error) {
         throw new Error(
@@ -347,18 +350,34 @@ const setProject = async (id, location, isCurrent, position, company, startDate,
         );
     }
 
-    await models.project.upsert({
-        id: id ? id : uuid(),
-        userId: user.id,
-        locationId: location,
-        isCurrent,
-        position,
-        company,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate)
+    // Get language
+    const languageModel = await models.language.findOne({
+        where: {
+            code: language
+        }
     });
 
-    response.status = true
+    if (languageModel) {
+        await models.project.upsert({
+            id: id ? id : uuid(),
+            userId: user.id,
+            locationId: location,
+            isCurrent,
+            position,
+            company,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+            i18n:[{
+                languageId: languageModel.dataValues.id,
+                title,
+                description
+            }]
+        });
+        response.status = true;
+    } else {
+        response.error = 'Language not found!';
+    }
+    
     return response;
 }
 
@@ -379,7 +398,7 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async (id, location, isCurrent, position, company, startDate, endDate, { user, models }) => {
+const setExperience = async (id, location, isCurrent, position, company, startDate, endDate, title, description, language, { user, models }) => {
     validateUser(user);
 
     let response = {
@@ -394,7 +413,10 @@ const setExperience = async (id, location, isCurrent, position, company, startDa
             position,
             company,
             startDate,
-            endDate
+            endDate,
+            title,
+            description,
+            language
         }, { abortEarly: false });
     } catch (error) {
         console.log(error);
@@ -409,18 +431,38 @@ const setExperience = async (id, location, isCurrent, position, company, startDa
         );
     }
 
-    await models.experience.upsert({
-        id: id ? id : uuid(),
-        userId: user.id,
-        locationId: location,
-        isCurrent,
-        position,
-        company,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate)
+    // Get language
+    const languageModel = await models.language.findOne({
+        where: {
+            code: language
+        }
     });
 
-    response.status = true
+    if (languageModel) {
+        await models.sequelize.transaction(async t => {
+            const experienceId = id ? id : uuid();
+            await models.experience.upsert({
+                id: experienceId,
+                userId: user.id,
+                locationId: location,
+                isCurrent,
+                position,
+                company,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+            });
+            await models.experienceText.upsert({
+                experienceId: experienceId,
+                languageId: languageModel.dataValues.id,
+                title,
+                description
+            });
+        });
+        response.status = true;
+    } else {
+        response.error = 'Language not found!';
+    }
+    
     return response;
 }
 
@@ -437,39 +479,6 @@ const removeExperience = async (id, { user, models }) => {
     } else {
         response.error = 'Experience not found';
     }
-
-    return response;
-}
-
-const handleArticle = async (article, { user, models }) => {
-    validateUser(user);
-
-    let response = {
-        status: false,
-        error: ''
-    };
-
-    return response;
-}
-
-const handleTeam = async (team, { user, models }) => {
-    validateUser(user);
-
-    let response = {
-        status: false,
-        error: ''
-    };
-
-    return response;
-}
-
-const handleQA = async (qa, { user, models }) => {
-    validateUser(user);
-
-    let response = {
-        status: false,
-        error: ''
-    };
 
     return response;
 }
@@ -501,15 +510,15 @@ const createProfileResponse = async (user, models) => {
             { association: 'values', include: [{ association: 'i18n' }] },
             { association: 'profile' },
             { association: 'articles' },
-            { association: 'experience' },
-            { association: 'projects' },
+            { association: 'experience', include: [ { association: 'i18n' } ] },
+            { association: 'projects', include: [ { association: 'i18n' } ] },
             { association: 'contact' }
         ]
     });
-
+    const profile = newUser.profile ? await newUser.profile.get() : {};
     return {
         ...await newUser.get(),
-        ...await newUser.profile.get()
+        ...profile
     };
 }
 

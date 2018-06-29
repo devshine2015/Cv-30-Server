@@ -31,23 +31,31 @@ module.exports = {
             .max(255, 'Contact linkedin cannot be longer than 255 chars'),
     }),
     project: yup.object().shape({
+        language: yup.string().required(),
         location: yup.number(),
         isCurrent: yup.boolean(),
         position: yup.string()
             .max(255, 'Project position cannot be longer than 255 chars'),
         company: yup.string()
             .max(255, 'Project company cannot be longer than 255 chars'),
-        startDate: yup.date(),
-        endDate: yup.date()
+        startDate: yup.date().required(),
+        endDate: yup.date().required(),
+        title: yup.string().trim()
+            .max(255, 'Project title cannot be longer than 255 chars'),
+        description: yup.string()
     }),
     experience: yup.object().shape({
+        language: yup.string().required(),
         location: yup.number(),
         isCurrent: yup.boolean(),
         position: yup.string()
             .max(255, 'Experience position cannot be longer than 255 chars'),
         company: yup.string()
             .max(255, 'Experience company cannot be longer than 255 chars'),
-        startDate: yup.date(),
-        endDate: yup.date()
+        startDate: yup.date().required(),
+        endDate: yup.date().required(),
+        title: yup.string().trim()
+            .max(255, 'Experience title cannot be longer than 255 chars'),
+        description: yup.string()
     })
 };
