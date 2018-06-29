@@ -37,7 +37,8 @@ module.exports = {
             .max(255, 'Project position cannot be longer than 255 chars'),
         company: yup.string()
             .max(255, 'Project company cannot be longer than 255 chars'),
-        startDate: yup.date()
+        startDate: yup.date(),
+        endDate: yup.date()
     }),
     experience: yup.object().shape({
         location: yup.number(),
@@ -46,6 +47,7 @@ module.exports = {
             .max(255, 'Experience position cannot be longer than 255 chars'),
         company: yup.string()
             .max(255, 'Experience company cannot be longer than 255 chars'),
-        startDate: yup.date()
+        startDate: yup.date(),
+        endDate: yup.date()
     })
 };

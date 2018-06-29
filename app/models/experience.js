@@ -70,6 +70,7 @@ module.exports = (Sequelize, DataTypes) => {
 		});
 	Experience.associate = models => {
 		Experience.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
+		Experience.hasMany(models.experienceText, { as: 'i18n' });
 		// Experience.belongsTo(models.location, { as: 'location' });
 	};
 	return Experience;
