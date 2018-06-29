@@ -6,6 +6,7 @@ const Experience = require('./experience');
 const Project = require('./project');
 const Contact = require('./contact');
 const Salary = require('./salary');
+const Story = require('./story');
 const Image = require('./image');
 const Error = require('./error');
 
@@ -24,11 +25,11 @@ const Profile = `
         hasAvatar: Boolean
         hasProfileCover: Boolean
         coverBackground: String
-        story: String
+        story: Story
         salary: Salary
         errors: [Error]
     }
 `;
 
-module.exports = () => [Profile, Salary, Contact, Skill, Value, Article, Experience, Project];
+module.exports = () => [Profile, Story, Salary, Contact, Skill, Value, Article, Experience, Project];
 

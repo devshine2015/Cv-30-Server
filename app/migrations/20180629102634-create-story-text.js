@@ -1,12 +1,12 @@
 'use strict';
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return queryInterface.createTable('faq_i18n', {
-			faqId: {
+		return queryInterface.createTable('story_i18n', {
+			userId: {
 				primaryKey: true,
 				allowNull: false,
 				type: Sequelize.INTEGER,
-				field: 'faq_id'
+				field: 'user_id'
 			},
 			languageId: {
 				primaryKey: true,
@@ -40,10 +40,10 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
 			freezeTableName: true,
-			tableName: 'faq_i18n'
+			tableName: 'story_i18n'
 		});
 	},
 	down: (queryInterface, Sequelize) => {
-		return queryInterface.dropTable('faq_i18n');
+		return queryInterface.dropTable('story_i18n');
 	}
 };

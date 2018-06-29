@@ -46,6 +46,7 @@ if (cluster.isMaster) {
                 schema,
                 context: { user, models, res },
                 graphiql: true,
+                formatError: error => console.log(error),
                 debug: true
             };
         })
