@@ -33,6 +33,7 @@ module.exports = {
 		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 
+		handleCompany: (_, { language, details }, context) => companyResolvers.handleCompany(language, details, context),
 		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
 
 		handleTeam: (_, { team }, context) => companyResolvers.handleTeam(team, context),

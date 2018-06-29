@@ -4,6 +4,7 @@ const Profile = require('./profile');
 const Error = require('./error');
 const Article = require('./article');
 const Salary = require('./salary');
+const Company = require('./company');
 
 const TeamInput = `
 	input TeamInput {
@@ -94,6 +95,10 @@ const Query = `
 		removeExperience (
 			id: String
 		): StandardResponse
+		handleCompany(
+			language: LanguageCodeType!
+			details: CompanyInput
+		): StandardResponse
 		handleArticle (
 			language: LanguageCodeType!
 			article: ArticleInput
@@ -140,4 +145,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];
+module.exports = [SchemaDefinition, Company, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];

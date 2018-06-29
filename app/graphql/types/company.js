@@ -1,6 +1,6 @@
 module.exports = `
     type Company {
-        id: String
+        id: String!
         name: String
         createdAt: Date
         updatedAt: Date
@@ -11,19 +11,25 @@ module.exports = `
         tags: [Tag]
         faqs: [Faq]
     }
+    input CompanyInput {
+        id: String
+        name: String
+        headline: String
+        description: String
+    }
     type CompanyText {
         headline: String
         description: String
     }
     type Tag {
-        id
+        id: Int
         i18n: [TagText]
     }
     type TagText {
         title: String
     }
     type Faq {
-        id
+        id: Int
         i18n: [FaqText]
     }
     type FaqText {
