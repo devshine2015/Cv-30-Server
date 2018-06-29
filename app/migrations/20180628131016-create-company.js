@@ -11,15 +11,11 @@ module.exports = {
 				},
 				field: 'id'
 			},
-			headline: {
-				type: Sequelize.TEXT,
+			name: {
 				allowNull: true,
-				field: 'headline'
-			},
-			coverVideo: {
-				type: Sequelize.TEXT,
-				allowNull: true,
-				field: 'cover_video_url'
+				type: Sequelize.STRING(255),
+				field: 'name',
+				unique: true
 			},
 			createdAt: {
 				allowNull: false,
@@ -29,7 +25,12 @@ module.exports = {
 				allowNull: false,
 				type: Sequelize.DATE
 			}
-		});
+		}, {
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at'
+		})
+		.then(() => queryInterface.addIndex('companies', { unique: true, fields: ['name'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('companies');

@@ -4,29 +4,37 @@ module.exports = (sequelize, DataTypes) => {
 		id: {
 			primaryKey: true,
 			type: DataTypes.UUID,
-            allowNull: false,
-            validate: {
-                isUUID: 4
-            },
-            field: 'id'
+			allowNull: false,
+			validate: {
+				isUUID: 4
+			},
+			field: 'id'
 		},
-		headline: {
-			type: DataTypes.TEXT,
+		name: {
+			type: DataTypes.STRING(255),
 			allowNull: true,
-			field: 'headline'
+			field: 'name',
+			unique: true
 		},
-		coverVideo: {
-			type: DataTypes.TEXT,
-			allowNull: true,
-			field: 'cover_video_url'
+		createdAt: {
+			allowNull: false,
+			type: DataTypes.DATE
+		},
+		updatedAt: {
+			allowNull: false,
+			type: DataTypes.DATE
 		}
 	}, {
 		timestamps: true,
 		updatedAt: 'updated_at',
-		createdAt: 'created_at'
+		createdAt: 'created_at',
+		indexes: [
+			{  unique: true, fields: ['name'] }
+		]
 	});
 	Company.associate = function(models) {
 		Company.belongsToMany(models.tag, { through: 'company_tags', as: 'tags' });
+		Company.hasMany(models.companyText, { as: 'i18n', foreignKey: 'company_id' });
 		Company.hasMany(models.faq, { as: 'faqs', foreignKey: 'company_id' });
 	};
 	return Company;
