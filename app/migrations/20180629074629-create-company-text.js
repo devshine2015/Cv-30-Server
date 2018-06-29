@@ -44,8 +44,8 @@ module.exports = {
 			freezeTableName: true,
 			tableName: 'company_i18n'
 		})
-		.then(() => queryInterface.addIndex('companyText', { fields: ['company_id'] }))
-		.then(() => queryInterface.addIndex('companyText', { fields: ['language_id'] }));
+		.then(() => queryInterface.addIndex('company_i18n', { fields: ['company_id'] }))
+		.then(() => queryInterface.addIndex('company_i18n', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('company_i18n');
