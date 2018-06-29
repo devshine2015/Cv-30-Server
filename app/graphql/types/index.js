@@ -2,15 +2,7 @@ const User = require('./user');
 const Response = require('./response');
 const Profile = require('./profile');
 const Error = require('./error');
-
-const ArticleInput = `
-	input ArticleInput {
-		id: String
-		img: String
-		title: String
-		text: String
-	}
-`;
+const Article = require('./article');
 
 const TeamInput = `
 	input TeamInput {
@@ -139,4 +131,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, User, Profile, Response, ArticleInput, TeamInput, QAInput, Error];
+module.exports = [SchemaDefinition, Article, Query, User, Profile, Response, TeamInput, QAInput, Error];

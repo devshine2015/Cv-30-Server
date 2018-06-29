@@ -24,7 +24,7 @@ module.exports = `
     }
     type Faq {
         id
-        u18n: [FaqText]
+        i18n: [FaqText]
     }
     type FaqText {
         question: String,
