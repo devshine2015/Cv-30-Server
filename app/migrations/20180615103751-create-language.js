@@ -31,7 +31,20 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		})
-		.then(() => queryInterface.addIndex('languages', { unique: true, fields: ['code'] }));
+		.then(() => queryInterface.addIndex('languages', { unique: true, fields: ['code'] }))
+		.then(() => queryInterface.bulkInsert('languages', [
+			{
+				code: "en",
+				label: "English",
+				created_at: new Date(),
+				updated_at: new Date()
+			}, {
+				code: "ro",
+				label: "Română",
+				created_at: new Date(),
+				updated_at: new Date()
+			},
+		]));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('languages');
