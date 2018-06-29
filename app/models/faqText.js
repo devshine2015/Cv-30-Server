@@ -4,34 +4,34 @@ module.exports = (sequelize, DataTypes) => {
 		faqId: {
 			primaryKey: true,
 			allowNull: false,
-			type: Sequelize.INTEGER,
+			type: DataTypes.INTEGER,
 			field: 'faq_id'
 		},
 		languageId: {
 			primaryKey: true,
 			allowNull: false,
 			defaultValue: 1,
-			type: Sequelize.INTEGER,
+			type: DataTypes.INTEGER,
 			field: 'language_id'
 		},
 		question: {
 			allowNull: false,
-			type: Sequelize.TEXT,
+			type: DataTypes.TEXT,
 			field: 'question'
 		},
 		answer: {
 			allowNull: false,
-			type: Sequelize.TEXT,
+			type: DataTypes.TEXT,
 			field: 'answer'
 		},
 		createdAt: {
 			allowNull: false,
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 			field: 'created_at'
 		},
 		updatedAt: {
 			allowNull: false,
-			type: Sequelize.DATE,
+			type: DataTypes.DATE,
 			field: 'updated_at'
 		}
 	}, {
