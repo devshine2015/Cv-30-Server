@@ -24,12 +24,6 @@ const handleArticle = async (language, article, options, { user, models }) => {
         );
     }
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
-    // Get language
     language = await models.language.findOne({
         where: {
             code: language
