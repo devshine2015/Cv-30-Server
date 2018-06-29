@@ -44,16 +44,24 @@ const createAccount = async (nickname, email, password, { models }) => {
         return response;
     }
 
+    const id = uuid();
     user = await models.user.create({
-        id: uuid(),
+        id: id,
         uid: uniqid(),
         nickname,
         email,
         salt: await bcrypt.hash("" + new Date().getTime(), 12),
         status: 'pending',
         activationToken: uuid(),
-        hash: await bcrypt.hash(password, 12)
-    }, {});
+        hash: await bcrypt.hash(password, 12),
+        profile: {
+            userId: id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
+    }, {
+        include: [ { association: 'profile' } ]
+    });
 
     if (!user) {
         response.error = 'Sorry ... we could not create your account';
