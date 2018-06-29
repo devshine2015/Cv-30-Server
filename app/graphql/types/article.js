@@ -14,6 +14,7 @@ const Article = `
     }
     input ArticleInput {
         id: String
+        isFeatured: Boolean
         author: String
         image: String
         video: String
@@ -21,6 +22,13 @@ const Article = `
         description: String
         created_at: Date
         updated_at: Date
+    }
+    input ArticleOptions {
+        articleId: String
+        companyId: String
+        isFeatured: Boolean
+        isAtOffice: Boolean
+        isMoreStories: Boolean
     }
 `;
 

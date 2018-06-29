@@ -95,7 +95,9 @@ const Query = `
 			id: String
 		): StandardResponse
 		handleArticle (
+			language: LanguageCodeType!
 			article: ArticleInput
+			options: ArticleOptions
 		): StandardResponse
 		handleTeam (
 			team: TeamInput

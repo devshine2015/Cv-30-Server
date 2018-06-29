@@ -1,6 +1,7 @@
 const authResolvers = require('./auth');
 const userResolvers = require('./user');
 const companyResolvers = require('./company');
+const articleResolvers = require('./article');
 
 module.exports = {
 	Query: {
@@ -31,7 +32,9 @@ module.exports = {
 		
 		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
-		handleArticle: (_, { article }, context) => companyResolvers.handleArticle(article, context),   
+
+		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
+
 		handleTeam: (_, { team }, context) => companyResolvers.handleTeam(team, context),
     	handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
 		register: (_, {

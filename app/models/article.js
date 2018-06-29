@@ -18,7 +18,7 @@ module.exports = (Sequelize, DataTypes) => {
             },
             field: 'user_id'
 		},
-		is_featured: {
+		isFeatured: {
 			allowNull: true,
 			defaultValue: false,
 			type: DataTypes.BOOLEAN,
