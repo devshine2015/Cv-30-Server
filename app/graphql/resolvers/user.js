@@ -28,9 +28,13 @@ const setAvatar = async (status, { user, models }) => {
 
     }
     if (errors.length) throw new Error(errors);
-    if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
-        return await createProfileResponse(user, models);
-    } else {
+    try {
+        if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
+            return await createProfileResponse(user, models);
+    
+        }
+    } catch(err) {
+        console.log(error);
         return {
             status: false,
             error: "We did not manage to store your profile picture"
@@ -50,12 +54,14 @@ const setHasProfileCover = async (status, { user, models }) => {
     }
     console.log(user);
     if (errors.length) throw new Error(errors);
-    if (await models.profile.upsert({ userId: user.id, hasProfileCover: status })) {
+    try {
+        await models.profile.upsert({ userId: user.id, hasProfileCover: status });
         return await createProfileResponse(user, models);
-    } else {
+    } catch(error) {
+        console.log(error);
         return {
             status: false,
-            error: "We did not manage to store your profile picture"
+            error: "We did not manage to store your profile cover"
         };
     }
 }
@@ -73,14 +79,41 @@ const setCoverBackground = async (color, { user, models }) => {
 
     if (errors.length) throw new Error(errors);
 
-    if (await models.profile.upsert({ userId: user.id, coverBackground: color })) {
-        return await createProfileResponse(user, models);
-    } else {
+    try {
+        if (await models.profile.upsert({ userId: user.id, coverBackground: color }))
+            return await createProfileResponse(user, models);
+    } catch(error) {
+        console.log(error);
         return {
             status: false,
             error: "We did not manage to store your profile picture"
         };
     }
+}
+
+const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
+    validateUser(user);
+
+    const response = {
+        status: false,
+        error: ''
+    };
+
+    try {
+        await models.salary.upsert({
+            userId: user.id,
+            amount,
+            currency,
+            isPublic
+        });
+
+        response.status = true;
+    } catch(error) {
+        console.log(error);
+        response.error = 'We did not manage to store your salary'
+    }
+    
+    return response;
 }
 
 const setValues = async (values, language, { user, models }) => {
@@ -508,7 +541,7 @@ const createProfileResponse = async (user, models) => {
         include: [
             { association: 'skills', include: [{ association: 'i18n' }] },
             { association: 'values', include: [{ association: 'i18n' }] },
-            { association: 'profile' },
+            { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'articles' },
             { association: 'experience', include: [ { association: 'i18n' } ] },
             { association: 'projects', include: [ { association: 'i18n' } ] },
@@ -527,6 +560,7 @@ module.exports = {
     setAvatar,
     setHasProfileCover,
     setCoverBackground,
+    setSalary,
     setValues,
     removeValue,
     setSkills,

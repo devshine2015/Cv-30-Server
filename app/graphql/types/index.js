@@ -3,6 +3,7 @@ const Response = require('./response');
 const Profile = require('./profile');
 const Error = require('./error');
 const Article = require('./article');
+const Salary = require('./salary');
 
 const TeamInput = `
 	input TeamInput {
@@ -37,6 +38,7 @@ const Query = `
 		avatar (status: Boolean): Profile
 		profileCover (status: Boolean): Profile
 		setCoverBackground (color: String): Profile
+		setSalary(salary: SalaryInput): StandardResponse
 		setValues (
 			values: [String!]!
 			language: LanguageCodeType!
@@ -131,4 +133,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Article, Query, User, Profile, Response, TeamInput, QAInput, Error];
+module.exports = [SchemaDefinition, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];
