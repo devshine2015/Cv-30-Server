@@ -3,22 +3,20 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.createTable('company_tags', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
+			companyId: {
 				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
-			user_id: {
 				type: Sequelize.UUID,
                 validate: {
                     isUUID: 4
                 },
-                allowNull: false
+				allowNull: false,
+				field: 'company_id'
 			},
-			value_id: {
+			tagId: {
+				primaryKey: true,
 				type: Sequelize.INTEGER,
 				allowNull: false,
+				field: 'tag_id'
 			},
 			createdAt: {
 				allowNull: false,

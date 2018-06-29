@@ -1,12 +1,12 @@
 'use strict';
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return queryInterface.createTable('tag_i18n', {
-			tagId: {
+		return queryInterface.createTable('faqTexts', {
+			faqId: {
 				primaryKey: true,
 				allowNull: false,
 				type: Sequelize.INTEGER,
-				field: 'tag_id'
+				field: 'faq_id'
 			},
 			languageId: {
 				primaryKey: true,
@@ -15,9 +15,15 @@ module.exports = {
 				type: Sequelize.INTEGER,
 				field: 'language_id'
 			},
-			title: {
-				type: Sequelize.STRING(100),
-				allowNull: false
+			question: {
+				allowNull: false,
+				type: Sequelize.TEXT,
+				field: 'question'
+			},
+			answer: {
+				allowNull: false,
+				type: Sequelize.TEXT,
+				field: 'answer'
 			},
 			createdAt: {
 				allowNull: false,
@@ -34,13 +40,10 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
 			freezeTableName: true,
-			tableName: 'tag_i18n'
-		})
-		.then(() => queryInterface.addIndex('tag_i18n', { fields: ['tag_id'] }))
-		.then(() => queryInterface.addIndex('tag_i18n', { fields: ['language_id'] }))
-		.then(() => queryInterface.addIndex('tag_i18n', { unique: true, fields: ['tag_id', 'language_id'] }));
+			tableName: 'faq_i18n'
+		});
 	},
 	down: (queryInterface, Sequelize) => {
-		return queryInterface.dropTable('tag_i18n');
+		return queryInterface.dropTable('faqTexts');
 	}
 };

@@ -3,13 +3,8 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.createTable('company_featured_articles', {
-			id: {
-				allowNull: false,
-				autoIncrement: true,
-				primaryKey: true,
-				type: Sequelize.INTEGER
-			},
 			company_id: {
+				primaryKey: true,
 				type: Sequelize.UUID,
                 validate: {
                     isUUID: 4
@@ -17,6 +12,7 @@ module.exports = {
                 allowNull: false
 			},
 			article_id: {
+				primaryKey: true,
 				type: Sequelize.UUID,
                 validate: {
                     isUUID: 4
