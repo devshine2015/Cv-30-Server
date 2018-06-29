@@ -526,8 +526,5 @@ module.exports = {
     setProject,
     removeProject,
     setExperience,
-    removeExperience,
-    handleArticle,
-    handleQA,
-    handleTeam
+    removeExperience
 };
