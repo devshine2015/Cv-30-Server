@@ -4,7 +4,10 @@ module.exports = (sequelize, DataTypes) => {
 		userId: {
 			primaryKey: true,
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+				validate: {
+					isUUID: 4
+				},
 			field: 'user_id'
 		},
 		languageId: {
@@ -39,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		freezeTableName: true,
-		tableName: 'user_i18n'
+		tableName: 'story_i18n'
 	});
 	storyText.associate = models => {};
 	return storyText;

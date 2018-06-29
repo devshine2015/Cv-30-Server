@@ -18,6 +18,7 @@ module.exports = {
 		profileCover: (_, { status }, context) => userResolvers.setHasProfileCover(status, context),
 		setCoverBackground: (_, { color }, context) => userResolvers.setCoverBackground(color, context),
 		setSalary: (_, { salary }, context) => userResolvers.setSalary(salary, context),
+		setStory: (_, { language, title, description }, context) => userResolvers.setStory(language, title, description, context),
 
 		setValues: (_, { values, language }, context) => userResolvers.setValues(values, language, context),
 		removeValue: (_, { id }, context) => userResolvers.removeValue(id, context),

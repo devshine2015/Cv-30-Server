@@ -3,10 +3,13 @@ module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.createTable('story_i18n', {
 			userId: {
-				primaryKey: true,
 				allowNull: false,
-				type: Sequelize.INTEGER,
-				field: 'user_id'
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
+				field: 'user_id',
+				primaryKey: true
 			},
 			languageId: {
 				primaryKey: true,
@@ -15,15 +18,15 @@ module.exports = {
 				type: Sequelize.INTEGER,
 				field: 'language_id'
 			},
-			question: {
+			title: {
 				allowNull: false,
 				type: Sequelize.TEXT,
-				field: 'question'
+				field: 'title'
 			},
-			answer: {
+			description: {
 				allowNull: false,
 				type: Sequelize.TEXT,
-				field: 'answer'
+				field: 'description'
 			},
 			createdAt: {
 				allowNull: false,

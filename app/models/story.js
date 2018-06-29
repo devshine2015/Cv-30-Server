@@ -10,20 +10,6 @@ module.exports = (Sequelize, DataTypes) => {
 				},
 			field: 'user_id'
 		},
-		languageId: {
-			allowNull: false,
-			defaultValue: 1,
-			type: DataTypes.INTEGER,
-            field: 'language_id'
-		},
-		title: {
-			type: DataTypes.STRING(255),
-			allowNull: true
-		},
-		description: {
-			type: DataTypes.TEXT,
-			allowNull: true
-		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -38,10 +24,7 @@ module.exports = (Sequelize, DataTypes) => {
 		timestamps: true,
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
-		indexes: [
-			{ fields: ['language_id'] },
-			{ unique: true, fields: ['user_id', 'language_id'] }
-		]
+		indexes: []
 	});
 	Story.associate = models => {
 		Story.belongsTo(models.user, { as: 'owner' });

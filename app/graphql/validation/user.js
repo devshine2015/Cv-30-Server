@@ -1,8 +1,18 @@
 const yup = require('yup');
 
 module.exports = {
+    salary: yup.object().shape({
+        amount: yup.number().positive().required(),
+        currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
+        isPublic: yup.boolean().required()
+    }),
+    story: yup.object().shape({
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
+        title: yup.string().required(),
+        description: yup.string().required()
+    }),
     values: yup.object().shape({
-        language: yup.string().required(),
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         values: yup.array().of(
             yup.string().trim()
             .required('Value needs a title')
@@ -10,7 +20,7 @@ module.exports = {
         )
     }),
     skills: yup.object().shape({
-        language: yup.string().required(),
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         skills: yup.array().of(
             yup.string().trim()
             .required('Skill needs a title')
@@ -31,7 +41,7 @@ module.exports = {
             .max(255, 'Contact linkedin cannot be longer than 255 chars'),
     }),
     project: yup.object().shape({
-        language: yup.string().required(),
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         location: yup.number(),
         isCurrent: yup.boolean(),
         position: yup.string()
@@ -45,7 +55,7 @@ module.exports = {
         description: yup.string()
     }),
     experience: yup.object().shape({
-        language: yup.string().required(),
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         location: yup.number(),
         isCurrent: yup.boolean(),
         position: yup.string()

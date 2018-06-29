@@ -38,6 +38,11 @@ const Query = `
 		avatar (status: Boolean): Profile
 		profileCover (status: Boolean): Profile
 		setCoverBackground (color: String): Profile
+		setStory(
+			language: LanguageCodeType!
+			title: String
+			description: String
+		): StandardResponse
 		setSalary(salary: SalaryInput): StandardResponse
 		setValues (
 			values: [String!]!

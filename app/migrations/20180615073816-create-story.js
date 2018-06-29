@@ -12,21 +12,6 @@ module.exports = {
 				},
 				field: 'user_id'
 			},
-			languageId: {
-				primaryKey: true,
-				allowNull: false,
-				defaultValue: 1,
-				type: Sequelize.INTEGER,
-				field: 'language_id'
-			},
-			title: {
-				type: Sequelize.STRING(255),
-				allowNull: true
-			},
-			description: {
-				type: Sequelize.TEXT,
-				allowNull: true
-			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
@@ -41,8 +26,7 @@ module.exports = {
 			timestamps: true,
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
-		})
-		.then(() => queryInterface.addIndex('stories', { fields: ['language_id'] }));
+		});
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('stories');

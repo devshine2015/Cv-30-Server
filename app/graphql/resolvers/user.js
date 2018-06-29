@@ -94,6 +94,24 @@ const setCoverBackground = async (color, { user, models }) => {
 const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
     validateUser(user);
 
+    try {
+        schema.user.salary.validateSync({
+            amount,
+            currency,
+            isPublic
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+
     const response = {
         status: false,
         error: ''
@@ -107,6 +125,57 @@ const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
             isPublic
         });
 
+        response.status = true;
+    } catch(error) {
+        console.log(error);
+        response.error = 'We did not manage to store your salary'
+    }
+    
+    return response;
+}
+
+const setStory = async(language, title, description, { user, models }) => {
+    validateUser(user);
+
+    try {
+        schema.user.story.validateSync({
+            language,
+            title,
+            description
+        }, { abortEarly: false });
+    } catch (error) {
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+
+    const response = {
+        status: false,
+        error: ''
+    };
+
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    try {
+        await models.story.upsert({
+            userId: user.id
+        });
+        await models.storyText.upsert({
+            userId: user.id,
+            languageId: language.id, 
+            title,
+            description
+        });
         response.status = true;
     } catch(error) {
         console.log(error);
@@ -561,6 +630,7 @@ module.exports = {
     setHasProfileCover,
     setCoverBackground,
     setSalary,
+    setStory,
     setValues,
     removeValue,
     setSkills,
