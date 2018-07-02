@@ -41,22 +41,19 @@ const Query = `
 		): [Job]
 	}
 	type Mutation {
-		avatar (status: Boolean): Profile
-		profileCover (status: Boolean): Profile
-		setCoverBackground (color: String): Profile
+		avatar ( status: Boolean ): Profile
+		profileCover ( status: Boolean ): Profile
+		setCoverBackground ( color: String ): Profile
 		setStory(
+			story: StoryInput
 			language: LanguageCodeType!
-			title: String
-			description: String
 		): StandardResponse
-		setSalary(salary: SalaryInput): StandardResponse
+		setSalary( salary: SalaryInput ): StandardResponse
 		setValues (
 			values: [String!]!
 			language: LanguageCodeType!
 		): StandardResponse
-		removeValue (
-			id: Int
-		): StandardResponse
+		removeValue ( id: Int ): StandardResponse
 		setSkills (
 			skills: [String!]!
 			language: LanguageCodeType!
@@ -64,37 +61,14 @@ const Query = `
 		removeSkill (
 			id: Int
 		): StandardResponse
-		setContact (
-			phone: String
-			email: String
-			facebook: String
-			linkedin: String
-		): StandardResponse
+		setContact ( contact: ContactInput ): StandardResponse
 		setProject (
-			id: String 
-			location: Int
-			isCurrent: Boolean
-			position: String
-			company: String
-			startDate: Date
-			endDate: Date
-			title: String
-			description: String
+			project: ProjectInput
 			language: LanguageCodeType!
 		): StandardResponse
-		removeProject (
-			id: String
-		): StandardResponse
+		removeProject ( id: String ): StandardResponse
 		setExperience (
-			id: String
-			location: Int
-			isCurrent: Boolean
-			position: String
-			company: String
-			startDate: Date
-			endDate: Date
-			title: String
-			description: String
+			experience: ExperienceInput
 			language: LanguageCodeType!
 		): StandardResponse
 		removeExperience (

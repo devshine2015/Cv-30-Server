@@ -134,7 +134,7 @@ const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
     return response;
 }
 
-const setStory = async(language, title, description, { user, models }) => {
+const setStory = async(language, { title, description }, { user, models }) => {
     validateUser(user);
 
     try {
@@ -381,7 +381,7 @@ const removeSkill = async (id, { user, models }) => {
     return response;
 }
 
-const setContact = async (phone, email, facebook, linkedin, { user, models }) => {
+const setContact = async ({ phone, email, facebook, linkedin }, { user, models }) => {
     validateUser(user);
 
     let response = {
@@ -420,7 +420,7 @@ const setContact = async (phone, email, facebook, linkedin, { user, models }) =>
     return response;
 }
 
-const setProject = async (id, location, isCurrent, position, company, startDate, endDate, title, description, language, { user, models }) => {
+const setProject = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
     validateUser(user);
 
     let response = {
@@ -500,7 +500,7 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async (id, location, isCurrent, position, company, startDate, endDate, title, description, language, { user, models }) => {
+const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description} , language, { user, models }) => {
     validateUser(user);
 
     let response = {

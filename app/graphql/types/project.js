@@ -11,6 +11,17 @@ const Project = `
         isCurrent: Boolean,
         i18n: [ProjectText]
     }
+    input ProjectInput {
+        id: String
+        location: Int
+        isCurrent: Boolean
+        position: String
+        company: String
+        startDate: Date
+        endDate: Date
+        title: String
+        description: String
+    }
 `;
 
 const ProjectText = `

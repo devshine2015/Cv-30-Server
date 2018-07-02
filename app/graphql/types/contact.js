@@ -5,6 +5,12 @@ const Contact = `
         facebook: String
         linkedin: String
     }
+    input ContactInput {
+        phone: String
+        email: String
+        facebook: String
+        linkedin: String
+    }
 `;
 
 module.exports = () => [Contact];

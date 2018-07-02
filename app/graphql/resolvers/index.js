@@ -23,18 +23,18 @@ module.exports = {
 		profileCover: (_, { status }, context) => userResolvers.setHasProfileCover(status, context),
 		setCoverBackground: (_, { color }, context) => userResolvers.setCoverBackground(color, context),
 		setSalary: (_, { salary }, context) => userResolvers.setSalary(salary, context),
-		setStory: (_, { language, title, description }, context) => userResolvers.setStory(language, title, description, context),
+		setStory: (_, { language, story }, context) => userResolvers.setStory(language, story, context),
 
 		setValues: (_, { values, language }, context) => userResolvers.setValues(values, language, context),
 		removeValue: (_, { id }, context) => userResolvers.removeValue(id, context),
 		setSkills: (_, { skills, language }, context) => userResolvers.setSkills(skills, language, context),
 		removeSkill: (_, { id }, context) => userResolvers.removeSkill(id, context),
-		setContact: (_, { phone, email, facebook, linkedin }, context) => userResolvers.setContact(phone, email, facebook, linkedin, context),
+		setContact: (_, { contact }, context) => userResolvers.setContact(contact, context),
 
-		setProject: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setProject(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
+		setProject: (_, { project, language }, context) => userResolvers.setProject(project, language, context),
 		removeProject: (_, { id }, context) => userResolvers.removeProject(id, context),
 		
-		setExperience: (_, { id, location, isCurrent, position, company, startDate, endDate, title, description, language }, context) => userResolvers.setExperience(id, location, isCurrent, position, company, startDate, endDate, title, description, language, context),
+		setExperience: (_, { experience, language }, context) => userResolvers.setExperience(experience, language, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 
 		handleCompany: (_, { language, details }, context) => companyResolvers.handleCompany(language, details, context),
@@ -45,32 +45,13 @@ module.exports = {
 		
 		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),
 
-		register: (_, {
-			nickname,
-			email,
-			password
-		}, context) => authResolvers.createAccount(nickname, email, password, context),
-		login: (_, {
-			email,
-			password
-		}, context) => authResolvers.attemptLogin(email, password, context),
+		register: (_, { nickname, email, password }, context) => authResolvers.createAccount(nickname, email, password, context),
+		login: (_, { email, password }, context) => authResolvers.attemptLogin(email, password, context),
 		logout: (_, __, context) => authResolvers.attemptLogout(context),
-		checkTokens: (_, {
-			token,
-			refreshToken
-		}, context) => authResolvers.checkTokens(token, refreshToken, context),
-		forgotPassword: (_, {
-			email
-		}, context) => authResolvers.forgotPasswordSendCode(email, context),
-		checkResetToken: (_, {
-			token
-		}, context) => authResolvers.forgotPasswordCheckToken(token, context),
-		updateForgotPassword: (_, {
-			token,
-			password
-		}, context) => authResolvers.forgotPasswordUpdate(token, password, context),
-		activateAccount: (_, {
-			token
-		}, context) => authResolvers.activateAccount(token, context)
+		checkTokens: (_, { token, refreshToken }, context) => authResolvers.checkTokens(token, refreshToken, context),
+		forgotPassword: (_, { email }, context) => authResolvers.forgotPasswordSendCode(email, context),
+		checkResetToken: (_, { token }, context) => authResolvers.forgotPasswordCheckToken(token, context),
+		updateForgotPassword: (_, { token, password }, context) => authResolvers.forgotPasswordUpdate(token, password, context),
+		activateAccount: (_, { token }, context) => authResolvers.activateAccount(token, context)
 	}
 };
