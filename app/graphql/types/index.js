@@ -5,6 +5,7 @@ const Error = require('./error');
 const Article = require('./article');
 const Salary = require('./salary');
 const Company = require('./company');
+const Job = require('./job');
 
 const TeamInput = `
 	input TeamInput {
@@ -110,6 +111,10 @@ const Query = `
 		handleQA (
 			qa: QAInput
 		): StandardResponse
+		handleJob (
+			language: LanguageCodeType!
+			jobDetails: JobInput
+		): StandardResponse
 		register (
 			nickname: String!
 			email: String!
@@ -145,4 +150,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Company, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];
+module.exports = [SchemaDefinition, Company, Job, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];

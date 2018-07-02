@@ -1,13 +1,13 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 
-const handleCompany = async(language, details, { user, models }) => {
+const handleJob = async(language, jobDetails, { user, models }) => {
     validateUser(user);
 
     try {
-        schema.company.input.validateSync({
+        schema.job.input.validateSync({
             language,
-            details
+            jobDetails
         }, { abortEarly: false });
     } catch (error) {
         console.log(error);
@@ -29,38 +29,16 @@ const handleCompany = async(language, details, { user, models }) => {
     });
 
     await models.sequelize.transaction(async t => {
-        if (details) {
-            details.id = details.id || uuid();
-            await models.company.upsert(details, {transaction: t});
-            details.companyId = details.id;
-            details.languageId = language.id;
-            await models.companyText.upsert(details, {transaction: t});
+        if (jobDetails) {
+            jobDetails.id = jobDetails.id || uuid();
+            await models.job.upsert(jobDetails, {transaction: t});
+            jobDetails.jobId = jobDetails.id;
+            jobDetails.languageId = language.id;
+            await models.jobText.upsert(jobDetails, {transaction: t});
         }
     });
 
     return { status: true };
-}
-
-const handleTeam = async (team, { user, models }) => {
-    validateUser(user);
-
-    let response = {
-        status: false,
-        error: ''
-    };
-
-    return response;
-}
-
-const handleQA = async (qa, { user, models }) => {
-    validateUser(user);
-
-    let response = {
-        status: false,
-        error: ''
-    };
-
-    return response;
 }
 
 const validateUser = (user) => {
@@ -81,7 +59,5 @@ const validateUser = (user) => {
 }
 
 module.exports = {
-    handleCompany,
-    handleQA,
-    handleTeam
+    handleJob
 }

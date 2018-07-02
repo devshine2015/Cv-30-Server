@@ -33,18 +33,18 @@ const handleArticle = async (language, article, options, { user, models }) => {
         if (article) {
             article.id = article.id || uuid();
             article.userId = user.id;   
-            await models.article.upsert(article);
+            await models.article.upsert(article, {transaction: t});
             article.articleId = article.id;
             article.languageId = language.id;
-            article.slug = slugify(article.title);
-            await models.articleText.upsert(article);
+            article.slug = slugify(article.title, {transaction: t});
+            await models.articleText.upsert(article, {transaction: t});
         }
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ where: { id: options.articleId } });
             company = await models.company.findOne({ where: { id: options.companyId } });
-            if (options.isFeatured) company.addFeaturedArticle(article);
-            if (options.isAtOffice) company.addOfficeArticle(article);
-            if (options.isMoreStories) company.addStoriesArticle(article);
+            if (options.isFeatured) company.addFeaturedArticle(article, {transaction: t});
+            if (options.isAtOffice) company.addOfficeArticle(article, {transaction: t});
+            if (options.isMoreStories) company.addStoriesArticle(article, {transaction: t});
         }
     });
 

@@ -552,13 +552,13 @@ const setExperience = async (id, location, isCurrent, position, company, startDa
                 company,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-            });
+            }, {transaction: t});
             await models.experienceText.upsert({
                 experienceId: experienceId,
                 languageId: languageModel.dataValues.id,
                 title,
                 description
-            });
+            }, {transaction: t});
         });
         response.status = true;
     } else {

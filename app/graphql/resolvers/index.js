@@ -2,6 +2,7 @@ const authResolvers = require('./auth');
 const userResolvers = require('./user');
 const companyResolvers = require('./company');
 const articleResolvers = require('./article');
+const jobResolvers = require('./job');
 
 module.exports = {
 	Query: {
@@ -37,7 +38,10 @@ module.exports = {
 		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
 
 		handleTeam: (_, { team }, context) => companyResolvers.handleTeam(team, context),
-    	handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
+		handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
+		
+		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),
+
 		register: (_, {
 			nickname,
 			email,
