@@ -594,12 +594,12 @@ const all = async (language, { models }) => {
 
     const users = await models.user.findAll({
         include: [
-            { association: 'skills', include: [{ association: 'i18n' }] },
-            { association: 'values', include: [{ association: 'i18n' }] },
+            { association: 'skills', include: [{ association: 'i18n', where: { languageId: language.id } }] },
+            { association: 'values', include: [{ association: 'i18n', where: { languageId: language.id } }] },
             { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'articles' },
-            { association: 'experience', include: [ { association: 'i18n' } ] },
-            { association: 'projects', include: [ { association: 'i18n' } ] },
+            { association: 'experience', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
+            { association: 'projects', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
             { association: 'contact' }
         ]
     });

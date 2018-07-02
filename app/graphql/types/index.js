@@ -41,6 +41,9 @@ const Query = `
 		users(
 			language: LanguageCodeType!
 		): [Profile]
+		jobs(
+			language: LanguageCodeType!
+		): [Job]
 	}
 	type Mutation {
 		avatar (status: Boolean): Profile

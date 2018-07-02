@@ -9,6 +9,7 @@ module.exports = {
 		profile: (_, { id = '', language }, context) => userResolvers.profile(id, language, context),
 		companies: (_, { language }, context) => companyResolvers.all(language, context),
 		users: (_, { language }, context) => userResolvers.all(language, context),
+		jobs: (_, { language }, context) => jobResolvers.all(language, context),
 		// articles: (_, { language }, context) => articleResolvers.many(language, context),
 		// article: (_, { id, language }, context) => articleResolvers.one(id, language, context)
 		// profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
