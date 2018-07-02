@@ -64,10 +64,10 @@ module.exports = {
 		})
 		.then(() => queryInterface.addIndex('videos', { fields: ['user_id'] }))
 		.then(() => queryInterface.addIndex('videos', { fields: ['source_id'] }))
-		.then(() => queryInterface.addIndex('videos', { fields: ['target'] }))
+		.then(() => queryInterface.addIndex('videos', { fields: ['source_type'] }))
 		.then(() => queryInterface.addIndex('videos', { fields: ['user_id', 'source_id'] }))
-		.then(() => queryInterface.addIndex('videos', { fields: ['user_id', 'source_id', 'target'] }))
-		.then(() => queryInterface.addIndex('videos', { unique: true, fields: ['user_id', 'source_id', 'target', 'is_featured'] }));
+		.then(() => queryInterface.addIndex('videos', { fields: ['user_id', 'source_id', 'source_type'] }))
+		.then(() => queryInterface.addIndex('videos', { unique: true, fields: ['user_id', 'source_id', 'source_type', 'is_featured'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('videos');

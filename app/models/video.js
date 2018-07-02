@@ -30,11 +30,6 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.ENUM('article','profile','company', 'job', 'team'),
             field: 'source_type'
 		},
-		target: {
-			allowNull: false,
-			type: DataTypes.ENUM('article','profile_cover','company_cover'),
-            field: 'target'
-		},
     	isFeatured: {
 			allowNull: true,
 			defaultValue: false,
@@ -63,10 +58,10 @@ module.exports = (Sequelize, DataTypes) => {
 		indexes: [
 			{ fields: ['user_id'] },
 			{ fields: ['source_id'] },
-			{ fields: ['target'] },
+			{ fields: ['source_type'] },
 			{ fields: ['user_id', 'source_id'] },
-			{ fields: ['user_id', 'source_id', 'target'] },
-			{ unique: true, fields: ['user_id', 'source_id', 'target', 'is_featured'] }
+			{ fields: ['user_id', 'source_id', 'source_type'] },
+			{ unique: true, fields: ['user_id', 'source_id', 'source_type', 'is_featured'] }
 		]
 	});
 	Video.associate = models => {

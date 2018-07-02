@@ -40,7 +40,7 @@ module.exports = {
 		handleCompany: (_, { language, details }, context) => companyResolvers.handleCompany(language, details, context),
 		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
 
-		handleTeam: (_, { team }, context) => companyResolvers.handleTeam(team, context),
+		handleTeam: (_, { teamDetails }, context) => companyResolvers.handleTeam(teamDetails, context),
 		handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
 		
 		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),

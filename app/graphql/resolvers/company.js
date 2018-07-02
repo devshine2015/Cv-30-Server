@@ -80,15 +80,31 @@ const all = async (language, { models }) => {
     })
 };
 
-const handleTeam = async (team, { user, models }) => {
+const handleTeam = async (teamDetails, { user, models }) => {
     validateUser(user);
+    console.log(teamDetails);
+    try {
+        schema.team.input.validateSync({
+            teamDetails
+        }, { abortEarly: false });
+    } catch (error) {
+        console.log(error);
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
 
-    let response = {
-        status: false,
-        error: ''
-    };
+    teamDetails.id = teamDetails.id || uuid();
+    teamDetails.coverBackground = teamDetails.profileBackgroundColor;
+    await models.team.upsert(teamDetails);
 
-    return response;
+    return { status: true };
 }
 
 const handleQA = async (qa, { user, models }) => {

@@ -6,12 +6,7 @@ const Article = require('./article');
 const Salary = require('./salary');
 const Company = require('./company');
 const Job = require('./job');
-
-const TeamInput = `
-	input TeamInput {
-		id: String
-	}
-`;
+const Team = require('./team');
 
 const QAInput = `
 	input QAInput {
@@ -115,7 +110,7 @@ const Query = `
 			options: ArticleOptions
 		): StandardResponse
 		handleTeam (
-			team: TeamInput
+			teamDetails: TeamInput
 		): StandardResponse
 		handleQA (
 			qa: QAInput
@@ -159,4 +154,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Company, Job, Article, Salary, Query, User, Profile, Response, TeamInput, QAInput, Error];
+module.exports = [SchemaDefinition, Company, Job, Team, Article, Salary, Query, User, Profile, Response, QAInput, Error];

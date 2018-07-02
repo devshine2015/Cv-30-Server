@@ -77,10 +77,10 @@ module.exports = {
 		})
 		.then(() => queryInterface.addIndex('images', { fields: ['user_id']}))
 		.then(() => queryInterface.addIndex('images', { fields: ['source_id']}))
-		.then(() => queryInterface.addIndex('images', { fields: ['target'] }))
+		.then(() => queryInterface.addIndex('images', { fields: ['source_type'] }))
 		.then(() => queryInterface.addIndex('images', { fields: ['user_id', 'source_id'] }))
-		.then(() => queryInterface.addIndex('images', { fields: ['user_id', 'source_id', 'target'] }))
-		.then(() => queryInterface.addIndex('images', { unique: true, fields: ['user_id', 'source_id', 'target', 'is_featured'] }));
+		.then(() => queryInterface.addIndex('images', { fields: ['user_id', 'source_id', 'source_type'] }))
+		.then(() => queryInterface.addIndex('images', { unique: true, fields: ['user_id', 'source_id', 'source_type', 'is_featured'] }));
 	},
 	down: (queryInterface, Sequelize) => {
     	return queryInterface.dropTable('images');
