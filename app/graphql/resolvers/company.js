@@ -30,13 +30,11 @@ const handleCompany = async(language, details, { user, models }) => {
     });
 
     await models.sequelize.transaction(async t => {
-        if (details) {
-            details.id = details.id || uuid();
-            await models.company.upsert(details, {transaction: t});
-            details.companyId = details.id;
-            details.languageId = language.id;
-            await models.companyText.upsert(details, {transaction: t});
-        }
+        details.id = details.id || uuid();
+        await models.company.upsert(details, {transaction: t});
+        details.companyId = details.id;
+        details.languageId = language.id;
+        await models.companyText.upsert(details, {transaction: t});
     });
 
     return { status: true };

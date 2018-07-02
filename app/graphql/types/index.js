@@ -98,7 +98,7 @@ const Query = `
 		): StandardResponse
 		handleCompany(
 			language: LanguageCodeType!
-			details: CompanyInput
+			details: CompanyInput!
 		): StandardResponse
 		handleArticle (
 			language: LanguageCodeType!
