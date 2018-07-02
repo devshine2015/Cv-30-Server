@@ -17,6 +17,7 @@ const Profile = `
         firstName: String
         lastName: String
         featuredArticles: [Article]
+        aboutMeArticles: [Article]
         skills: [Skill]
         values: [Value]
         experience: [Experience]

@@ -15,6 +15,7 @@ const Article = `
     input ArticleInput {
         id: String
         isFeatured: Boolean
+        isAboutMe: Boolean
         author: String
         image: String
         video: String

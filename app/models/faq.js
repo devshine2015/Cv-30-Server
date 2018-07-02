@@ -32,7 +32,7 @@ module.exports = (Sequelize, DataTypes) => {
 	});
 	Faq.associate = models => {
 		Faq.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
-		Faq.hasMany(models.faqText, { as: 'i18n', foreignKey: 'company_id' });
+		Faq.hasMany(models.faqText, { as: 'i18n', foreignKey: 'faq_id' });
 	};
 	return Faq;
 };

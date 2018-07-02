@@ -24,6 +24,12 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.BOOLEAN,
 			field: 'is_featured'
 		},
+		isAboutMe: {
+			allowNull: true,
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'is_about_me'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -40,13 +46,14 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at',
 		indexes: [
 			{ fields: ['user_id'] },
-			{ fields: ['user_id', 'is_featured'] }
+			{ fields: ['user_id', 'is_featured'] },
+			{ fields: ['user_id', 'is_about_me'] }
 		]
 	});
 	Article.associate = models => {
 		Article.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
 		Article.hasMany(models.articleText, { as: 'i18n' });
-		Article.hasMany(models.image, { as: 'images' });
+		Article.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 		Article.belongsToMany(models.company, { as: 'featured', through: 'company_featured_articles', foreignKey: 'article_id' }),
 		Article.belongsToMany(models.company, { as: 'lifeAtTheOffice', through: 'company_office_articles', foreignKey: 'article_id' }),
 		Article.belongsToMany(models.company, { as: 'moreStories', through: 'company_stories_articles', foreignKey: 'article_id' })

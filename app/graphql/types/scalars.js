@@ -4,6 +4,13 @@ module.exports = `
         eur
         ron
     }
+    enum MediaSourceType {
+        article
+        profile
+        company
+        job
+        team
+    }
     enum VideoTarget {
         article
         profile_cover

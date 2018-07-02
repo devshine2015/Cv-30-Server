@@ -42,6 +42,46 @@ const handleCompany = async(language, details, { user, models }) => {
     return { status: true };
 }
 
+const all = async (language, { models }) => {
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    return models.company.findAll({
+        include: [
+            {
+                association: 'i18n',
+                where: { languageId: language.id }
+            }, {
+                association: 'featuredArticles',
+                include: [
+                    { association: 'images' },
+                    { association: 'i18n', where: { languageId: language.id } }
+                ]
+            }, {
+                association: 'officeArticles',
+                include: [
+                    { association: 'i18n', where: { languageId: language.id } },
+		            { association: 'images' }
+                ]
+            }, {
+                association: 'storiesArticles',
+                include: [
+                    { association: 'i18n', where: { languageId: language.id } },
+		            { association: 'images' }
+                ]
+            }, {
+                association: 'faqs',
+                include: [
+                    { association: 'i18n', where: { languageId: language.id } }
+                ]
+            }
+        ]
+    })
+};
+
 const handleTeam = async (team, { user, models }) => {
     validateUser(user);
 
@@ -67,5 +107,6 @@ const handleQA = async (qa, { user, models }) => {
 module.exports = {
     handleCompany,
     handleQA,
-    handleTeam
+    handleTeam,
+    all
 }

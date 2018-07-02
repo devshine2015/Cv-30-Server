@@ -23,11 +23,17 @@ module.exports = {
                 },
 				field: 'user_id'
 			},
-			is_featured: {
+			isFeatured: {
 				allowNull: true,
 				defaultValue: false,
 				type: Sequelize.BOOLEAN,
 				field: 'is_featured'
+			},
+			isAboutMe: {
+				allowNull: true,
+				defaultValue: false,
+				type: Sequelize.BOOLEAN,
+				field: 'is_about_me'
 			},
 			createdAt: {
 				allowNull: false,
@@ -45,7 +51,8 @@ module.exports = {
 			createdAt: 'created_at'
 		})
 		.then(() => queryInterface.addIndex('articles', ['user_id']))
-		.then(() => queryInterface.addIndex('articles', ['user_id', 'is_featured']));
+		.then(() => queryInterface.addIndex('articles', ['user_id', 'is_featured']))
+		.then(() => queryInterface.addIndex('articles', ['user_id', 'is_about_me']));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('articles');

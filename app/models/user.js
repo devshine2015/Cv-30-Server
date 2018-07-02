@@ -94,6 +94,8 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.skill, { through: 'user_skills', as: 'skills' });
         User.belongsToMany(models.value, { through: 'user_values', as: 'values' });
         User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
+        User.hasMany(models.article, { as: 'featuredArticles', foreignKey: 'user_id', where: { isFeatured: true } });
+        User.hasMany(models.article, { as: 'aboutMeArticles', foreignKey: 'user_id', where: { isAboutMe: true } });
         User.hasMany(models.article, { as: 'articles', foreignKey: 'user_id' });
         User.hasMany(models.experience, { as: 'experience', foreignKey: 'user_id' });
         User.hasMany(models.project, { as: 'projects', foreignKey: 'user_id' });

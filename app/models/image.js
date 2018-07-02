@@ -78,7 +78,7 @@ module.exports = (Sequelize, DataTypes) => {
 	Image.associate = models => {
 		Image.belongsTo(models.article, { as: 'article', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
-		Image.belongsTo(models.user, { as: 'author' });
+		Image.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
   	};
 	return Image;
 };

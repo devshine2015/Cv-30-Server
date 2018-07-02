@@ -35,6 +35,9 @@ const Query = `
 		profiles(
 			language: LanguageCodeType!
 		): [Profile]
+		companies(
+			language: LanguageCodeType!
+		): [Company]
 	}
 	type Mutation {
 		avatar (status: Boolean): Profile
