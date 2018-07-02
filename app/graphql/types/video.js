@@ -8,7 +8,6 @@ const Video = `
         isFeatured: Boolean
         source: String
         sourceType: MediaSourceType
-        target: VideoTarget
         path: String
         originalFilename: String
         filename: String
@@ -22,7 +21,6 @@ const Video = `
         isFeatured: Boolean
         source: String
         sourceType: MediaSourceType
-        target: VideoTarget
         path: String
     }
 `;

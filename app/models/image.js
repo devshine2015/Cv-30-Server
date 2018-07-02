@@ -20,13 +20,16 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		sourceId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
-            field: 'source_id'
+			type: DataTypes.UUID,
+			validate: {
+				isUUID: 4
+			},
+			field: 'source_id'
 		},
-		target: {
+		sourceType: {
 			allowNull: false,
-			type: DataTypes.ENUM('article','profile','profile_cover','company_cover'),
-            field: 'target'
+			type: DataTypes.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team'),
+			field: 'source_type'
 		},
     	isFeatured: {
 			allowNull: true,
@@ -79,6 +82,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Image.belongsTo(models.article, { as: 'article', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
+		Image.hasMany(models.imageText, { as: 'i18n', foreignKey: 'image_id' });
   	};
 	return Image;
 };

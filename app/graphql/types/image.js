@@ -6,10 +6,8 @@ const Image = `
         title: String
         description: String
         isFeatured: Boolean
-        isAboutMe: Boolean
         source: String
         sourceType: MediaSourceType
-        target: ImageTarget
         path: String
         originalFilename: String
         filename: String
@@ -21,10 +19,8 @@ const Image = `
         title: String
         description: String
         isFeatured: Boolean
-        isAboutMe: Boolean
         source: String
         sourceType: MediaSourceType
-        target: ImageTarget
         path: String
     }
 `;

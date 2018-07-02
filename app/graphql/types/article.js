@@ -17,8 +17,8 @@ const Article = `
         isFeatured: Boolean
         isAboutMe: Boolean
         author: String
-        image: String
-        video: String
+        images: [ImageInput]
+        videos: [VideoInput]
         title: String
         description: String
         created_at: Date

@@ -26,15 +26,15 @@ module.exports = {
 			sourceId: {
 				allowNull: false,
 				type: Sequelize.UUID,
-                validate: {
-                    isUUID: 4
-                },
+				validate: {
+					isUUID: 4
+				},
 				field: 'source_id'
 			},
-			target: {
+			sourceType: {
 				allowNull: false,
-				type: Sequelize.ENUM('article','profile','profile_cover','company_cover'),
-				field: 'target'
+				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team'),
+				field: 'source_type'
 			},
 			isFeatured: {
 				allowNull: true,
@@ -49,12 +49,12 @@ module.exports = {
 			},
 			originalFilename: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 				field: 'original_filename'
 			},
 			filename: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 				validate: {
 					isUUID: 4
 				},

@@ -1,7 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 const { validateUser } = require('./user');
-// const slug = require('limax');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     validateUser(user);
@@ -37,8 +36,75 @@ const handleArticle = async (language, article, options, { user, models }) => {
             await models.article.upsert(article, {transaction: t});
             article.articleId = article.id;
             article.languageId = language.id;
-            article.slug = slugify(article.title, {transaction: t});
-            await models.articleText.upsert(article, {transaction: t});
+            article.slug = slugify(article.title);
+            if (article.images) {
+                await models.image.bulkCreate(article.images.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured,
+                    sourceId: article.id,
+                    sourceType: item.sourceType,
+                    target: item.target,
+                    path: item.path
+                })), {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                await models.imageText.bulkCreate(article.images.map(item => ({
+                    imageId: item.id,
+                    title: item.title,
+                    description: item.description,
+                    languageId: language.id
+                })), {
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
+            }
+            if (article.images) {
+                await models.image.bulkCreate(article.images.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured,
+                    sourceId: article.id,
+                    sourceType: item.sourceType,
+                    path: item.path
+                })), {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                await models.imageText.bulkCreate(article.images.map(item => ({
+                    imageId: item.id,
+                    title: item.title,
+                    description: item.description,
+                    languageId: language.id
+                })), {
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
+            }
+            if (article.videos) {
+                await models.video.bulkCreate(article.videos.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured,
+                    sourceId: article.id,
+                    sourceType: item.sourceType,
+                    path: item.path
+                })), {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                await models.videoText.bulkCreate(article.videos.map(item => ({
+                    videoId: item.id,
+                    title: item.title,
+                    description: item.description,
+                    languageId: language.id
+                })), {
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
+            }
+            await models.articleText.upsert(article, { transaction: t });
         }
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ where: { id: options.articleId } });

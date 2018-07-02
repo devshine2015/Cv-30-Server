@@ -7,8 +7,24 @@ module.exports = {
             id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             isFeatured: yup.boolean(),
             author: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            image: yup.string().trim(),
-            video: yup.string().trim(),
+            images: yup.array().of(yup.object().shape({
+                id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+                title: yup.string().trim().max(255),
+                description: yup.string().trim(),
+                isFeatured: yup.boolean(),
+                source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+                sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team)/, { excludeEmptyString: true }),
+                path: yup.string().trim().max(255)
+            })),
+            videos: yup.array().of(yup.object().shape({
+                id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+                title: yup.string().trim().max(255),
+                description: yup.string().trim(),
+                isFeatured: yup.boolean(),
+                source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+                sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team)/, { excludeEmptyString: true }),
+                path: yup.string().trim().max(255)
+            })),
             title: yup.string().trim().max(255).required(),
             description: yup.string().trim()
         }),

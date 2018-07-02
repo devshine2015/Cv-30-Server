@@ -20,7 +20,7 @@ module.exports = {
 				field: 'language_id'
 			},
 			title: {
-				type: Sequelize.STRING(100),
+				type: Sequelize.STRING(255),
 				allowNull: false
 			},
 			createdAt: {

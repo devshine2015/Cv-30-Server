@@ -20,7 +20,7 @@ module.exports = {
 				primaryKey: true
 			},
 			title: {
-				type: Sequelize.TEXT,
+				type: Sequelize.STRING(255),
 				allowNull: true
 			},
 			description: {

@@ -19,19 +19,27 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		sourceId: {
 			allowNull: false,
-			type: DataTypes.INTEGER,
-            field: 'source_id'
+			type: DataTypes.UUID,
+			validate: {
+				isUUID: 4
+			},
+			field: 'source_id'
+		},
+		sourceType: {
+			allowNull: false,
+			type: DataTypes.ENUM('article','profile','company', 'job', 'team'),
+            field: 'source_type'
 		},
 		target: {
 			allowNull: false,
 			type: DataTypes.ENUM('article','profile_cover','company_cover'),
             field: 'target'
 		},
-    	is_featured: {
+    	isFeatured: {
 			allowNull: true,
 			defaultValue: false,
 			type: DataTypes.BOOLEAN,
-			field: 'isFeatured'
+			field: 'is_featured'
 		},
     	path: {
 			type: DataTypes.STRING(255),
