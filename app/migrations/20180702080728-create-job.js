@@ -11,6 +11,19 @@ module.exports = {
 				},
 				field: 'id'
 			},
+			companyId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+				validate: {
+					isUUID: 4
+				},
+				field: 'company_id'
+			},
+			expireDate: {
+				allowNull: true,
+				type: Sequelize.DATE,
+				field: 'expire_date'
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

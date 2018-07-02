@@ -2,14 +2,11 @@ module.exports = `
     type Job {
         id: String!
         name: String
+        expireDate: Date
         createdAt: Date
         updatedAt: Date
         i18n: [JobText]
-        featuredArticles: [Article]
-        officeArticles: [Article]
-        storiesArticles: [Article]
-        tags: [Tag]
-        faqs: [Faq]
+        company: Company
     }
     type JobText {
         title: String
@@ -18,8 +15,10 @@ module.exports = `
     }
     input JobInput {
         id: String
+        companyId: String
         title: String
         description: String
         idealCandidate: String
+        expireDate: Date
     }
 `;
