@@ -585,6 +585,27 @@ const removeExperience = async (id, { user, models }) => {
     return response;
 }
 
+const all = async (language, { models }) => {
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    const users = await models.user.findAll({
+        include: [
+            { association: 'skills', include: [{ association: 'i18n', where: { languageId: language.id } }] },
+            { association: 'values', include: [{ association: 'i18n', where: { languageId: language.id } }] },
+            { association: 'profile', include: [{ association: 'salary' }] },
+            { association: 'articles' },
+            { association: 'experience', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
+            { association: 'projects', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
+            { association: 'contact' }
+        ]
+    });
+    return users;
+}
+
 const validateUser = (user) => {
     const errors = [];
 
@@ -640,5 +661,6 @@ module.exports = {
     removeProject,
     setExperience,
     removeExperience,
-    validateUser
+    validateUser,
+    all
 };

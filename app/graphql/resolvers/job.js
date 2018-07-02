@@ -43,6 +43,23 @@ const handleJob = async(language, jobDetails, { user, models }) => {
     return { status: true };
 }
 
+const all = async (language, { models }) => {
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    return models.job.findAll(
+    {
+        include: [
+            { association: 'i18n', where: { languageId: language.id } },
+            { association: 'company', include: [ { association: 'i18n', where: { languageId: language.id} }] }
+        ]
+    });
+}
+
 module.exports = {
-    handleJob
+    handleJob,
+    all
 }

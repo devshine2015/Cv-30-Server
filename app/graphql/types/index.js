@@ -38,6 +38,12 @@ const Query = `
 		companies(
 			language: LanguageCodeType!
 		): [Company]
+		users(
+			language: LanguageCodeType!
+		): [Profile]
+		jobs(
+			language: LanguageCodeType!
+		): [Job]
 	}
 	type Mutation {
 		avatar (status: Boolean): Profile
