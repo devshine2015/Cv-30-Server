@@ -1,5 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
+const { validateUser } = require('./user');
 // const slug = require('limax');
 
 const handleArticle = async (language, article, options, { user, models }) => {
@@ -53,23 +54,6 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
 module.exports = {
     handleArticle
-}
-
-const validateUser = (user) => {
-    const errors = [];
-
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-
-    }
-    if (errors.length) {
-        console.log(errors);
-        throw new Error(errors);
-    }
 }
 
 function slugify(str) {

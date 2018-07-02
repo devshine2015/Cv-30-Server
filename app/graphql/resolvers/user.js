@@ -639,5 +639,6 @@ module.exports = {
     setProject,
     removeProject,
     setExperience,
-    removeExperience
+    removeExperience,
+    validateUser
 };
