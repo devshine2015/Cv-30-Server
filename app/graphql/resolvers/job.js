@@ -2,7 +2,7 @@ const uuid = require('uuidv4');
 const schema = require('../validation');
 const { validateUser } = require('./user');
 
-const handleJob = async(language, jobDetails, { user, models }) => {
+const handleJob = async (language, jobDetails, { user, models }) => {
     validateUser(user);
 
     try {
@@ -22,7 +22,7 @@ const handleJob = async(language, jobDetails, { user, models }) => {
             )
         );
     }
-    
+
     language = await models.language.findOne({
         where: {
             code: language
@@ -31,12 +31,12 @@ const handleJob = async(language, jobDetails, { user, models }) => {
 
     if (jobDetails) {
         await models.sequelize.transaction(async t => {
-        
+
             jobDetails.id = jobDetails.id || uuid();
-            await models.job.upsert(jobDetails, {transaction: t});
+            await models.job.upsert(jobDetails, { transaction: t });
             jobDetails.jobId = jobDetails.id;
             jobDetails.languageId = language.id;
-            await models.jobText.upsert(jobDetails, {transaction: t});
+            await models.jobText.upsert(jobDetails, { transaction: t });
         });
     }
 
@@ -51,13 +51,13 @@ const all = async (language, { models }) => {
     });
 
     return models.job.findAll(
-    {
-        include: [
-            { association: 'i18n', where: { languageId: language.id } },,
-            { association: 'team', include: [ { association: 'i18n', where: { languageId: language.id} }] },
-            { association: 'company', include: [ { association: 'i18n', where: { languageId: language.id} }] }
-        ]
-    });
+        {
+            include: [
+                { association: 'i18n', where: { languageId: language.id } },
+                { association: 'team' },
+                { association: 'company', include: [{ association: 'i18n', where: { languageId: language.id } }] }
+            ]
+        });
 }
 
 module.exports = {
