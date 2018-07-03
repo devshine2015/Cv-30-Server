@@ -27,7 +27,7 @@ module.exports = {
             })),
             title: yup.string().trim().max(255).required(),
             description: yup.string().trim()
-        }),
+        }).default(undefined),
         options: yup.object().shape({
             articleId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             companyId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
