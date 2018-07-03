@@ -41,7 +41,7 @@ if (cluster.isMaster) {
         bodyParser.json(),
         cookieParser(process.env.COOKIE_SECRET, {}),
         apolloServer.graphqlExpress(async (req, res) => {
-            const { user, models } = await getContext(req);
+            const { user, models } = await getContext(req, res);
             return {
                 schema,
                 context: { user, models, res },
