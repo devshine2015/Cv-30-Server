@@ -260,7 +260,7 @@ const setValues = async (values, language, { user, models }) => {
                 const mappedValueTexts = newValues.map((title, i) => {
                     return {
                         valueId: createdValues[i].dataValues.id,
-                        languageId: 1,
+                        languageId: languageModel.id,
                         title,
                     };
                 });

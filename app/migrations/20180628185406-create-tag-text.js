@@ -2,14 +2,18 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.createTable('tag_i18n', {
-			tagId: {
+			id: {
+				allowNull: false,
+				autoIncrement: true,
 				primaryKey: true,
+				type: Sequelize.INTEGER
+			}, 
+			tagId: {
 				allowNull: false,
 				type: Sequelize.INTEGER,
 				field: 'tag_id'
 			},
 			languageId: {
-				primaryKey: true,
 				allowNull: false,
 				defaultValue: 1,
 				type: Sequelize.INTEGER,

@@ -39,6 +39,9 @@ module.exports = {
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 
 		handleCompany: (_, { language, details }, context) => companyResolvers.handleCompany(language, details, context),
+		setTags: (_, { language, tagsInput }, context) => companyResolvers.setTags(language, tagsInput, context),
+		removeTag: (_, { id, companyId }, context) => companyResolvers.removeTag(id, companyId, context),
+
 		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
 
 		handleTeam: (_, { teamDetails }, context) => teamResolvers.handleTeam(teamDetails, context),

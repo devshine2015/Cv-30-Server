@@ -29,6 +29,10 @@ module.exports = `
     type TagText {
         title: String
     }
+    input TagsInput {
+        companyId: String!
+        tags: [String!]!
+    }
     type Faq {
         id: String
         i18n: [FaqText]

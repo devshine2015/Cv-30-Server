@@ -72,6 +72,14 @@ const Query = `
 			language: LanguageCodeType!
 			details: CompanyInput!
 		): StandardResponse
+		setTags(
+			language: LanguageCodeType!
+			tagsInput: TagsInput!
+		): StandardResponse
+		removeTag (
+			id: Int!
+			companyId: String!
+		): StandardResponse
 		handleArticle (
 			language: LanguageCodeType!
 			article: ArticleInput

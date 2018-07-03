@@ -20,10 +20,7 @@ module.exports = (Sequelize, DataTypes) => {
 	}, {
 		timestamps: true,
 		updatedAt: 'updated_at',
-		createdAt: 'created_at',
-		indexes: [],
-		freezeTableName: true,
-		tableName: 'tag_i18n'
+		createdAt: 'created_at'
 	});
 	Tag.associate = models => {
 		Tag.belongsToMany(models.company, {
