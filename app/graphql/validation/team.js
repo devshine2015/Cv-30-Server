@@ -9,6 +9,10 @@ module.exports = {
             hasProfileCover: yup.boolean(),
             profileBackgroundColor: yup.string().trim(100)
         })
+    }),
+    addRemoveMemberInput: yup.object().shape({
+        teamId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+        memberId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
     })
 };
     

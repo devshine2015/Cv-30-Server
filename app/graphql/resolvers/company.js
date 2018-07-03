@@ -83,33 +83,6 @@ const all = async (language, { models }) => {
     })
 };
 
-const handleTeam = async (teamDetails, { user, models }) => {
-    validateUser(user);
-    console.log(teamDetails);
-    try {
-        schema.team.input.validateSync({
-            teamDetails
-        }, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
-
-    teamDetails.id = teamDetails.id || uuid();
-    teamDetails.coverBackground = teamDetails.profileBackgroundColor;
-    await models.team.upsert(teamDetails);
-
-    return { status: true };
-}
-
 const handleQA = async (qa, { user, models }) => {
     validateUser(user);
 
@@ -124,6 +97,5 @@ const handleQA = async (qa, { user, models }) => {
 module.exports = {
     handleCompany,
     handleQA,
-    handleTeam,
     all
 }

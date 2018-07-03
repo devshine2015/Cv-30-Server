@@ -3,6 +3,7 @@ const userResolvers = require('./user');
 const companyResolvers = require('./company');
 const articleResolvers = require('./article');
 const jobResolvers = require('./job');
+const teamResolvers = require('./team');
 
 module.exports = {
 	Query: {
@@ -40,7 +41,10 @@ module.exports = {
 		handleCompany: (_, { language, details }, context) => companyResolvers.handleCompany(language, details, context),
 		handleArticle: (_, { language, article, options }, context) => articleResolvers.handleArticle(language, article, options, context),
 
-		handleTeam: (_, { teamDetails }, context) => companyResolvers.handleTeam(teamDetails, context),
+		handleTeam: (_, { teamDetails }, context) => teamResolvers.handleTeam(teamDetails, context),
+		addMemberToTeam: (_, { teamId, memberId }, context) => teamResolvers.addMemberToTeam(teamId, memberId, context),
+		removeMemberFromTeam: (_, { teamId, memberId }, context) => teamResolvers.removeMemberFromTeam(teamId, memberId, context),
+
 		handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
 		
 		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),
