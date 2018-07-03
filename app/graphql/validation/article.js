@@ -33,7 +33,8 @@ module.exports = {
             companyId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             isFeatured: yup.boolean(),
             isAtOffice: yup.boolean(),
-            isMoreStories: yup.boolean()
+            isMoreStories: yup.boolean(),
+            teamId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
         })
     })
 }

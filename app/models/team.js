@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
                 isUUID: 4
             }
 		},
+		companyId: {
+			allowNull: false,
+			type: DataTypes.UUID,
+			validate: {
+                isUUID: 4
+			},
+			field: 'company_id'
+		},
 		name: {
 			allowNull: true,
 			type: DataTypes.STRING(255)

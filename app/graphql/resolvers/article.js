@@ -113,6 +113,12 @@ const handleArticle = async (language, article, options, { user, models }) => {
             if (options.isAtOffice) company.addOfficeArticle(article, {transaction: t});
             if (options.isMoreStories) company.addStoriesArticle(article, {transaction: t});
         }
+        if (options && options.articleId && options.teamId && options.isAtOffice) {
+            models.teamOfficeArticles.upsert({
+                team_id: options.teamId,
+                article_id: options.articleId
+            }, { transaction: t})
+        }
     });
 
     return { status: true };

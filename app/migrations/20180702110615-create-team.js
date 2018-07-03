@@ -10,6 +10,14 @@ module.exports = {
 					isUUID: 4
 				}
 			},
+			companyId: {
+				allowNull: false,
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
+				field: 'company_id'
+			},
 			name: {
 				allowNull: true,
 				type: Sequelize.STRING(255)
@@ -40,7 +48,8 @@ module.exports = {
 			timestamps: true,
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
-		});
+		})
+		.then(() => queryInterface.addIndex('teams', { fields: ['company_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('teams');

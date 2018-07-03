@@ -86,6 +86,14 @@ const Query = `
 		handleTeam (
 			teamDetails: TeamInput
 		): StandardResponse
+		addMemberToTeam (
+			teamId: String,
+			memberId: String
+		): StandardResponse
+		removeMemberFromTeam (
+			teamId: String,
+			memberId: String
+		): StandardResponse
 		handleQA (
 			qa: QAInput
 		): StandardResponse

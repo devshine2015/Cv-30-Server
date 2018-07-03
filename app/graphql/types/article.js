@@ -34,6 +34,7 @@ const Article = `
         isFeatured: Boolean
         isAtOffice: Boolean
         isMoreStories: Boolean
+        teamId: String
     }
 `;
 

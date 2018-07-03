@@ -11,6 +11,7 @@ module.exports = `
     }
     input TeamInput {
         id: String
+        companyId: String
         name: String
         hasProfileCover: Boolean
         profileBackgroundColor: String

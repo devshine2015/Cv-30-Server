@@ -58,6 +58,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Article.belongsToMany(models.company, { as: 'featured', through: 'company_featured_articles', foreignKey: 'article_id' }),
 		Article.belongsToMany(models.company, { as: 'lifeAtTheOffice', through: 'company_office_articles', foreignKey: 'article_id' }),
 		Article.belongsToMany(models.company, { as: 'moreStories', through: 'company_stories_articles', foreignKey: 'article_id' })
+		Article.belongsToMany(models.team, { as: 'officeArticles', through: 'team_office_articles', foreignKey: 'article_id' });
 	};
 	return Article;
 };
