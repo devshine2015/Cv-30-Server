@@ -59,6 +59,7 @@ module.exports = {
 		forgotPassword: (_, { email }, context) => authResolvers.forgotPasswordSendCode(email, context),
 		checkResetToken: (_, { token }, context) => authResolvers.forgotPasswordCheckToken(token, context),
 		updateForgotPassword: (_, { token, password }, context) => authResolvers.forgotPasswordUpdate(token, password, context),
-		activateAccount: (_, { token }, context) => authResolvers.activateAccount(token, context)
+		activateAccount: (_, { token }, context) => authResolvers.activateAccount(token, context),
+		updateUserSettings: (_, { userSettings }, context) => authResolvers.updateUserSettings(userSettings, context),
 	}
 };

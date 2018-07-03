@@ -10,7 +10,13 @@ const User = `
         lastName: String
         updatedAt: Date!
         createdAt: Date!
-  	}
+    }
+    input UserSettingsInput {
+        firstName: String!
+        lastName: String!
+        oldPassword: String
+        newPassword: String
+    }
 `;
 
 module.exports = () => [User, Scalars];

@@ -6,6 +6,8 @@ const nodemailer = require('nodemailer');
 const validator = require('validator');
 const uniqid = require('uniqid');
 const uuid = require('uuidv4');
+const { validateUser } = require('./user');
+const schema = require('../validation');
 
 const createAccount = async (nickname, email, password, { models }) => {
     let response = {
@@ -343,6 +345,88 @@ const forgotPasswordUpdate = async (token, password, { models }) => {
     }
     return response;
 }
+const updateUserSettings = async ({ firstName, lastName, oldPassword, newPassword }, { user, res }) => {
+    validateUser(user);
+    try {
+        schema.user.settings.validateSync({
+            firstName,
+            lastName,
+            oldPassword,
+            newPassword
+        }, { abortEarly: false });
+    } catch (error) {
+        console.log(error);
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+    user.firstName = firstName.trim();
+    user.lastName = lastName.trim();
+    await user.save();
+    if (!oldPassword) return { status: true };
+    const valid = await bcrypt.compare(oldPassword, user.hash);
+    if (!valid) {
+        throw new Error(
+            JSON.stringify(
+                [{
+                    path: 'userSettings',
+                    type: 'invalidCredentials',
+                    message: 'Invalid credentials'
+                }]
+            )
+        );
+    }
+    if (user) {
+        user.salt = await bcrypt.hash("" + new Date().getTime(), 12);
+        user.hash = await bcrypt.hash(password, 12);
+        if (!await user.save()) {
+            throw new Error(
+                JSON.stringify(
+                    [{
+                        path: 'userSettings',
+                        type: 'invalidCredentials',
+                        message: 'We could not save your details'
+                    }]
+                )
+            );
+        }
+    } else {
+        throw new Error(
+            JSON.stringify(
+                [{
+                    path: 'userSettings',
+                    type: 'invalidCredentials',
+                    message: 'Invalid credentials'
+                }]
+            )
+        );
+    }
+    let tokens = _createTokens(user);
+    res.cookie(process.env.TOKEN_NAME, tokens.token, {
+        path: '/',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    });
+    res.cookie(process.env.REFRESH_TOKEN_NAME, tokens.refreshToken, {
+        path: '/',
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true
+    });
+    tokens.id = user.id;
+    tokens.email = user.email;
+    tokens.firstName = user.firstName;
+    tokens.lastName = user.lastName;
+    tokens.hasAvatar = !!(user.profile && user.profile.hasAvatar)
+    return tokens;
+}
 
 const forgotPasswordCheckToken = async (token, { models }) => {
     let status = false;
@@ -439,5 +523,6 @@ module.exports = {
     forgotPasswordSendCode,
     forgotPasswordUpdate,
     forgotPasswordCheckToken,
-    activateAccount
+    activateAccount,
+    updateUserSettings
 };

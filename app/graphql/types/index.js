@@ -129,6 +129,7 @@ const Query = `
 			password: String!
 		): StandardResponse
 		activateAccount (token: String!): StandardResponse
+		updateUserSettings (userSettings: UserSettingsInput): StandardResponse
 	}
 `;
 

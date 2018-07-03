@@ -1,14 +1,3 @@
-/*
-
-decodedToken = await jwt.decode(token);
-decodedRefreshToken = await jwt.decode(refreshToken);
-decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
-decodedRefreshToken.data = JSON.parse(_decrypt(decodedRefreshToken.data));
-user = await models.user.findOne({ where: {id: decodedToken.data.id} });
-decodedToken = await jwt.verify(token, user.salt + process.env.JWT_SECRET);
-decodedRefreshToken = await jwt.verify(refreshToken, user.salt + process.env.JWT_REFRESH_SECRET);
-
-*/
 const jwt = require('jsonwebtoken');
 const models = require('./models/');
 const crypto = require('crypto');
