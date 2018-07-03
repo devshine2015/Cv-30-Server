@@ -48,9 +48,9 @@ const setAvatar = async (status, { user, models }) => {
     try {
         if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
             return await createProfileResponse(user, models);
-    
+
         }
-    } catch(err) {
+    } catch (err) {
         console.log(error);
         return {
             status: false,
@@ -74,7 +74,7 @@ const setHasProfileCover = async (status, { user, models }) => {
     try {
         await models.profile.upsert({ userId: user.id, hasProfileCover: status });
         return await createProfileResponse(user, models);
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         return {
             status: false,
@@ -99,7 +99,7 @@ const setCoverBackground = async (color, { user, models }) => {
     try {
         if (await models.profile.upsert({ userId: user.id, coverBackground: color }))
             return await createProfileResponse(user, models);
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         return {
             status: false,
@@ -108,7 +108,7 @@ const setCoverBackground = async (color, { user, models }) => {
     }
 }
 
-const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
+const setSalary = async ({ amount, currency, isPublic }, { user, models }) => {
     validateUser(user);
 
     try {
@@ -143,15 +143,15 @@ const setSalary = async({ amount, currency, isPublic }, { user, models }) => {
         });
 
         response.status = true;
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         response.error = 'We did not manage to store your salary'
     }
-    
+
     return response;
 }
 
-const setStory = async(language, { title, description }, { user, models }) => {
+const setStory = async (language, { title, description }, { user, models }) => {
     validateUser(user);
 
     try {
@@ -189,16 +189,16 @@ const setStory = async(language, { title, description }, { user, models }) => {
         });
         await models.storyText.upsert({
             userId: user.id,
-            languageId: language.id, 
+            languageId: language.id,
             title,
             description
         });
         response.status = true;
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         response.error = 'We did not manage to store your salary'
     }
-    
+
     return response;
 }
 
@@ -486,7 +486,7 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
             company,
             startDate: new Date(startDate),
             endDate: new Date(endDate),
-            i18n:[{
+            i18n: [{
                 languageId: languageModel.dataValues.id,
                 title,
                 description
@@ -496,7 +496,7 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
     } else {
         response.error = 'Language not found!';
     }
-    
+
     return response;
 }
 
@@ -517,7 +517,7 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description} , language, { user, models }) => {
+const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
     validateUser(user);
 
     let response = {
@@ -568,19 +568,19 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
                 company,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-            }, {transaction: t});
+            }, { transaction: t });
             await models.experienceText.upsert({
                 experienceId: experienceId,
                 languageId: languageModel.dataValues.id,
                 title,
                 description
-            }, {transaction: t});
+            }, { transaction: t });
         });
         response.status = true;
     } else {
         response.error = 'Language not found!';
     }
-    
+
     return response;
 }
 
@@ -628,9 +628,10 @@ const createProfileResponse = async (user, models) => {
             { association: 'values', include: [{ association: 'i18n' }] },
             { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'articles' },
-            { association: 'experience', include: [ { association: 'i18n' } ] },
-            { association: 'projects', include: [ { association: 'i18n' } ] },
-            { association: 'contact' }
+            { association: 'experience', include: [{ association: 'i18n' }] },
+            { association: 'projects', include: [{ association: 'i18n' }] },
+            { association: 'contact' },
+            { association: 'featuredArticles' }
         ]
     });
     const profile = newUser.profile ? await newUser.profile.get() : {};
