@@ -2,8 +2,9 @@ module.exports = `
     type Team {
         id: String!
         name: String
-        members: [Profile]
-        officeLife: [Article]
+        company: Company
+        members: [User]
+        officeArticles: [Article]
         jobs: [Job]
         hasProfileCover: Boolean
         profileBackgroundColor: String
