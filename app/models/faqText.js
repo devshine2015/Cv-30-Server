@@ -4,7 +4,10 @@ module.exports = (sequelize, DataTypes) => {
 		faqId: {
 			primaryKey: true,
 			allowNull: false,
-			type: DataTypes.INTEGER,
+			type: DataTypes.UUID,
+			validate: {
+				isUUID: 4
+			},
 			field: 'faq_id'
 		},
 		languageId: {

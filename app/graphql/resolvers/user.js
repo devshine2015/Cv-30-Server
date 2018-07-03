@@ -618,6 +618,23 @@ const validateUser = (user) => {
     }
 }
 
+const yupValidation = (yupValidator, input) => {
+    try {
+        yupValidator.validateSync(input, { abortEarly: false });
+    } catch (error) {
+        console.log(error);
+        throw new Error(
+            JSON.stringify(
+                error.inner.map(err => ({
+                    path: err.path,
+                    type: err.type,
+                    message: err.message
+                }))
+            )
+        );
+    }
+}
+
 const createProfileResponse = async (user, models) => {
     const newUser = await models.user.findOne({
         where: {
@@ -658,5 +675,6 @@ module.exports = {
     setExperience,
     removeExperience,
     validateUser,
+    yupValidation,
     all
 };

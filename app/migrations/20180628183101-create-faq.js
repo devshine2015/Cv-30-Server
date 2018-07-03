@@ -4,9 +4,11 @@ module.exports = {
 		return queryInterface.createTable('faqs', {
 			id: {
 				allowNull: false,
-				autoIncrement: true,
 				primaryKey: true,
-				type: Sequelize.INTEGER
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				}
 			},
 			companyId: {
 				allowNull: false,

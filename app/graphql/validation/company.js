@@ -9,5 +9,14 @@ module.exports = {
             headline: yup.string().trim().max(255),
             description: yup.string().trim()
         })
+    }),
+    faqInput: yup.object().shape({
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
+        details: yup.object().shape({
+            id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            companyId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
+            question: yup.string().trim(),
+            answer: yup.string().trim(),
+        }).required()
     })
 };

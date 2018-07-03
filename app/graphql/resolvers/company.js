@@ -1,27 +1,10 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { validateUser } = require('./user');
+const { validateUser, yupValidation } = require('./user');
 
 const handleCompany = async(language, details, { user, models }) => {
     validateUser(user);
-
-    try {
-        schema.company.input.validateSync({
-            language,
-            details
-        }, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
+    yupValidation(schema.company.input, { language, details });
     
     language = await models.language.findOne({
         where: {
@@ -83,19 +66,29 @@ const all = async (language, { models }) => {
     })
 };
 
-const handleQA = async (qa, { user, models }) => {
+const handleFAQ = async (language, details, { user, models }) => {
     validateUser(user);
+    yupValidation(schema.company.faqInput, { language, details });
 
-    let response = {
-        status: false,
-        error: ''
-    };
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
 
-    return response;
+    await models.sequelize.transaction(async t => {
+        details.id = details.id || uuid();
+        await models.faq.upsert(details, { transaction: t });
+        details.faqId = details.id;
+        details.languageId = language.id;
+        await models.faqText.upsert(details, { transaction: t });
+    });
+
+    return { status: true };
 }
 
 module.exports = {
     handleCompany,
-    handleQA,
+    handleFAQ,
     all
 }

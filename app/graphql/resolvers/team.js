@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { validateUser } = require('./user');
+const { validateUser, yupValidation } = require('./user');
 
 const handleTeam = async (teamDetails, { user, models }) => {
     validateUser(user);
@@ -33,23 +33,6 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
     team.removeMember(member);
 
     return { status: true };
-}
-
-const yupValidation = (yupValidator, input) => {
-    try {
-        yupValidator.validateSync(input, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
 }
 
 module.exports = {

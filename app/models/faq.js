@@ -3,9 +3,11 @@ module.exports = (Sequelize, DataTypes) => {
 	var Faq = Sequelize.define('faq', {
 		id: {
 			allowNull: false,
-			autoIncrement: true,
 			primaryKey: true,
-			type: DataTypes.INTEGER
+			type: DataTypes.UUID,
+			validate: {
+				isUUID: 4
+			}
 		},
 		companyId: {
 			allowNull: false,

@@ -45,7 +45,7 @@ module.exports = {
 		addMemberToTeam: (_, { teamId, memberId }, context) => teamResolvers.addMemberToTeam(teamId, memberId, context),
 		removeMemberFromTeam: (_, { teamId, memberId }, context) => teamResolvers.removeMemberFromTeam(teamId, memberId, context),
 
-		handleQA: (_, { qa }, context) => companyResolvers.handleQA(qa, context),
+		handleFAQ: (_, { language, faq }, context) => companyResolvers.handleFAQ(language, faq, context),
 		
 		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),
 

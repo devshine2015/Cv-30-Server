@@ -10,6 +10,7 @@ module.exports = `
         storiesArticles: [Article]
         tags: [Tag]
         faqs: [Faq]
+        teams: [Team]
     }
     input CompanyInput {
         id: String
@@ -29,11 +30,17 @@ module.exports = `
         title: String
     }
     type Faq {
-        id: Int
+        id: String
         i18n: [FaqText]
     }
     type FaqText {
         question: String,
 		answer: String
     }
+    input FaqInput {
+        id: String
+        companyId: String
+        question: String
+        answer: String
+	}
 `;

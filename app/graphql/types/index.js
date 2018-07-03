@@ -8,12 +8,6 @@ const Company = require('./company');
 const Job = require('./job');
 const Team = require('./team');
 
-const QAInput = `
-	input QAInput {
-		id: String
-	}
-`;
-
 const Query = `
 	type Query {
 		profile(
@@ -84,22 +78,23 @@ const Query = `
 			options: ArticleOptions
 		): StandardResponse
 		handleTeam (
-			teamDetails: TeamInput
+			teamDetails: TeamInput!
 		): StandardResponse
 		addMemberToTeam (
-			teamId: String,
-			memberId: String
+			teamId: String!,
+			memberId: String!
 		): StandardResponse
 		removeMemberFromTeam (
-			teamId: String,
-			memberId: String
+			teamId: String!,
+			memberId: String!
 		): StandardResponse
-		handleQA (
-			qa: QAInput
+		handleFAQ (
+			language: LanguageCodeType!
+			faq: FaqInput!
 		): StandardResponse
 		handleJob (
 			language: LanguageCodeType!
-			jobDetails: JobInput
+			jobDetails: JobInput!
 		): StandardResponse
 		register (
 			nickname: String!
@@ -136,4 +131,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Company, Job, Team, Article, Salary, Query, User, Profile, Response, QAInput, Error];
+module.exports = [SchemaDefinition, Company, Job, Team, Article, Salary, Query, User, Profile, Response, Error];
