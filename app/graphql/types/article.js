@@ -5,12 +5,16 @@ const Article = `
     type Article {
         id: String!
         author: User
-        image: Image
-        video: Video
-        title: String
-        description: String
+        featuredImage: Image
+        images: [Image]
+        videos: Video
+        i18n: [ArticleText]
         created_at: Date
         updated_at: Date
+    }
+    type ArticleText {
+        title: String
+        description: String
     }
     input ArticleInput {
         id: String

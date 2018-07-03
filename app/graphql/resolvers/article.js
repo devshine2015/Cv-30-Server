@@ -118,8 +118,26 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: true };
 }
 
+const all = async (language, { models }) => {
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+    return models.article.findAll({
+        where: {},
+        include: [
+            { association: 'author' },
+            { association: 'i18n' },
+            { association: 'images' },
+            { association: 'featuredImage' }
+        ]
+    });
+}
+
 module.exports = {
-    handleArticle
+    handleArticle,
+    all
 }
 
 function slugify(str) {
