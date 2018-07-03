@@ -55,20 +55,23 @@ const all = async (language, { models }) => {
             }, {
                 association: 'featuredArticles',
                 include: [
-                    { association: 'images' },
+                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                    { association: 'images', include: [{ association: 'i18n' }] },
                     { association: 'i18n', where: { languageId: language.id } }
                 ]
             }, {
                 association: 'officeArticles',
                 include: [
+                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
                     { association: 'i18n', where: { languageId: language.id } },
-		            { association: 'images' }
+		            { association: 'images', include: [{ association: 'i18n' }] }
                 ]
             }, {
                 association: 'storiesArticles',
                 include: [
+                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
                     { association: 'i18n', where: { languageId: language.id } },
-		            { association: 'images' }
+		            { association: 'images', include: [{ association: 'i18n' }] }
                 ]
             }, {
                 association: 'faqs',

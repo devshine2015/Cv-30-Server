@@ -3,8 +3,7 @@ const Video = `
     type Video {
         id: String
         author: User
-        title: String
-        description: String
+        i18n: [VideoText]
         isFeatured: Boolean
         source: String
         sourceType: MediaSourceType
@@ -13,6 +12,10 @@ const Video = `
         filename: String
         createdAt: Date
         updatedAt: Date
+    }
+    type VideoText {
+        title: String
+        description: String
     }
     input VideoInput {
         id: String
