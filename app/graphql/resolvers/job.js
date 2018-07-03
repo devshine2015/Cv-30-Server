@@ -53,7 +53,8 @@ const all = async (language, { models }) => {
     return models.job.findAll(
     {
         include: [
-            { association: 'i18n', where: { languageId: language.id } },
+            { association: 'i18n', where: { languageId: language.id } },,
+            { association: 'team', include: [ { association: 'i18n', where: { languageId: language.id} }] },
             { association: 'company', include: [ { association: 'i18n', where: { languageId: language.id} }] }
         ]
     });

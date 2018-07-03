@@ -7,6 +7,7 @@ module.exports = `
         updatedAt: Date
         i18n: [JobText]
         company: Company
+        team: Team
     }
     type JobText {
         title: String
@@ -16,6 +17,7 @@ module.exports = `
     input JobInput {
         id: String
         companyId: String
+        teamId: String
         title: String
         description: String
         idealCandidate: String

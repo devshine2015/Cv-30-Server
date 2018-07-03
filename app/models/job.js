@@ -18,6 +18,14 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			field: 'company_id'
 		},
+		teamId: {
+			type: DataTypes.UUID,
+			allowNull: false,
+			validate: {
+				isUUID: 4
+			},
+			field: 'team_id'
+		},
 		expireDate: {
 			allowNull: true,
 			type: DataTypes.DATE,
@@ -36,11 +44,17 @@ module.exports = (sequelize, DataTypes) => {
 	}, {
 		timestamps: true,
 		updatedAt: 'updated_at',
-		createdAt: 'created_at'
+		createdAt: 'created_at',
+		indexes: [
+			{  fields: ['company_id'] },
+			{  fields: ['team_id'] },
+			{  fields: ['team_id', 'company_id'] }
+		]
 	});
 	Job.associate = function(models) {
 		Job.hasMany(models.jobText, { as: 'i18n', foreignKey: 'job_id' });
 		Job.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
+		Job.belongsTo(models.team, { as: 'team', foreignKey: 'team_id' });
 	};
 	return Job;
 };

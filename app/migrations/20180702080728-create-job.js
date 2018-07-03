@@ -19,6 +19,14 @@ module.exports = {
 				},
 				field: 'company_id'
 			},
+			teamId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+				validate: {
+					isUUID: 4
+				},
+				field: 'team_id'
+			},
 			expireDate: {
 				allowNull: true,
 				type: Sequelize.DATE,
@@ -38,7 +46,10 @@ module.exports = {
 			timestamps: true,
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
-		});
+		})
+		.then(() => queryInterface.addIndex('jobs', { fields: ['company_id'] }))
+		.then(() => queryInterface.addIndex('jobs', { fields: ['team_id'] }))
+		.then(() => queryInterface.addIndex('jobs', { fields: ['team_id', 'company_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
 		return queryInterface.dropTable('jobs');
