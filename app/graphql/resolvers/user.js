@@ -15,6 +15,23 @@ const profile = async (id, language, { user, models }) => {
     console.log(await createProfileResponse(user, models))
     return await createProfileResponse(user, models);
 }
+const all = async (language, { models }) => {
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+    return models.user.findAll({
+        where: {},
+        include: [
+            { association: 'skills', include: [{ association: 'i18n' }] },
+            { association: 'values', include: [{ association: 'i18n' }] },
+            { association: 'profile' },
+            { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }, { association: 'i18n' }] },
+            { association: 'contact' }
+        ]
+    })
+};
 
 const setAvatar = async (status, { user, models }) => {
     const errors = [];
@@ -533,7 +550,6 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
         );
     }
 
-    // Get language
     const languageModel = await models.language.findOne({
         where: {
             code: language
@@ -583,27 +599,6 @@ const removeExperience = async (id, { user, models }) => {
     }
 
     return response;
-}
-
-const all = async (language, { models }) => {
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
-    const users = await models.user.findAll({
-        include: [
-            { association: 'skills', include: [{ association: 'i18n', where: { languageId: language.id } }] },
-            { association: 'values', include: [{ association: 'i18n', where: { languageId: language.id } }] },
-            { association: 'profile', include: [{ association: 'salary' }] },
-            { association: 'articles' },
-            { association: 'experience', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
-            { association: 'projects', include: [ { association: 'i18n', where: { languageId: language.id } } ] },
-            { association: 'contact' }
-        ]
-    });
-    return users;
 }
 
 const validateUser = (user) => {
