@@ -142,7 +142,23 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: true };
 }
 
-const all = async (language, { models }) => {
+const article = async (id, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.one, { id, language });
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+    return models.article.findOne({
+        where: { id },
+        ...includeForFind(language.id)
+    });
+}
+
+const all = async (language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.all, { language });
     language = await models.language.findOne({
         where: {
             code: language
@@ -150,17 +166,24 @@ const all = async (language, { models }) => {
     });
     return models.article.findAll({
         where: {},
+        ...includeForFind(language.id)
+    });
+}
+
+const includeForFind = (languageId) => {
+    return {
         include: [
             { association: 'author' },
-            { association: 'i18n' },
+            { association: 'i18n', where: { languageId } },
             { association: 'images' },
             { association: 'featuredImage' }
         ]
-    });
+    };
 }
 
 module.exports = {
     handleArticle,
+    article,
     all
 }
 

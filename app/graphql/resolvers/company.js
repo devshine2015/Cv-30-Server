@@ -37,7 +37,7 @@ const handleCompany = async(language, details, { user, models }) => {
 
 const company = async (id, language, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.company.company, { id, language });
+    yupValidation(schema.company.one, { id, language });
 
     language = await models.language.findOne({
         where: {
@@ -53,6 +53,7 @@ const company = async (id, language, { user, models }) => {
 
 const all = async (language, { user, models }) => {
     checkUserAuth(user);
+    yupValidation(schema.company.all, { language });
 
     language = await models.language.findOne({
         where: {

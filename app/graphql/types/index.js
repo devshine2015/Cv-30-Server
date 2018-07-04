@@ -18,7 +18,7 @@ const Query = `
 			language: LanguageCodeType!
 		): [Article]
 		article(
-			id: Int!
+			id: String!
 			language: LanguageCodeType!
 		): Article
 		profiles(

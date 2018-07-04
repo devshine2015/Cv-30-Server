@@ -4,7 +4,7 @@ const { checkUserAuth, yupValidation } = require('./common');
 
 const profile = async (id, language, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.profile, { id, language});
+    yupValidation(schema.user.one, { id, language});
 
     if (id) {
         user = await models.user.findOne({ where: { id: id }, attributes: ['id']});
@@ -16,6 +16,7 @@ const profile = async (id, language, { user, models }) => {
 }
 const all = async (language, { user, models }) => {
     checkUserAuth(user);
+    yupValidation(schema.user.all, { language });
     language = await models.language.findOne({
         where: {
             code: language
