@@ -26,9 +26,14 @@ const Profile = `
         hasAvatar: Boolean
         hasProfileCover: Boolean
         coverBackground: String
+        currentPosition: CurrentPosition
         story: Story
         salary: Salary
         errors: [Error]
+    }
+    type CurrentPosition {
+        experience: Experience
+        project: Project
     }
 `;
 

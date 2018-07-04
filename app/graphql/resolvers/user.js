@@ -20,9 +20,21 @@ const all = async (language, { models }) => {
             { association: 'values', include: [{ association: 'i18n' }] },
             { association: 'profile' },
             { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }, { association: 'i18n' }] },
-            { association: 'contact' }
+            { association: 'contact' },
+            { association: 'currentExperience' },
+            { association: 'currentProject', include: [{ association: 'i18n', where: { languageId: language.id } }] }
         ]
     })
+    .then(users => users.map(item => ({
+            ...item.get(),
+            currentPosition: {
+                experience: item.currentExperience,
+                // team: item.getCurrentTeams(),
+                // position: item.getCurrentPosition(),
+                project: item.currentProject
+            }
+        })
+    ))
 };
 
 const setAvatar = async (status, { user, models }) => {
