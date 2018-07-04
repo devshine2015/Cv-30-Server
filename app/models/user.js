@@ -100,6 +100,8 @@ module.exports = (Sequelize, DataTypes) => {
         User.hasMany(models.experience, { as: 'experience', foreignKey: 'user_id' });
         User.hasMany(models.project, { as: 'projects', foreignKey: 'user_id' });
         User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
+        User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', where: { isCurrent: true } });
+        User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', where: { isCurrent: true } });
     }
     return User;
 };
