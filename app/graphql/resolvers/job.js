@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -15,16 +15,23 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         }
     });
 
-    if (jobDetails) {
-        await models.sequelize.transaction(async t => {
+    const company = await models.company.findOne({ where: { id: jobDetails.companyId } });
+    if (!company)
+        return { status: false, error: 'Company not found' };
+    
+    if (company.userId != user.id)
+        throwForbiddenError();
 
-            jobDetails.id = jobDetails.id || uuid();
-            await models.job.upsert(jobDetails, { transaction: t });
-            jobDetails.jobId = jobDetails.id;
-            jobDetails.languageId = language.id;
-            await models.jobText.upsert(jobDetails, { transaction: t });
-        });
-    }
+    if (jobDetails.id && !await models.job.findOne({ where: { id: jobDetails.id } }))
+        return { status: false, error: 'Job not found' }
+
+    await models.sequelize.transaction(async t => {
+        jobDetails.id = jobDetails.id || uuid();
+        await models.job.upsert(jobDetails, { transaction: t });
+        jobDetails.jobId = jobDetails.id;
+        jobDetails.languageId = language.id;
+        await models.jobText.upsert(jobDetails, { transaction: t });
+    });
 
     return { status: true };
 }
