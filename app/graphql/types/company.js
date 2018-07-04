@@ -10,6 +10,7 @@ module.exports = `
         storiesArticles: [Article]
         tags: [Tag]
         faqs: [Faq]
+        jobs: [Job]
         teams: [Team]
     }
     input CompanyInput {

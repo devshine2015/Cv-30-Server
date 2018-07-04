@@ -48,6 +48,12 @@ const all = async (language, { models }) => {
                 association: 'i18n',
                 where: { languageId: language.id }
             }, {
+                association: 'jobs',
+                include: [
+                    { association: 'i18n', where: { languageId: language.id } },
+                    { association: 'team' }
+                ]
+            }, {
                 association: 'featuredArticles',
                 include: [
                     { association: 'featuredImage', include: [{ association: 'i18n' }] },
