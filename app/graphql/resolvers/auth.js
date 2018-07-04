@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const validator = require('validator');
 const uniqid = require('uniqid');
 const uuid = require('uuidv4');
-const { validateUser } = require('./user');
+const { checkUserAuth, yupValidation } = require('./common');
 const schema = require('../validation');
 
 const createAccount = async (nickname, email, password, { models }) => {
@@ -346,26 +346,14 @@ const forgotPasswordUpdate = async (token, password, { models }) => {
     return response;
 }
 const updateUserSettings = async ({ firstName, lastName, oldPassword, newPassword }, { user, res }) => {
-    validateUser(user);
-    try {
-        schema.user.settings.validateSync({
-            firstName,
-            lastName,
-            oldPassword,
-            newPassword
-        }, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
+    checkUserAuth(user);
+    yupValidation(schema.user.settings, {
+        firstName,
+        lastName,
+        oldPassword,
+        newPassword
+    });
+    
     user.firstName = firstName.trim();
     user.lastName = lastName.trim();
     await user.save();

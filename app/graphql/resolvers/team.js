@@ -1,9 +1,9 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { validateUser, yupValidation } = require('./user');
+const { checkUserAuth, yupValidation } = require('./common');
 
 const handleTeam = async (teamDetails, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.team.input, { teamDetails });
 
     teamDetails.id = teamDetails.id || uuid();
@@ -14,7 +14,7 @@ const handleTeam = async (teamDetails, { user, models }) => {
 }
 
 const addMemberToTeam = async (teamId, memberId, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
 
     const team = await models.team.findOne({ where: { id: teamId } });
@@ -25,7 +25,7 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
 }
 
 const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
 
     const team = await models.team.findOne({ where: { id: teamId } });

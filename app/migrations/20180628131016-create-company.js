@@ -11,6 +11,14 @@ module.exports = {
 				},
 				field: 'id'
 			},
+			userId: {
+				allowNull: false,
+				type: Sequelize.UUID,
+				validate: {
+					isUUID: 4
+				},
+				field: 'user_id'
+			},
 			name: {
 				allowNull: true,
 				type: Sequelize.STRING(255),
@@ -32,6 +40,7 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at'
 		})
+		.then(() => queryInterface.addIndex('companies', ['user_id']))
 		.then(() => queryInterface.addIndex('companies', { unique: true, fields: ['name'] }));
 	},
 	down: (queryInterface, Sequelize) => {

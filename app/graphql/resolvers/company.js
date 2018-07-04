@@ -1,9 +1,9 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { validateUser, yupValidation } = require('./user');
+const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
 
 const handleCompany = async(language, details, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.company.input, { language, details });
     
     language = await models.language.findOne({
@@ -12,8 +12,20 @@ const handleCompany = async(language, details, { user, models }) => {
         }
     });
 
+    if (details.id) {
+        const company = await models.company.findOne({
+            where: {
+                id: details.id
+            }
+        });
+
+        if (!company) return { status: false, error: 'Company doesn\'t exist!' }
+        if (company.userId != user.id) throwForbiddenError();
+    }
+
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
+        details.userId = user.id;
         await models.company.upsert(details, {transaction: t});
         details.companyId = details.id;
         details.languageId = language.id;
@@ -72,7 +84,7 @@ const all = async (language, { models }) => {
 };
 
 const handleFAQ = async (language, details, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.company.faqInput, { language, details });
 
     language = await models.language.findOne({
@@ -93,7 +105,7 @@ const handleFAQ = async (language, details, { user, models }) => {
 }
 
 const setTags = async (language, tagsInput, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.company.tags, { language, tagsInput });
 
     // Get existing tags
@@ -162,7 +174,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
 }
 
 const removeTag = async (id, companyId, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
     yupValidation(schema.company.removeTag, { id, companyId });
 
     let response = {

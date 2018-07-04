@@ -1,17 +1,9 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
+const { checkUserAuth, yupValidation } = require('./common');
 
 const profile = async (id, language, { user, models }) => {
-    const errors = [];
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-    }
-    if (errors.length)
-        throw new Error(errors);
+    checkUserAuth(user);
     console.log(await createProfileResponse(user, models))
     return await createProfileResponse(user, models);
 }
@@ -34,17 +26,7 @@ const all = async (language, { models }) => {
 };
 
 const setAvatar = async (status, { user, models }) => {
-    const errors = [];
-
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-
-    }
-    if (errors.length) throw new Error(errors);
+    checkUserAuth(user);
     try {
         if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
             return await createProfileResponse(user, models);
@@ -60,17 +42,7 @@ const setAvatar = async (status, { user, models }) => {
 }
 
 const setHasProfileCover = async (status, { user, models }) => {
-    const errors = [];
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-
-    }
-    console.log(user);
-    if (errors.length) throw new Error(errors);
+    checkUserAuth(user);
     try {
         await models.profile.upsert({ userId: user.id, hasProfileCover: status });
         return await createProfileResponse(user, models);
@@ -84,17 +56,7 @@ const setHasProfileCover = async (status, { user, models }) => {
 }
 
 const setCoverBackground = async (color, { user, models }) => {
-    const errors = [];
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-
-    }
-
-    if (errors.length) throw new Error(errors);
+    checkUserAuth(user);
 
     try {
         if (await models.profile.upsert({ userId: user.id, coverBackground: color }))
@@ -109,25 +71,12 @@ const setCoverBackground = async (color, { user, models }) => {
 }
 
 const setSalary = async ({ amount, currency, isPublic }, { user, models }) => {
-    validateUser(user);
-
-    try {
-        schema.user.salary.validateSync({
-            amount,
-            currency,
-            isPublic
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
+    checkUserAuth(user);
+    yupValidation(schema.user.salary, {
+        amount,
+        currency,
+        isPublic
+    });
 
     const response = {
         status: false,
@@ -152,25 +101,12 @@ const setSalary = async ({ amount, currency, isPublic }, { user, models }) => {
 }
 
 const setStory = async (language, { title, description }, { user, models }) => {
-    validateUser(user);
-
-    try {
-        schema.user.story.validateSync({
-            language,
-            title,
-            description
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
+    checkUserAuth(user);
+    yupValidation(schema.user.story, {
+        language,
+        title,
+        description
+    });
 
     const response = {
         status: false,
@@ -184,16 +120,22 @@ const setStory = async (language, { title, description }, { user, models }) => {
     });
 
     try {
-        await models.story.upsert({
-            userId: user.id
-        });
-        await models.storyText.upsert({
-            userId: user.id,
-            languageId: language.id,
-            title,
-            description
-        });
-        response.status = true;
+        await models.sequelize.transaction(async t => {
+            await models.story.upsert({
+                userId: user.id
+            }, {
+                transaction: t
+            });
+            await models.storyText.upsert({
+                userId: user.id,
+                languageId: language.id,
+                title,
+                description
+            }, {
+                transaction: t
+            });
+            response.status = true;
+        })
     } catch (error) {
         console.log(error);
         response.error = 'We did not manage to store your salary'
@@ -203,29 +145,17 @@ const setStory = async (language, { title, description }, { user, models }) => {
 }
 
 const setValues = async (values, language, { user, models }) => {
-    validateUser(user);
-
+    checkUserAuth(user);
+    yupValidation(schema.user.value, {
+        language,
+        values
+    });
+    
     let response = {
         status: false,
         error: ''
     };
 
-    try {
-        schema.user.values.validateSync({
-            language,
-            values
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
     // Get existing values
     const languageModel = await models.language.findOne({
         where: {
@@ -279,7 +209,7 @@ const setValues = async (values, language, { user, models }) => {
 }
 
 const removeValue = async (id, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
 
     let response = {
         status: false,
@@ -301,29 +231,17 @@ const removeValue = async (id, { user, models }) => {
 }
 
 const setSkills = async (skills, language, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
+    yupValidation(schema.user.skills, {
+        language,
+        skills
+    });
 
     let response = {
         status: false,
         error: ''
     };
 
-    try {
-        schema.user.skills.validateSync({
-            language,
-            skills
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
     // Get existing values
     const languageModel = await models.language.findOne({
         where: {
@@ -377,7 +295,7 @@ const setSkills = async (skills, language, { user, models }) => {
 }
 
 const removeSkill = async (id, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
 
     let response = {
         status: false,
@@ -399,31 +317,18 @@ const removeSkill = async (id, { user, models }) => {
 }
 
 const setContact = async ({ phone, email, facebook, linkedin }, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
+    yupValidation(schema.user.contact, {
+        phone,
+        email,
+        facebook,
+        linkedin
+    });
 
     let response = {
         status: false,
         error: ''
     };
-
-    try {
-        schema.user.contact.validateSync({
-            phone,
-            email,
-            facebook,
-            linkedin
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
 
     await models.contact.upsert({
         userId: user.id,
@@ -438,36 +343,23 @@ const setContact = async ({ phone, email, facebook, linkedin }, { user, models }
 }
 
 const setProject = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
+    yupValidation(schema.user.project, {
+        location,
+        isCurrent,
+        position,
+        company,
+        startDate,
+        endDate,
+        title,
+        description,
+        language
+    });
 
-    let response = {
+    const response = {
         status: false,
         error: ''
     };
-
-    try {
-        schema.user.project.validateSync({
-            location,
-            isCurrent,
-            position,
-            company,
-            startDate,
-            endDate,
-            title,
-            description,
-            language
-        }, { abortEarly: false });
-    } catch (error) {
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
 
     // Get language
     const languageModel = await models.language.findOne({
@@ -501,7 +393,7 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
 }
 
 const removeProject = async (id, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
 
     let response = {
         status: false,
@@ -518,37 +410,23 @@ const removeProject = async (id, { user, models }) => {
 }
 
 const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
+    yupValidation(schema.user.experience, {
+        location,
+        isCurrent,
+        position,
+        company,
+        startDate,
+        endDate,
+        title,
+        description,
+        language
+    });
 
     let response = {
         status: false,
         error: ''
     };
-
-    try {
-        schema.user.experience.validateSync({
-            location,
-            isCurrent,
-            position,
-            company,
-            startDate,
-            endDate,
-            title,
-            description,
-            language
-        }, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
 
     const languageModel = await models.language.findOne({
         where: {
@@ -585,7 +463,7 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
 }
 
 const removeExperience = async (id, { user, models }) => {
-    validateUser(user);
+    checkUserAuth(user);
 
     let response = {
         status: false,
@@ -599,40 +477,6 @@ const removeExperience = async (id, { user, models }) => {
     }
 
     return response;
-}
-
-const validateUser = (user) => {
-    const errors = [];
-
-    if (!user) {
-        errors.push({
-            name: 'Forbidden',
-            message: 'Not allowed',
-            statusCode: 403
-        });
-
-    }
-    if (errors.length) {
-        console.log(errors);
-        throw new Error(errors);
-    }
-}
-
-const yupValidation = (yupValidator, input) => {
-    try {
-        yupValidator.validateSync(input, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
 }
 
 const createProfileResponse = async (user, models) => {
@@ -674,7 +518,5 @@ module.exports = {
     removeProject,
     setExperience,
     removeExperience,
-    validateUser,
-    yupValidation,
     all
 };

@@ -1,28 +1,14 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { validateUser } = require('./user');
+const { checkUserAuth, yupValidation } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
-    validateUser(user);
-
-    try {
-        schema.article.input.validateSync({
-            language,
-            article,
-            options
-        }, { abortEarly: false });
-    } catch (error) {
-        console.log(error);
-        throw new Error(
-            JSON.stringify(
-                error.inner.map(err => ({
-                    path: err.path,
-                    type: err.type,
-                    message: err.message
-                }))
-            )
-        );
-    }
+    checkUserAuth(user);
+    yupValidation(schema.article.input, {
+        language,
+        article,
+        options
+    });
 
     language = await models.language.findOne({
         where: {
