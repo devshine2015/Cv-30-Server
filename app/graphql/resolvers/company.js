@@ -35,7 +35,25 @@ const handleCompany = async(language, details, { user, models }) => {
     return { status: true };
 }
 
-const all = async (language, { models }) => {
+const company = async (id, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.company.company, { id, language });
+
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    return models.company.findOne({
+        where: { id: id },
+        ...includeForFind(language.id)
+    });
+}
+
+const all = async (language, { user, models }) => {
+    checkUserAuth(user);
+
     language = await models.language.findOne({
         where: {
             code: language
@@ -43,50 +61,55 @@ const all = async (language, { models }) => {
     });
 
     return models.company.findAll({
-        include: [
-            {
-                association: 'i18n',
-                where: { languageId: language.id }
-            }, {
-                association: 'jobs',
-                include: [
-                    { association: 'i18n', where: { languageId: language.id } },
-                    { association: 'team' }
-                ]
-            }, {
-                association: 'featuredArticles',
-                include: [
-                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
-                    { association: 'images', include: [{ association: 'i18n' }] },
-                    { association: 'i18n', where: { languageId: language.id } }
-                ]
-            }, {
-                association: 'officeArticles',
-                include: [
-                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
-                    { association: 'i18n', where: { languageId: language.id } },
-		            { association: 'images', include: [{ association: 'i18n' }] }
-                ]
-            }, {
-                association: 'storiesArticles',
-                include: [
-                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
-                    { association: 'i18n', where: { languageId: language.id } },
-		            { association: 'images', include: [{ association: 'i18n' }] }
-                ]
-            }, {
-                association: 'faqs',
-                include: [
-                    { association: 'i18n', where: { languageId: language.id } }
-                ]
-            }, {
-                association: 'tags',
-                include: [
-                    { association: 'i18n', where: { languageId: language.id } }
-                ]
-            }
-        ]
+        ...includeForFind(language.id)
     })
+};
+
+const includeForFind =(languageId) => {
+    return {
+        include: [
+        {
+            association: 'i18n',
+            where: { languageId }
+        }, {
+            association: 'jobs',
+            include: [
+                { association: 'i18n', where: { languageId } },
+                { association: 'team' }
+            ]
+        }, {
+            association: 'featuredArticles',
+            include: [
+                { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                { association: 'images', include: [{ association: 'i18n' }] },
+                { association: 'i18n', where: { languageId } }
+            ]
+        }, {
+            association: 'officeArticles',
+            include: [
+                { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                { association: 'i18n', where: { languageId } },
+                { association: 'images', include: [{ association: 'i18n' }] }
+            ]
+        }, {
+            association: 'storiesArticles',
+            include: [
+                { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                { association: 'i18n', where: { languageId } },
+                { association: 'images', include: [{ association: 'i18n' }] }
+            ]
+        }, {
+            association: 'faqs',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }, {
+            association: 'tags',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
+    ]}
 };
 
 const handleFAQ = async (language, details, { user, models }) => {
@@ -210,5 +233,6 @@ module.exports = {
     handleFAQ,
     setTags,
     removeTag,
-    all
+    all,
+    company
 }

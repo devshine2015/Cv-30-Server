@@ -14,7 +14,8 @@ const profile = async (id, language, { user, models }) => {
         return await createProfileResponse(user, models);
     }
 }
-const all = async (language, { models }) => {
+const all = async (language, { user, models }) => {
+    checkUserAuth(user);
     language = await models.language.findOne({
         where: {
             code: language

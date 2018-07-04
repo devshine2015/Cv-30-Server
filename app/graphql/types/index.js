@@ -27,6 +27,10 @@ const Query = `
 		companies(
 			language: LanguageCodeType!
 		): [Company]
+		company(
+			id: String!
+			language: LanguageCodeType!
+		): Company
 		users(
 			language: LanguageCodeType!
 		): [Profile]
