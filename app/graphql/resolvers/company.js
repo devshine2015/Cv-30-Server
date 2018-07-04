@@ -6,22 +6,22 @@ const handleCompany = async(language, details, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.input, { language, details });
     
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
     if (details.id) {
         const company = await models.company.findOne({
             where: {
                 id: details.id
             }
         });
-
+        
         if (!company) return { status: false, error: 'Company not found' }
         if (company.userId != user.id) throwForbiddenError();
     }
+    
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
 
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
@@ -99,6 +99,16 @@ const handleFAQ = async (language, details, { user, models }) => {
         }
     });
 
+    const company = await models.company.findOne({ where: { id: details.companyId } });
+    if (!company)
+        return { status: false, error: 'Company not found' };
+    
+    if (company.userId != user.id)
+        throwForbiddenError();
+
+    if (details.id && !await models.faq.findOne({ where: { id: details.id } }))
+        return { status: false, error: 'FAQ not found' }
+
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
         await models.faq.upsert(details, { transaction: t });
@@ -121,18 +131,9 @@ const setTags = async (language, tagsInput, { user, models }) => {
         }
     });
 
-    const company = await models.company.findOne({
-        where: {
-            id: tagsInput.companyId
-        }
-    });
-
-    if (!company) {
-        return {
-            status: false,
-            error: 'Company not found'
-        };
-    }
+    const company = await models.company.findOne({ where: { id: tagsInput.companyId } });
+    if (!company) return { status: false, error: 'Company not found' }
+    if (company.userId != user.id) throwForbiddenError();
 
     const cleanInputTags = tagsInput.tags.map(item => item.trim().toLowerCase());
 
@@ -183,10 +184,9 @@ const removeTag = async (id, companyId, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.removeTag, { id, companyId });
 
-    let response = {
-        status: false,
-        error: ''
-    };
+    const company = await models.company.findOne({ where: { id: companyId } });
+    if (!company) return { status: false, error: 'Company not found' }
+    if (company.userId != user.id) throwForbiddenError();
 
     const model = models.sequelize.define('companyTag', {
     }, {
@@ -199,12 +199,10 @@ const removeTag = async (id, companyId, { user, models }) => {
             company_id: companyId
         }
     })) {
-        response.status = true;
-    } else {
-        response.error = 'Tag not found';
+        return { status: true };
     }
 
-    return response;
+    return { status: false, error: 'Tag not found' };
 }
 
 module.exports = {
