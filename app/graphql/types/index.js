@@ -11,7 +11,7 @@ const Team = require('./team');
 const Query = `
 	type Query {
 		profile(
-			id: Int
+			id: String
 			language: LanguageCodeType!
 		): Profile
 		articles(

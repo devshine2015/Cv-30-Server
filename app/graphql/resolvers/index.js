@@ -7,7 +7,7 @@ const teamResolvers = require('./team');
 
 module.exports = {
 	Query: {
-		profile: (_, { id = '', language }, context) => userResolvers.profile(id, language, context),
+		profile: (_, { id, language }, context) => userResolvers.profile(id, language, context),
 		profiles: (_, { language }, context) => userResolvers.all(language, context),
 		companies: (_, { language }, context) => companyResolvers.all(language, context),
 		jobs: (_, { language }, context) => jobResolvers.all(language, context),

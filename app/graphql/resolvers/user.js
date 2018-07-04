@@ -4,8 +4,15 @@ const { checkUserAuth, yupValidation } = require('./common');
 
 const profile = async (id, language, { user, models }) => {
     checkUserAuth(user);
-    console.log(await createProfileResponse(user, models))
-    return await createProfileResponse(user, models);
+    yupValidation(schema.user.profile, { id, language});
+
+    if (id) {
+        user = await models.user.findOne({ where: { id: id }, attributes: ['id']});
+        if (!user) return { status: false, error: 'User not found'};
+        return await createProfileResponse(user, models);
+    } else {
+        return await createProfileResponse(user, models);
+    }
 }
 const all = async (language, { models }) => {
     language = await models.language.findOne({

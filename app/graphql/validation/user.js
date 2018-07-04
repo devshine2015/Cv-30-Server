@@ -1,6 +1,10 @@
 const yup = require('yup');
 
 module.exports = {
+    profile: yup.object().shape({
+        id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).notRequired(),
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true })
+    }),
     settings: yup.object().shape({
         firstName: yup.string().required(),
         lastName: yup.string().required(),
