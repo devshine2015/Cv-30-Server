@@ -19,7 +19,7 @@ const handleCompany = async(language, details, { user, models }) => {
             }
         });
 
-        if (!company) return { status: false, error: 'Company doesn\'t exist!' }
+        if (!company) return { status: false, error: 'Company not found' }
         if (company.userId != user.id) throwForbiddenError();
     }
 

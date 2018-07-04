@@ -20,7 +20,6 @@ const Article = `
         id: String
         isFeatured: Boolean
         isAboutMe: Boolean
-        author: String
         images: [ImageInput]
         videos: [VideoInput]
         title: String

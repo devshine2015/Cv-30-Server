@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
@@ -10,11 +10,43 @@ const handleArticle = async (language, article, options, { user, models }) => {
         options
     });
 
+    if (article && article.id) {
+        const foundArticle = await models.article.findOne({ where: { id: article.id } });
+        if (!foundArticle) return { status: false, error: 'Article not found' }
+        if (foundArticle.userId != user.id) throwForbiddenError();
+    }
+
+    if (options) {
+        if (options.articleId) {
+            const foundArticle = await models.article.findOne({ where: { id: options.articleId } });
+            if (!foundArticle) return { status: false, error: 'Article not found' }
+            if (foundArticle.userId != user.id) throwForbiddenError();
+        }
+
+        if (options.companyId) {
+            const foundCompany = await models.company.findOne({ where: { id: options.companyId } });
+            if (!foundCompany) return { status: false, error: 'Company not found' }
+            if (foundCompany.userId != user.id) throwForbiddenError();
+        }
+
+        if (options.teamId) {
+            const foundTeam = await models.team.findOne({
+                where: { id: options.teamId },
+                include: [
+                    {association: 'company' }
+                ]
+            });
+            if (!foundTeam) return { status: false, error: 'Team not found' }
+            if (foundTeam.company.userId != user.id) throwForbiddenError();
+        }
+    }
+
     language = await models.language.findOne({
         where: {
             code: language
         }
     });
+    
     await models.sequelize.transaction(async t => {
         if (article) {
             article.id = article.id || uuid();
