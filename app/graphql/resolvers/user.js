@@ -513,7 +513,12 @@ const createProfileResponse = async (user, models) => {
             { association: 'experience', include: [{ association: 'i18n' }] },
             { association: 'projects', include: [{ association: 'i18n' }] },
             { association: 'contact' },
-            { association: 'featuredArticles' }
+            { association: 'featuredArticles', include: [
+                { association: 'author' },
+                { association: 'i18n', where: { languageId } },
+                { association: 'images' },
+                { association: 'featuredImage' }
+            ] }
         ]
     });
     const profile = newUser.profile ? await newUser.profile.get() : {};
