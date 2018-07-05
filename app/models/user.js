@@ -94,14 +94,14 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.skill, { through: 'user_skills', as: 'skills' });
         User.belongsToMany(models.value, { through: 'user_values', as: 'values' });
         User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
-        User.hasMany(models.article, { as: 'featuredArticles', foreignKey: 'user_id', where: { isFeatured: true } });
-        User.hasMany(models.article, { as: 'aboutMeArticles', foreignKey: 'user_id', where: { isAboutMe: true } });
+        User.hasMany(models.article, { as: 'featuredArticles', foreignKey: 'user_id', scope: { is_featured: true } } );
+        User.hasMany(models.article, { as: 'aboutMeArticles', foreignKey: 'user_id', scope: { is_about_me: true } });
         User.hasMany(models.article, { as: 'articles', foreignKey: 'user_id' });
         User.hasMany(models.experience, { as: 'experience', foreignKey: 'user_id' });
         User.hasMany(models.project, { as: 'projects', foreignKey: 'user_id' });
         User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
-        User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', where: { isCurrent: true } });
-        User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', where: { isCurrent: true } });
+        User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', scope: { is_current: true } });
+        User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.story, { as: 'story', foreignKey: 'user_id' });
     }
     return User;

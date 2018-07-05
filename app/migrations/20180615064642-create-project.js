@@ -48,7 +48,7 @@ module.exports = {
 				field: 'start_date'
 			},
 			endDate: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.DATE,
 				field: 'end_date'
 			},

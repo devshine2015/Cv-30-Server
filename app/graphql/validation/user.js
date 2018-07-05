@@ -66,7 +66,7 @@ module.exports = {
         company: yup.string()
             .max(255, 'Project company cannot be longer than 255 chars'),
         startDate: yup.date().required(),
-        endDate: yup.date().required(),
+        endDate: yup.date().nullable(),
         title: yup.string().trim()
             .max(255, 'Project title cannot be longer than 255 chars'),
         description: yup.string()
@@ -80,7 +80,7 @@ module.exports = {
         company: yup.string()
             .max(255, 'Experience company cannot be longer than 255 chars'),
         startDate: yup.date().required(),
-        endDate: yup.date().required(),
+        endDate: yup.date().nullable(),
         title: yup.string().trim()
             .max(255, 'Experience title cannot be longer than 255 chars'),
         description: yup.string()

@@ -55,7 +55,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Article.hasMany(models.articleText, { as: 'i18n' });
 		Article.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 		Article.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
-		Article.hasOne(models.image, { as: 'featuredImage', foreignKey: 'source_id', where: { isFeatured: true } })
+		Article.hasOne(models.image, { as: 'featuredImage', foreignKey: 'source_id', scope: { is_featured: true } })
 		Article.belongsToMany(models.company, { as: 'featured', through: 'company_featured_articles', foreignKey: 'article_id' }),
 			Article.belongsToMany(models.company, { as: 'lifeAtTheOffice', through: 'company_office_articles', foreignKey: 'article_id' }),
 			Article.belongsToMany(models.company, { as: 'moreStories', through: 'company_stories_articles', foreignKey: 'article_id' })
