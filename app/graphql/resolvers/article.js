@@ -54,7 +54,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             await models.article.upsert(article, {transaction: t});
             article.articleId = article.id;
             article.languageId = language.id;
-            article.slug = slugify(article.title);
+            if (article.title) article.slug = slugify(article.title);
             if (article.images) {
                 await models.image.bulkCreate(article.images.map(item => ({
                     id: item.id,

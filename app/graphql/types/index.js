@@ -50,9 +50,9 @@ const Query = `
 		): Team
 	}
 	type Mutation {
-		avatar ( status: Boolean ): Profile
-		profileCover ( status: Boolean ): Profile
-		setCoverBackground ( color: String ): Profile
+		avatar ( status: Boolean ): StandardResponse
+		profileCover ( status: Boolean ): StandardResponse
+		setCoverBackground ( color: String ): StandardResponse
 		setStory(
 			story: StoryInput
 			language: LanguageCodeType!

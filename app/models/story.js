@@ -27,9 +27,9 @@ module.exports = (Sequelize, DataTypes) => {
 		indexes: []
 	});
 	Story.associate = models => {
-		Story.belongsTo(models.user, { as: 'owner' });
-		Story.hasMany(models.storyText, { as: 'i18n' })
-		Story.belongsTo(models.language, { as: 'language' });
+		Story.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
+		Story.hasMany(models.storyText, { as: 'i18n', foreignKey: 'user_id' });
+		// Story.belongsTo(models.language, { as: 'language' });
 	};
 	return Story;
 };

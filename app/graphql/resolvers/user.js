@@ -5,13 +5,18 @@ const { checkUserAuth, yupValidation } = require('./common');
 const profile = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.one, { id, language});
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
 
     if (id) {
         user = await models.user.findOne({ where: { id: id }, attributes: ['id']});
         if (!user) return { status: false, error: 'User not found'};
-        return await createProfileResponse(user, models);
+        return await createProfileResponse(user, models, language.id);
     } else {
-        return await createProfileResponse(user, models);
+        return await createProfileResponse(user, models, language.id);
     }
 }
 const all = async (language, { user, models }) => {
@@ -53,8 +58,7 @@ const setAvatar = async (status, { user, models }) => {
     checkUserAuth(user);
     try {
         if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
-            return await createProfileResponse(user, models);
-
+            return { status: true };
         }
     } catch (err) {
         console.log(error);
@@ -69,7 +73,7 @@ const setHasProfileCover = async (status, { user, models }) => {
     checkUserAuth(user);
     try {
         await models.profile.upsert({ userId: user.id, hasProfileCover: status });
-        return await createProfileResponse(user, models);
+        return { status: true };
     } catch (error) {
         console.log(error);
         return {
@@ -84,7 +88,7 @@ const setCoverBackground = async (color, { user, models }) => {
 
     try {
         if (await models.profile.upsert({ userId: user.id, coverBackground: color }))
-            return await createProfileResponse(user, models);
+            return { status: true };
     } catch (error) {
         console.log(error);
         return {
@@ -503,7 +507,7 @@ const removeExperience = async (id, { user, models }) => {
     return response;
 }
 
-const createProfileResponse = async (user, models) => {
+const createProfileResponse = async (user, models, languageId) => {
     const newUser = await models.user.findOne({
         where: {
             id: user.id
@@ -515,6 +519,7 @@ const createProfileResponse = async (user, models) => {
             { association: 'articles' },
             { association: 'experience', include: [{ association: 'i18n' }] },
             { association: 'projects', include: [{ association: 'i18n' }] },
+            { association: 'story', include: [{ association: 'i18n' }] },
             { association: 'contact' },
             { association: 'featuredArticles', include: [
                 { association: 'author' },

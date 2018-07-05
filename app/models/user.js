@@ -102,6 +102,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
         User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', where: { isCurrent: true } });
         User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', where: { isCurrent: true } });
+        User.hasOne(models.story, { as: 'story', foreignKey: 'user_id' });
     }
     return User;
 };
