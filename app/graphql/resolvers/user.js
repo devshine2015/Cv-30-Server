@@ -22,28 +22,31 @@ const all = async (language, { user, models }) => {
             code: language
         }
     });
+    
     return models.user.findAll({
         where: {},
         include: [
             { association: 'skills', include: [{ association: 'i18n' }] },
             { association: 'values', include: [{ association: 'i18n' }] },
-            { association: 'profile' },
+            { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }, { association: 'i18n' }] },
             { association: 'contact' },
             { association: 'currentExperience' },
             { association: 'currentProject', include: [{ association: 'i18n', where: { languageId: language.id } }] }
         ]
     })
-    .then(users => users.map(item => ({
+    .then(users => users.map(item => {
+        return {
             ...item.get(),
+            ...(item.profile ? item.profile.get() : {}),
             currentPosition: {
                 experience: item.currentExperience,
                 // team: item.getCurrentTeams(),
                 // position: item.getCurrentPosition(),
                 project: item.currentProject
             }
-        })
-    ))
+        }
+    }))
 };
 
 const setAvatar = async (status, { user, models }) => {
