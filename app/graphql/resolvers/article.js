@@ -12,8 +12,8 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     if (article && article.id) {
         const foundArticle = await models.article.findOne({ where: { id: article.id } });
-        if (!foundArticle) return { status: false, error: 'Article not found' }
-        if (foundArticle.userId != user.id) throwForbiddenError();
+        // if (!foundArticle) return { status: false, error: 'Article not found' }
+        if (foundArticle && foundArticle.userId != user.id) throwForbiddenError();
     }
 
     if (options) {
@@ -33,7 +33,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             const foundTeam = await models.team.findOne({
                 where: { id: options.teamId },
                 include: [
-                    {association: 'company' }
+                    { association: 'company' }
                 ]
             });
             if (!foundTeam) return { status: false, error: 'Team not found' }
@@ -46,16 +46,16 @@ const handleArticle = async (language, article, options, { user, models }) => {
             code: language
         }
     });
-    
+
     await models.sequelize.transaction(async t => {
         if (article) {
             article.id = article.id || uuid();
-            article.userId = user.id;   
-            await models.article.upsert(article, {transaction: t});
+            article.userId = user.id;
+            await models.article.upsert(article, { transaction: t });
             article.articleId = article.id;
             article.languageId = language.id;
             if (article.title) article.slug = slugify(article.title);
-            if (article.images) {
+            if (article.images && article.images.length > 0) {
                 await models.image.bulkCreate(article.images.map(item => ({
                     id: item.id,
                     userId: user.id,
@@ -65,42 +65,22 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     target: item.target,
                     path: item.path
                 })), {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                });
+                        updateOnDuplicate: ["isFeatured", "path"],
+                        transaction: t
+                    });
                 await models.imageText.bulkCreate(article.images.map(item => ({
                     imageId: item.id,
                     title: item.title,
                     description: item.description,
                     languageId: language.id
                 })), {
-                    updateOnDuplicate: ["title", "description"],
-                    transaction: t
-                });
+                        updateOnDuplicate: ["title", "description"],
+                        transaction: t
+                    });
             }
-            if (article.images) {
-                await models.image.bulkCreate(article.images.map(item => ({
-                    id: item.id,
-                    userId: user.id,
-                    isFeatured: item.isFeatured,
-                    sourceId: article.id,
-                    sourceType: item.sourceType,
-                    path: item.path
-                })), {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                });
-                await models.imageText.bulkCreate(article.images.map(item => ({
-                    imageId: item.id,
-                    title: item.title,
-                    description: item.description,
-                    languageId: language.id
-                })), {
-                    updateOnDuplicate: ["title", "description"],
-                    transaction: t
-                });
-            }
-            if (article.videos) {
+
+            if (article.videos && article.videos.length > 0) {
+                console.log(article.videos);
                 await models.video.bulkCreate(article.videos.map(item => ({
                     id: item.id,
                     userId: user.id,
@@ -109,33 +89,35 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     sourceType: item.sourceType,
                     path: item.path
                 })), {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                });
+                        updateOnDuplicate: ["isFeatured", "path"],
+                        transaction: t
+                    });
                 await models.videoText.bulkCreate(article.videos.map(item => ({
                     videoId: item.id,
                     title: item.title,
                     description: item.description,
                     languageId: language.id
                 })), {
-                    updateOnDuplicate: ["title", "description"],
-                    transaction: t
-                });
+                        updateOnDuplicate: ["title", "description"],
+                        transaction: t
+                    });
             }
-            await models.articleText.upsert(article, { transaction: t });
+            if (!!article.title || !!article.description) {
+                await models.articleText.upsert(article, { transaction: t });
+            }
         }
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ where: { id: options.articleId } });
             company = await models.company.findOne({ where: { id: options.companyId } });
-            if (options.isFeatured) company.addFeaturedArticle(article, {transaction: t});
-            if (options.isAtOffice) company.addOfficeArticle(article, {transaction: t});
-            if (options.isMoreStories) company.addStoriesArticle(article, {transaction: t});
+            if (options.isFeatured) company.addFeaturedArticle(article, { transaction: t });
+            if (options.isAtOffice) company.addOfficeArticle(article, { transaction: t });
+            if (options.isMoreStories) company.addStoriesArticle(article, { transaction: t });
         }
         if (options && options.articleId && options.teamId && options.isAtOffice) {
             models.teamOfficeArticles.upsert({
                 team_id: options.teamId,
                 article_id: options.articleId
-            }, { transaction: t})
+            }, { transaction: t })
         }
     });
 
@@ -176,6 +158,7 @@ const includeForFind = (languageId) => {
             { association: 'author' },
             { association: 'i18n', where: { languageId } },
             { association: 'images' },
+            { association: 'videos' },
             { association: 'featuredImage' }
         ]
     };
@@ -193,14 +176,14 @@ function slugify(str) {
 
     // remove accents, swap ñ for n, etc
     var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
-    var to   = "aaaaaeeeeeiiiiooooouuuunc------";
-    for (var i=0, l=from.length ; i<l ; i++) {
-         str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+    var to = "aaaaaeeeeeiiiiooooouuuunc------";
+    for (var i = 0, l = from.length; i < l; i++) {
+        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
     }
 
     str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-    .replace(/\s+/g, '-') // collapse whitespace and replace by -
-    .replace(/-+/g, '-'); // collapse dashes
+        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+        .replace(/-+/g, '-'); // collapse dashes
 
     return str;
 };

@@ -7,7 +7,7 @@ const Article = `
         author: User
         featuredImage: Image
         images: [Image]
-        videos: Video
+        videos: [Video]
         i18n: [ArticleText]
         created_at: Date
         updated_at: Date

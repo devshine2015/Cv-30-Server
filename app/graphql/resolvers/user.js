@@ -4,7 +4,7 @@ const { checkUserAuth, yupValidation } = require('./common');
 
 const profile = async (id, language, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.one, { id, language});
+    yupValidation(schema.user.one, { id, language });
     language = await models.language.findOne({
         where: {
             code: language
@@ -12,8 +12,8 @@ const profile = async (id, language, { user, models }) => {
     });
 
     if (id) {
-        user = await models.user.findOne({ where: { id: id }, attributes: ['id']});
-        if (!user) return { status: false, error: 'User not found'};
+        user = await models.user.findOne({ where: { id: id }, attributes: ['id'] });
+        if (!user) return { status: false, error: 'User not found' };
         return await createProfileResponse(user, models, language.id);
     } else {
         return await createProfileResponse(user, models, language.id);
@@ -27,7 +27,7 @@ const all = async (language, { user, models }) => {
             code: language
         }
     });
-    
+
     return models.user.findAll({
         where: {},
         include: [
@@ -40,18 +40,18 @@ const all = async (language, { user, models }) => {
             { association: 'currentProject', include: [{ association: 'i18n', where: { languageId: language.id } }] }
         ]
     })
-    .then(users => users.map(item => {
-        return {
-            ...item.get(),
-            ...(item.profile ? item.profile.get() : {}),
-            currentPosition: {
-                experience: item.currentExperience,
-                // team: item.getCurrentTeams(),
-                // position: item.getCurrentPosition(),
-                project: item.currentProject
+        .then(users => users.map(item => {
+            return {
+                ...item.get(),
+                ...(item.profile ? item.profile.get() : {}),
+                currentPosition: {
+                    experience: item.currentExperience,
+                    // team: item.getCurrentTeams(),
+                    // position: item.getCurrentPosition(),
+                    project: item.currentProject
+                }
             }
-        }
-    }))
+        }))
 };
 
 const setAvatar = async (status, { user, models }) => {
@@ -152,16 +152,16 @@ const setStory = async (language, { title, description }, { user, models }) => {
             await models.story.upsert({
                 userId: user.id
             }, {
-                transaction: t
-            });
+                    transaction: t
+                });
             await models.storyText.upsert({
                 userId: user.id,
                 languageId: language.id,
                 title,
                 description
             }, {
-                transaction: t
-            });
+                    transaction: t
+                });
             response.status = true;
         })
     } catch (error) {
@@ -178,7 +178,7 @@ const setValues = async (values, language, { user, models }) => {
         language,
         values
     });
-    
+
     let response = {
         status: false,
         error: ''
@@ -521,12 +521,15 @@ const createProfileResponse = async (user, models, languageId) => {
             { association: 'projects', include: [{ association: 'i18n' }] },
             { association: 'story', include: [{ association: 'i18n' }] },
             { association: 'contact' },
-            { association: 'featuredArticles', include: [
-                { association: 'author' },
-                { association: 'i18n', where: { languageId } },
-                { association: 'images' },
-                { association: 'featuredImage' }
-            ] }
+            {
+                association: 'featuredArticles', include: [
+                    { association: 'author' },
+                    { association: 'i18n', where: { languageId } },
+                    { association: 'images' },
+                    { association: 'videos' },
+                    { association: 'featuredImage' }
+                ]
+            }
         ]
     });
     const profile = newUser.profile ? await newUser.profile.get() : {};

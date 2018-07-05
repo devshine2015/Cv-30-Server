@@ -5,17 +5,17 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: false,
 			type: DataTypes.UUID,
 			validate: {
-                isUUID: 4
-            },
+				isUUID: 4
+			},
 			primaryKey: true
 		},
 		userId: {
 			allowNull: false,
 			type: DataTypes.UUID,
-            validate: {
-                isUUID: 4
+			validate: {
+				isUUID: 4
 			},
-            field: 'user_id'
+			field: 'user_id'
 		},
 		sourceId: {
 			allowNull: false,
@@ -27,16 +27,16 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		sourceType: {
 			allowNull: false,
-			type: DataTypes.ENUM('article','profile','company', 'job', 'team'),
-            field: 'source_type'
+			type: DataTypes.ENUM('article', 'profile', 'company', 'job', 'team'),
+			field: 'source_type'
 		},
-    	isFeatured: {
+		isFeatured: {
 			allowNull: true,
 			defaultValue: false,
 			type: DataTypes.BOOLEAN,
 			field: 'is_featured'
 		},
-    	path: {
+		path: {
 			type: DataTypes.STRING(255),
 			allowNull: false,
 			field: 'path'
@@ -52,22 +52,22 @@ module.exports = (Sequelize, DataTypes) => {
 			field: 'updated_at'
 		}
 	}, {
-		timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at',
-		indexes: [
-			{ fields: ['user_id'] },
-			{ fields: ['source_id'] },
-			{ fields: ['source_type'] },
-			{ fields: ['user_id', 'source_id'] },
-			{ fields: ['user_id', 'source_id', 'source_type'] },
-			{ unique: true, fields: ['user_id', 'source_id', 'source_type', 'is_featured'] }
-		]
-	});
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at',
+			indexes: [
+				{ fields: ['user_id'] },
+				{ fields: ['source_id'] },
+				{ fields: ['source_type'] },
+				{ fields: ['user_id', 'source_id'] },
+				{ fields: ['user_id', 'source_id', 'source_type'] },
+				{ unique: true, fields: ['user_id', 'source_id', 'source_type', 'is_featured'] }
+			]
+		});
 	Video.associate = models => {
 		Video.belongsTo(models.article, { as: 'article', foreignKey: 'source_id' });
 		Video.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
-		Video.belongsTo(models.user, { as: 'author' });
+		Video.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
 	};
 	return Video;
 };
