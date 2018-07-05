@@ -31,7 +31,7 @@ module.exports = {
                 sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team)/, { excludeEmptyString: true }),
                 path: yup.string().trim().max(255)
             })),
-            title: yup.string().trim().max(255).required(),
+            title: yup.string().trim().max(255),
             description: yup.string().trim()
         }).default(undefined),
         options: yup.object().shape({
