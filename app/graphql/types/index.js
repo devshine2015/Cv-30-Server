@@ -37,6 +37,17 @@ const Query = `
 		jobs(
 			language: LanguageCodeType!
 		): [Job]
+		job(
+			id: String!
+			language: LanguageCodeType!
+		): Job
+		teams(
+			language: LanguageCodeType!
+		): [Team]
+		team(
+			id: String!
+			language: LanguageCodeType!
+		): Team
 	}
 	type Mutation {
 		avatar ( status: Boolean ): Profile

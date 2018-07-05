@@ -65,8 +65,78 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
     return { status: true };
 }
 
+const team = async (id, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.team.one, { id, language });
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+    return models.team.findOne({
+        where: { id },
+        ...includeForFind(language.id)
+    });
+}
+
+const all = async (language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.team.all, { language });
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+    return models.team.findAll({
+        where: {},
+        ...includeForFind(language.id)
+    });
+}
+
+const includeForFind = (languageId) => {
+    return {
+        include: [
+            {
+                association: 'officeArticles',
+                include: [
+                    { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                    { association: 'images', include: [{ association: 'i18n' }] },
+                    { association: 'i18n', where: { languageId } }
+                ]
+            },
+            {
+                association: 'company',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            },
+            {
+                association: 'members',
+                include: [
+                    { association: 'skills', include: [{ association: 'i18n' }] },
+                    { association: 'values', include: [{ association: 'i18n' }] },
+                    { association: 'profile', include: [{ association: 'salary' }] },
+                    { association: 'articles' },
+                    { association: 'experience', include: [{ association: 'i18n' }] },
+                    { association: 'projects', include: [{ association: 'i18n' }] },
+                    { association: 'contact' },
+                    { association: 'featuredArticles' }
+                ]
+            },
+            {
+                association: 'jobs',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            }
+        ]
+    };
+}
+
 module.exports = {
     handleTeam,
     addMemberToTeam,
-    removeMemberFromTeam
+    removeMemberFromTeam,
+    team,
+    all
 }

@@ -36,24 +36,49 @@ const handleJob = async (language, jobDetails, { user, models }) => {
     return { status: true };
 }
 
-const all = async (language, { models }) => {
+const job = async (id, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.job.one, { id, language });
+
     language = await models.language.findOne({
         where: {
             code: language
         }
     });
 
-    return models.job.findAll(
-        {
-            include: [
-                { association: 'i18n', where: { languageId: language.id } },
-                { association: 'team' },
-                { association: 'company', include: [{ association: 'i18n', where: { languageId: language.id } }] }
-            ]
-        });
+    return models.job.findOne({
+        where: { id },
+        ...includeForFind(language.id)
+    });
+}
+
+const all = async (language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.job.all, { language });
+
+    language = await models.language.findOne({
+        where: {
+            code: language
+        }
+    });
+
+    return models.job.findAll({
+        ...includeForFind(language.id)
+    });
+}
+
+const includeForFind = (languageId) => {
+    return {
+        include: [
+            { association: 'i18n', where: { languageId } },
+            { association: 'team' },
+            { association: 'company', include: [{ association: 'i18n', where: { languageId } }] }
+        ]
+    }
 }
 
 module.exports = {
     handleJob,
+    job,
     all
 }
