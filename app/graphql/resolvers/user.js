@@ -529,6 +529,15 @@ const createProfileResponse = async (user, models, languageId) => {
                     { association: 'videos' },
                     { association: 'featuredImage' }
                 ]
+            },
+            {
+                association: 'aboutMeArticles', include: [
+                    { association: 'author' },
+                    { association: 'i18n', where: { languageId } },
+                    { association: 'images' },
+                    { association: 'videos' },
+                    { association: 'featuredImage' }
+                ]
             }
         ]
     });
