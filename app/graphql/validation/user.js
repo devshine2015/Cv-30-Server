@@ -32,16 +32,16 @@ module.exports = {
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         values: yup.array().of(
             yup.string().trim()
-            .required('Value needs a title')
-            .max(100, 'Value title cannot be longer than 100 chars')
+                .required('Value needs a title')
+                .max(100, 'Value title cannot be longer than 100 chars')
         )
     }),
     skills: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         skills: yup.array().of(
             yup.string().trim()
-            .required('Skill needs a title')
-            .max(100, 'Skill title cannot be longer than 100 chars')
+                .required('Skill needs a title')
+                .max(100, 'Skill title cannot be longer than 100 chars')
         )
     }),
     contact: yup.object().shape({
@@ -68,8 +68,9 @@ module.exports = {
         startDate: yup.date().required(),
         endDate: yup.date().nullable(),
         title: yup.string().trim()
-            .max(255, 'Project title cannot be longer than 255 chars'),
-        description: yup.string()
+            .max(255, 'Project title cannot be longer than 255 chars')
+            .nullable(),
+        description: yup.string().nullable()
     }),
     experience: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
@@ -82,7 +83,8 @@ module.exports = {
         startDate: yup.date().required(),
         endDate: yup.date().nullable(),
         title: yup.string().trim()
-            .max(255, 'Experience title cannot be longer than 255 chars'),
-        description: yup.string()
+            .max(255, 'Experience title cannot be longer than 255 chars')
+            .nullable(),
+        description: yup.string().nullable()
     })
 };
