@@ -8,6 +8,9 @@ module.exports = `
         featuredArticles: [Article]
         officeArticles: [Article]
         storiesArticles: [Article]
+        activityField: String
+        noOfEmployees: String
+        location: String
         tags: [Tag]
         faqs: [Faq]
         jobs: [Job]
