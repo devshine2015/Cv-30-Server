@@ -18,6 +18,26 @@ module.exports = `
         name: String
         headline: String
         description: String
+        activityField: String
+        noOfEmployees: String
+        location: String
+        place: PlaceInput
+    }
+    input PlaceInput {
+        addressComponents: String
+        formattedAddress: String
+        latitude: Float
+        longitude: Float
+        internationalPhoneNumber: String
+        name: String
+        placeId: String
+        compoundCode: String
+        globalCode: String
+        rating: Float
+        reviews: String
+        types: String
+        googleUrl: String
+        website: String
     }
     type CompanyText {
         headline: String

@@ -25,6 +25,24 @@ module.exports = {
 				field: 'name',
 				unique: true
 			},
+			activityField: {
+				allowNull: true,
+				type: Sequelize.STRING(255),
+				field: 'activity_field',
+				unique: true
+			},
+			noOfEmployees: {
+				allowNull: true,
+				type: Sequelize.STRING(255),
+				field: 'no_of_employees',
+				unique: true
+			},
+			location: {
+				allowNull: true,
+				type: Sequelize.STRING(255),
+				field: 'location',
+				unique: true
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

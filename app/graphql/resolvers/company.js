@@ -30,6 +30,10 @@ const handleCompany = async(language, details, { user, models }) => {
         details.companyId = details.id;
         details.languageId = language.id;
         await models.companyText.upsert(details, {transaction: t});
+        if (details.place) {
+            details.place.companyId = details.id;
+            await models.place.upsert(details.place, {transaction: t});
+        }
     });
 
     return { status: true };

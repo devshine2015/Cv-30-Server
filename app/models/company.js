@@ -24,6 +24,24 @@ module.exports = (sequelize, DataTypes) => {
 			field: 'name',
 			unique: true
 		},
+		activityField: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'activity_field',
+			unique: true
+		},
+		noOfEmployees: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'no_of_employees',
+			unique: true
+		},
+		location: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'location',
+			unique: true
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -43,6 +61,7 @@ module.exports = (sequelize, DataTypes) => {
 		]
 	});
 	Company.associate = models => {
+		Company.hasOne(models.place, { as: 'place', foreignKey: 'company_id' });
 		Company.hasMany(models.companyText, { as: 'i18n', foreignKey: 'company_id' });
 		Company.hasMany(models.job, { as: 'jobs', foreignKey: 'company_id' });
 		Company.belongsToMany(models.article, { as: 'featuredArticles', through: 'company_featured_articles', foreignKey: 'company_id' });
