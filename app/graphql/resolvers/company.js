@@ -70,12 +70,17 @@ const all = async (language, { user, models }) => {
     })
 };
 
-const includeForFind =(languageId) => {
+const includeForFind = (languageId) => {
     return {
         include: [
         {
             association: 'i18n',
             where: { languageId }
+        }, {
+            association: 'teams',
+            include: [
+                { association: 'members' }
+            ]
         }, {
             association: 'jobs',
             include: [
