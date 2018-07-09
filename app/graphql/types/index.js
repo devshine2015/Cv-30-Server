@@ -50,7 +50,7 @@ const Query = `
 		): Team
 	}
 	type Mutation {
-		avatar ( status: Boolean ): StandardResponse
+		avatar ( status: Boolean, contentType: ImageType ): StandardResponse
 		profileCover ( status: Boolean ): StandardResponse
 		setCoverBackground ( color: String ): StandardResponse
 		setStory(

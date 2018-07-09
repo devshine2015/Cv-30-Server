@@ -18,11 +18,21 @@ module.exports = {
 				type: Sequelize.BOOLEAN,
 				field: 'has_avatar'
 			},
+			avatarContentType: {
+				allowNull: true,
+				type: Sequelize.ENUM('jpeg', 'png', 'gif'),
+				field: 'avatar_content_type'
+			},
 			hasProfileCover: {
 				allowNull: true,
 				defaultValue: false,
 				type: Sequelize.BOOLEAN,
 				field: 'has_profile_cover'
+			},
+			profileCoverContentType: {
+				allowNull: true,
+				type: Sequelize.ENUM('jpeg', 'png', 'gif'),
+				field: 'profile_cover_content_type'
 			},
 			coverBackground: {
 				allowNull: true,

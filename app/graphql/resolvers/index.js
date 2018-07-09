@@ -24,7 +24,7 @@ module.exports = {
 		// userProjects: (_, __, context) => userResolvers.userProjects(context)
 	},
 	Mutation: {
-		avatar: (_, { status }, context) => userResolvers.setAvatar(status, context),
+		avatar: (_, { status, contentType }, context) => userResolvers.setAvatar(status, contentType, context),
 		profileCover: (_, { status }, context) => userResolvers.setHasProfileCover(status, context),
 		setCoverBackground: (_, { color }, context) => userResolvers.setCoverBackground(color, context),
 		setSalary: (_, { salary }, context) => userResolvers.setSalary(salary, context),

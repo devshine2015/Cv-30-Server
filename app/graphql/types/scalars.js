@@ -39,6 +39,7 @@ module.exports = `
     enum ImageType {
         jpeg
         png
+        gif
     }
     enum SocialType {
         url

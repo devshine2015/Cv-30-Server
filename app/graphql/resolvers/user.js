@@ -54,10 +54,10 @@ const all = async (language, { user, models }) => {
         }))
 };
 
-const setAvatar = async (status, { user, models }) => {
+const setAvatar = async (status, contentType, { user, models }) => {
     checkUserAuth(user);
     try {
-        if (models.profile.upsert({ userId: user.id, hasAvatar: status })) {
+        if (models.profile.upsert({ userId: user.id, hasAvatar: status, avatarContentType: contentType })) {
             return { status: true };
         }
     } catch (err) {

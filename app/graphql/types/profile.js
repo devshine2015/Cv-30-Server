@@ -24,7 +24,9 @@ const Profile = `
         projects: [Project]
         contact: Contact
         hasAvatar: Boolean
+        avatarContentType: ImageType
         hasProfileCover: Boolean
+        profileCoverContentType: ImageType
         coverBackground: String
         currentPosition: CurrentPosition
         story: Story

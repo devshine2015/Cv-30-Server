@@ -7,6 +7,7 @@ module.exports = `
         firstName: String
         lastName: String
         hasAvatar: Boolean
+        avatarContentType: ImageType
         error: String
     }
     type CheckTokensResponse {
