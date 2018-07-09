@@ -17,10 +17,10 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'user_id'
 		},
-		locationId: {
+		location: {
 			allowNull: true,
-			type: DataTypes.INTEGER,
-			field: 'location_id'
+			type: DataTypes.STRING(255),
+			field: 'location'
 		},
 		isCurrent: {
 			allowNull: true,
@@ -62,8 +62,8 @@ module.exports = (Sequelize, DataTypes) => {
 			createdAt: 'created_at',
 			indexes: [
 				{ fields: ['user_id'] },
-				{ fields: ['location_id'] },
-				{ fields: ['user_id', 'location_id'] }
+				// { fields: ['location_id'] },
+				// { fields: ['user_id', 'location_id'] }
 			],
 			freezeTableName: true,
 			tableName: 'experience'
@@ -72,6 +72,8 @@ module.exports = (Sequelize, DataTypes) => {
 		Experience.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		Experience.hasMany(models.experienceText, { as: 'i18n', foreignKey: 'experience_id' });
 		// Experience.belongsTo(models.location, { as: 'location' });
+		Experience.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
+		Experience.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 	};
 	return Experience;
 };

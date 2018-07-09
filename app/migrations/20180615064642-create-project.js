@@ -23,10 +23,10 @@ module.exports = {
 				},
 				field: 'user_id'
 			},
-			locationId: {
+			location: {
 				allowNull: true,
-				type: Sequelize.INTEGER,
-				field: 'location_id'
+				type: Sequelize.STRING(255),
+				field: 'location'
 			},
 			isCurrent: {
 				allowNull: true,

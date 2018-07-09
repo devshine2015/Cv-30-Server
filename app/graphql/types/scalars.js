@@ -10,6 +10,8 @@ module.exports = `
         company
         job
         team
+        experience
+        project
     }
     enum VideoTarget {
         article

@@ -23,10 +23,10 @@ module.exports = {
                 },
 				field: 'user_id'
 			},
-			locationId: {
+			location: {
 				allowNull: true,
-				type: Sequelize.INTEGER,
-				field: 'location_id'
+				type: Sequelize.STRING(255),
+				field: 'location'
 			},
 			isCurrent: {
 				allowNull: true,
@@ -69,9 +69,9 @@ module.exports = {
 			freezeTableName: true,
 			tableName: 'experience'
 		})
-		.then(() => queryInterface.addIndex('experience', { fields: ['user_id'] }))
-		.then(() => queryInterface.addIndex('experience', { fields: ['location_id'] }))
-		.then(() => queryInterface.addIndex('experience', { fields: ['user_id', 'location_id'] }));
+		.then(() => queryInterface.addIndex('experience', { fields: ['user_id'] }));
+		// .then(() => queryInterface.addIndex('experience', { fields: ['location_id'] }))
+		// .then(() => queryInterface.addIndex('experience', { fields: ['user_id', 'location_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
     	return queryInterface.dropTable('experience');

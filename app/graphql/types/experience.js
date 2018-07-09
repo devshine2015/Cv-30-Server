@@ -7,13 +7,16 @@ const Experience = `
         company: String
         description: String
         startDate: Date
+        location: String
         endDate: Date
         isCurrent: Boolean,
         i18n: [ExperienceText]
+        videos: [Video]
+        images: [Image]
     }
     input ExperienceInput {
         id: String
-        location: Int
+        location: String
         isCurrent: Boolean
         position: String
         company: String
@@ -21,6 +24,8 @@ const Experience = `
         endDate: Date
         title: String
         description: String
+        videos: [VideoInput]
+        images: [ImageInput]
     }
 `;
 

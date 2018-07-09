@@ -27,7 +27,7 @@ module.exports = (Sequelize, DataTypes) => {
 		},
 		sourceType: {
 			allowNull: false,
-			type: DataTypes.ENUM('article', 'profile', 'company', 'job', 'team'),
+			type: DataTypes.ENUM('article', 'profile', 'company', 'job', 'team', 'experience', 'project'),
 			field: 'source_type'
 		},
 		isFeatured: {

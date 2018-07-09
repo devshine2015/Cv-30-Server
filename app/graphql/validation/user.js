@@ -59,7 +59,7 @@ module.exports = {
     }),
     project: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        location: yup.number(),
+        location: yup.string().trim().max(255),
         isCurrent: yup.boolean(),
         position: yup.string()
             .max(255, 'Project position cannot be longer than 255 chars'),
@@ -70,11 +70,29 @@ module.exports = {
         title: yup.string().trim()
             .max(255, 'Project title cannot be longer than 255 chars')
             .nullable(),
-        description: yup.string().nullable()
+        description: yup.string().nullable(),
+        images: yup.array().of(yup.object().shape({
+            id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            title: yup.string().trim().max(255),
+            description: yup.string().trim(),
+            isFeatured: yup.boolean(),
+            source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project)/, { excludeEmptyString: true }),
+            path: yup.string().trim().max(255)
+        })),
+        videos: yup.array().of(yup.object().shape({
+            id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            title: yup.string().trim().max(255),
+            description: yup.string().trim(),
+            isFeatured: yup.boolean(),
+            source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project)/, { excludeEmptyString: true }),
+            path: yup.string().trim().max(255)
+        }))
     }),
     experience: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        location: yup.number(),
+        location: yup.string().trim().max(255),
         isCurrent: yup.boolean(),
         position: yup.string()
             .max(255, 'Experience position cannot be longer than 255 chars'),
@@ -85,6 +103,24 @@ module.exports = {
         title: yup.string().trim()
             .max(255, 'Experience title cannot be longer than 255 chars')
             .nullable(),
-        description: yup.string().nullable()
+        description: yup.string().nullable(),
+        images: yup.array().of(yup.object().shape({
+            id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            title: yup.string().trim().max(255),
+            description: yup.string().trim(),
+            isFeatured: yup.boolean(),
+            source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project)/, { excludeEmptyString: true }),
+            path: yup.string().trim().max(255)
+        })),
+        videos: yup.array().of(yup.object().shape({
+            id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            title: yup.string().trim().max(255),
+            description: yup.string().trim(),
+            isFeatured: yup.boolean(),
+            source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project)/, { excludeEmptyString: true }),
+            path: yup.string().trim().max(255)
+        }))
     })
 };

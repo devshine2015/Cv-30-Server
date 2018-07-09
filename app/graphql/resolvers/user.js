@@ -370,7 +370,7 @@ const setContact = async ({ phone, email, facebook, linkedin }, { user, models }
     return response;
 }
 
-const setProject = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
+const setProject = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.project, {
         location,
@@ -381,7 +381,9 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
         endDate,
         title,
         description,
-        language
+        language,
+        images,
+        videos
     });
 
     const response = {
@@ -397,21 +399,69 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
     });
 
     if (languageModel) {
-        await models.project.upsert({
-            id: id ? id : uuid(),
-            userId: user.id,
-            locationId: location,
-            isCurrent,
-            position,
-            company,
-            startDate: new Date(startDate),
-            endDate: new Date(endDate),
-            i18n: [{
-                languageId: languageModel.dataValues.id,
-                title,
-                description
-            }]
-        });
+        await models.sequelize.transaction(async t => {
+            const projectId = id ? id : uuid();
+            await models.project.upsert({
+                id: projectId,
+                userId: user.id,
+                location,
+                isCurrent,
+                position,
+                company,
+                startDate: new Date(startDate),
+                endDate: new Date(endDate),
+                i18n: [{
+                    languageId: languageModel.dataValues.id,
+                    title,
+                    description
+                }]
+            }, { transaction: t });
+            if (images && images.length > 0) {
+                await models.image.upsert(images.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured,
+                    sourceId: id,
+                    sourceType: item.sourceType,
+                    target: item.target,
+                    path: item.path
+                })), {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                await models.imageText.upsert(images.map(item => ({
+                    imageId: item.id,
+                    title: item.title,
+                    description: item.description,
+                    languageId: language.id
+                })), {
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
+            }
+            if (videos && videos.length > 0) {
+                await models.video.upsert(videos.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured ? item.isFeatured : false,
+                    sourceId: projectId,
+                    sourceType: item.sourceType,
+                    path: item.path
+                }))[0], {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                // await models.videoText.upsert(videos.map(item => ({
+                //     videoId: item.id,
+                //     title: item.title,
+                //     description: item.description,
+                //     languageId: language.id
+                // })), {
+                //     updateOnDuplicate: ["title", "description"],
+                //     transaction: t
+                // });
+            }
+        })
         response.status = true;
     } else {
         response.error = 'Language not found!';
@@ -437,7 +487,7 @@ const removeProject = async (id, { user, models }) => {
     return response;
 }
 
-const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description }, language, { user, models }) => {
+const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.experience, {
         location,
@@ -448,7 +498,9 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
         endDate,
         title,
         description,
-        language
+        language,
+        images,
+        videos
     });
 
     let response = {
@@ -468,7 +520,7 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
             await models.experience.upsert({
                 id: experienceId,
                 userId: user.id,
-                locationId: location,
+                location,
                 isCurrent,
                 position,
                 company,
@@ -481,6 +533,51 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
                 title,
                 description
             }, { transaction: t });
+            if (images && images.length > 0) {
+                await models.image.upsert(images.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured,
+                    sourceId: id,
+                    sourceType: item.sourceType,
+                    target: item.target,
+                    path: item.path
+                })), {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                await models.imageText.upsert(images.map(item => ({
+                    imageId: item.id,
+                    title: item.title,
+                    description: item.description,
+                    languageId: language.id
+                })), {
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
+            }
+            if (videos && videos.length > 0) {
+                await models.video.upsert(videos.map(item => ({
+                    id: item.id,
+                    userId: user.id,
+                    isFeatured: item.isFeatured ? item.isFeatured : false,
+                    sourceId: experienceId,
+                    sourceType: item.sourceType,
+                    path: item.path
+                }))[0], {
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                // await models.videoText.upsert(videos.map(item => ({
+                //     videoId: item.id,
+                //     title: item.title,
+                //     description: item.description,
+                //     languageId: language.id
+                // })), {
+                //     updateOnDuplicate: ["title", "description"],
+                //     transaction: t
+                // });
+            }
         });
         response.status = true;
     } else {
@@ -517,8 +614,8 @@ const createProfileResponse = async (user, models, languageId) => {
             { association: 'values', include: [{ association: 'i18n' }] },
             { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'articles' },
-            { association: 'experience', include: [{ association: 'i18n' }] },
-            { association: 'projects', include: [{ association: 'i18n' }] },
+            { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
+            { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
             { association: 'story', include: [{ association: 'i18n' }] },
             { association: 'contact' },
             {

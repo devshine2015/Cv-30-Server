@@ -5,15 +5,18 @@ const Project = `
         id: String
         position: String
         company: String
+        location: String
         description: String
         startDate: Date
         endDate: Date
         isCurrent: Boolean,
         i18n: [ProjectText]
+        videos: [Video]
+        images: [Image]
     }
     input ProjectInput {
         id: String
-        location: Int
+        location: String
         isCurrent: Boolean
         position: String
         company: String
@@ -21,6 +24,8 @@ const Project = `
         endDate: Date
         title: String
         description: String
+        videos: [VideoInput]
+        images: [ImageInput]
     }
 `;
 

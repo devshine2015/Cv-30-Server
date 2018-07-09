@@ -1,5 +1,5 @@
 const Video = `
-    union VideoSource = Article | Profile
+    union VideoSource = Article | Profile | Experience | Project
     type Video {
         id: String
         author: User

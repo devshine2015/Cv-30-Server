@@ -17,10 +17,10 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'user_id'
 		},
-		locationId: {
+		location: {
 			allowNull: true,
-			type: DataTypes.INTEGER,
-			field: 'location_id'
+			type: DataTypes.STRING(255),
+			field: 'location'
 		},
 		isCurrent: {
 			allowNull: true,
@@ -66,6 +66,8 @@ module.exports = (Sequelize, DataTypes) => {
 		Project.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		Project.hasMany(models.projectText, { as: 'i18n', foreignKey: 'project_id' });
 		// Project.belongsTo(models.location, { as: 'location' });
+		Project.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
+		Project.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 	};
 	return Project;
 };
