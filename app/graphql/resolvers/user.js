@@ -174,7 +174,7 @@ const setStory = async (language, { title, description }, { user, models }) => {
 
 const setValues = async (values, language, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.value, {
+    yupValidation(schema.user.values, {
         language,
         values
     });
