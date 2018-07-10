@@ -47,7 +47,6 @@ module.exports = (Sequelize, DataTypes) => {
 		tableName: 'video_i18n'
 	});
 	VideoText.associate = models => {
-		VideoText.belongsTo(models.user, { as: 'author' });
 		VideoText.belongsTo(models.video, { as: 'video' });
 		VideoText.belongsTo(models.language, { as: 'language' });
 	};

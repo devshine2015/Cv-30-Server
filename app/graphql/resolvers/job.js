@@ -72,7 +72,27 @@ const includeForFind = (languageId) => {
         include: [
             { association: 'i18n', where: { languageId } },
             { association: 'team' },
-            { association: 'company', include: [{ association: 'i18n', where: { languageId } }] }
+            {
+                association: 'company',
+                include: [
+                    {
+                        association: 'i18n', where: { languageId }
+                    }, {
+                        association: 'officeArticles',
+                        include: [
+                            { association: 'featuredImage', include: [{ association: 'i18n', where: { languageId } }] },
+                            { association: 'i18n', where: { languageId } },
+                            { association: 'images', include: [{ association: 'i18n', where: { languageId } }] },
+                            { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
+                        ]
+                    }, {
+                        association: 'faqs',
+                        include: [
+                            { association: 'i18n', where: { languageId } }
+                        ]
+                    }
+                ]
+            }
         ]
     }
 }
