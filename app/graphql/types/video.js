@@ -18,7 +18,7 @@ const Video = `
         description: String
     }
     input VideoInput {
-        id: String
+        id: String!
         title: String
         description: String
         isFeatured: Boolean

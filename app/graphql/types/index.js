@@ -72,12 +72,12 @@ const Query = `
 		): StandardResponse
 		setContact ( contact: ContactInput ): StandardResponse
 		setProject (
-			project: ProjectInput
+			project: ProjectInput!
 			language: LanguageCodeType!
 		): StandardResponse
 		removeProject ( id: String ): StandardResponse
 		setExperience (
-			experience: ExperienceInput
+			experience: ExperienceInput!
 			language: LanguageCodeType!
 		): StandardResponse
 		removeExperience (

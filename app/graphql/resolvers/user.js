@@ -386,11 +386,6 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
         videos
     });
 
-    const response = {
-        status: false,
-        error: ''
-    };
-
     // Get language
     const languageModel = await models.language.findOne({
         where: {
@@ -410,47 +405,56 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
                 company,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-                i18n: [{
-                    languageId: languageModel.dataValues.id,
-                    title,
-                    description
-                }]
+            }, { transaction: t });
+            await models.projectText.upsert({
+                projectId,
+                languageId: languageModel.id,
+                title,
+                description
             }, { transaction: t });
             if (images && images.length > 0) {
-                await models.image.upsert(images.map(item => ({
+                await Promise.all(images.map(item => models.image.upsert({
                     id: item.id,
                     userId: user.id,
                     isFeatured: item.isFeatured,
-                    sourceId: id,
+                    sourceId: item.source ? item.source : projectId,
                     sourceType: item.sourceType,
-                    target: item.target,
                     path: item.path
-                })), {
+                }, {
                     updateOnDuplicate: ["isFeatured", "path"],
                     transaction: t
-                });
-                await models.imageText.upsert(images.map(item => ({
+                })));
+                await Promise.all(images.map(item => models.imageText.upsert({
                     imageId: item.id,
                     title: item.title,
                     description: item.description,
-                    languageId: language.id
-                })), {
+                    languageId: languageModel.id
+                }, {
                     updateOnDuplicate: ["title", "description"],
                     transaction: t
-                });
+                })));
             }
             if (videos && videos.length > 0) {
-                await models.video.upsert(videos.map(item => ({
+                // await models.video.bulkCreate(videos.map(item => ({
+                //     id: item.id,
+                //     userId: user.id,
+                //     isFeatured: item.isFeatured ? item.isFeatured : false,
+                //     sourceId: item.source ? item.source : projectId,
+                //     sourceType: item.sourceType,
+                //     path: item.path
+                // })));
+
+                await Promise.all(videos.map(item => models.video.upsert({
                     id: item.id,
                     userId: user.id,
                     isFeatured: item.isFeatured ? item.isFeatured : false,
-                    sourceId: projectId,
+                    sourceId: item.source ? item.source : projectId,
                     sourceType: item.sourceType,
                     path: item.path
-                }))[0], {
+                }, {
                     updateOnDuplicate: ["isFeatured", "path"],
                     transaction: t
-                });
+                })));
                 // await models.videoText.upsert(videos.map(item => ({
                 //     videoId: item.id,
                 //     title: item.title,
@@ -462,12 +466,10 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
                 // });
             }
         })
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Language not found!';
+        return { status: false, error: 'Language not found!' };
     }
-
-    return response;
 }
 
 const removeProject = async (id, { user, models }) => {
@@ -502,11 +504,6 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
         images,
         videos
     });
-
-    let response = {
-        status: false,
-        error: ''
-    };
 
     const languageModel = await models.language.findOne({
         where: {
@@ -579,12 +576,10 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
                 // });
             }
         });
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Language not found!';
+        return { status: false, error: 'Language not found!' };
     }
-
-    return response;
 }
 
 const removeExperience = async (id, { user, models }) => {

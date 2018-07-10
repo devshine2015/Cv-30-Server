@@ -62,7 +62,8 @@ module.exports = {
         location: yup.string().trim().max(255),
         isCurrent: yup.boolean(),
         position: yup.string()
-            .max(255, 'Project position cannot be longer than 255 chars'),
+            .max(255, 'Project position cannot be longer than 255 chars')
+            .required(),
         company: yup.string()
             .max(255, 'Project company cannot be longer than 255 chars'),
         startDate: yup.date().required(),
@@ -95,7 +96,8 @@ module.exports = {
         location: yup.string().trim().max(255),
         isCurrent: yup.boolean(),
         position: yup.string()
-            .max(255, 'Experience position cannot be longer than 255 chars'),
+            .max(255, 'Experience position cannot be longer than 255 chars')
+            .required(),
         company: yup.string()
             .max(255, 'Experience company cannot be longer than 255 chars'),
         startDate: yup.date().required(),

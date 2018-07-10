@@ -18,7 +18,7 @@ const Image = `
         description: String
     }
     input ImageInput {
-        id: String
+        id: String!
         title: String
         description: String
         isFeatured: Boolean
