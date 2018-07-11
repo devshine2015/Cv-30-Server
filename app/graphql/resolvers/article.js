@@ -12,15 +12,13 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     if (article && article.id) {
         const foundArticle = await models.article.findOne({ where: { id: article.id } });
-        // if (!foundArticle) return { status: false, error: 'Article not found' }
         if (foundArticle && foundArticle.userId != user.id) throwForbiddenError();
     }
 
     if (options) {
         if (options.articleId) {
             const foundArticle = await models.article.findOne({ attributes: ["id", "userId"], where: { id: options.articleId } });
-            if (!foundArticle) return { status: false, error: 'Article not found' }
-            if (foundArticle.userId != user.id) throwForbiddenError();
+            if (foundArticle && foundArticle.userId != user.id) throwForbiddenError();
         }
 
         if (options.companyId) {
@@ -47,7 +45,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             code: language
         }
     });
-    
+
     await models.sequelize.transaction(async t => {
         if (article) {
             article.id = article.id || uuid();
@@ -108,7 +106,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             }
         }
         if (options && options.articleId && options.companyId) {
-            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
+            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId }, transaction: t });
             const company = await models.company.findOne({ attributes: ["id"], where: { id: options.companyId } });
             if (options.isFeatured) {
                 await company.addFeaturedArticle(article, { transaction: t });
@@ -127,7 +125,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             }
         }
         if (options && options.articleId && options.teamId) {
-            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
+            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId }, transaction: t });
             const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId } });
             if (options.isAtOffice) {
                 await team.addOfficeArticle(article, { transaction: t });
