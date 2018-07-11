@@ -18,22 +18,23 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     if (options) {
         if (options.articleId) {
-            const foundArticle = await models.article.findOne({ where: { id: options.articleId } });
+            const foundArticle = await models.article.findOne({ attributes: ["id", "userId"], where: { id: options.articleId } });
             if (!foundArticle) return { status: false, error: 'Article not found' }
             if (foundArticle.userId != user.id) throwForbiddenError();
         }
 
         if (options.companyId) {
-            const foundCompany = await models.company.findOne({ where: { id: options.companyId } });
+            const foundCompany = await models.company.findOne({ attributes: ["id", "userId"], where: { id: options.companyId } });
             if (!foundCompany) return { status: false, error: 'Company not found' }
             if (foundCompany.userId != user.id) throwForbiddenError();
         }
 
         if (options.teamId) {
             const foundTeam = await models.team.findOne({
+                attributes: ["id"], 
                 where: { id: options.teamId },
                 include: [
-                    { association: 'company' }
+                    { association: 'company', attributes: ["id", "userId"] }
                 ]
             });
             if (!foundTeam) return { status: false, error: 'Team not found' }
@@ -107,17 +108,16 @@ const handleArticle = async (language, article, options, { user, models }) => {
             }
         }
         if (options && options.articleId && options.companyId) {
-            article = await models.article.findOne({ where: { id: options.articleId } });
-            company = await models.company.findOne({ where: { id: options.companyId } });
-            if (options.isFeatured) company.addFeaturedArticle(article, { transaction: t });
-            if (options.isAtOffice) company.addOfficeArticle(article, { transaction: t });
-            if (options.isMoreStories) company.addStoriesArticle(article, { transaction: t });
+            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
+            const company = await models.company.findOne({ attributes: ["id"], where: { id: options.companyId } });
+            if (options.isFeatured) await company.addFeaturedArticle(article, { transaction: t });
+            if (options.isAtOffice) await company.addOfficeArticle(article, { transaction: t });
+            if (options.isMoreStories) await company.addStoriesArticle(article, { transaction: t });
         }
         if (options && options.articleId && options.teamId && options.isAtOffice) {
-            models.teamOfficeArticles.upsert({
-                team_id: options.teamId,
-                article_id: options.articleId
-            }, { transaction: t })
+            article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
+            const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId } });
+            await team.addOfficeArticle(article, { transaction: t });
         }
     });
 

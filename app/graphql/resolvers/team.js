@@ -39,7 +39,7 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
     if (!member)
         return { status: false, error: 'Member not found' };
 
-    team.addMember(member);
+    await team.addMember(member);
 
     return { status: true };
 }
