@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
 
 const handleCompany = async(language, details, { user, models }) => {
     checkUserAuth(user);
@@ -16,19 +16,13 @@ const handleCompany = async(language, details, { user, models }) => {
         if (!company) return { status: false, error: 'Company not found' }
         if (company.userId != user.id) throwForbiddenError();
     }
-    
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
 
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
         details.userId = user.id;
         await models.company.upsert(details, {transaction: t});
         details.companyId = details.id;
-        details.languageId = language.id;
+        details.languageId = await getLanguageIdByCode(models, language);
         await models.companyText.upsert(details, {transaction: t});
         if (details.place) {
             details.place.companyId = details.id;
@@ -43,15 +37,9 @@ const company = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.one, { id, language });
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
     return models.company.findOne({
         where: { id: id },
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 
@@ -59,14 +47,8 @@ const all = async (language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.all, { language });
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
     return models.company.findAll({
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     })
 };
 
@@ -129,11 +111,7 @@ const handleFAQ = async (language, details, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.faqInput, { language, details });
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
+    const languageId = await getLanguageIdByCode(models, language);
 
     const company = await models.company.findOne({ where: { id: details.companyId } });
     if (!company)
@@ -149,7 +127,7 @@ const handleFAQ = async (language, details, { user, models }) => {
         details.id = details.id || uuid();
         await models.faq.upsert(details, { transaction: t });
         details.faqId = details.id;
-        details.languageId = language.id;
+        details.languageId = languageId;
         await models.faqText.upsert(details, { transaction: t });
     });
 
@@ -161,11 +139,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
     yupValidation(schema.company.tags, { language, tagsInput });
 
     // Get existing tags
-    const languageModel = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
+    const languageId = await getLanguageIdByCode(models, language);
 
     const company = await models.company.findOne({ where: { id: tagsInput.companyId } });
     if (!company) return { status: false, error: 'Company not found' }
@@ -177,7 +151,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
         include: [{
             association: 'i18n',
             where: {
-                languageId: languageModel.dataValues.id,
+                languageId,
                 title: {
                     [models.Sequelize.Op.in]: cleanInputTags
                 }
@@ -198,7 +172,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
                 const mappedTagTexts = newTags.map((title, i) => {
                     return {
                         tagId: createdTags[i].id,
-                        languageId: languageModel.dataValues.Id,
+                        languageId,
                         title,
                     };
                 });

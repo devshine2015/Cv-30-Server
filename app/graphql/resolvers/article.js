@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, getLanguageIdByCode } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
@@ -40,11 +40,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
         }
     }
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
+    language = await getLanguageByCode(models, language);
 
     await models.sequelize.transaction(async t => {
         if (article) {
@@ -141,28 +137,18 @@ const handleArticle = async (language, article, options, { user, models }) => {
 const article = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.one, { id, language });
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
     return models.article.findOne({
         where: { id },
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 
 const all = async (language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.all, { language });
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
     return models.article.findAll({
         where: {},
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 

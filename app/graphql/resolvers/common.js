@@ -34,9 +34,29 @@ const yupValidation = (yupValidator, input) => {
     }
 }
 
+const getLanguageByCode = async (models, code, attributes = ["id"]) => {
+    return models.language.findOne({
+        attributes,
+        where: {
+            code
+        }
+    });
+}
+
+const getLanguageIdByCode = async (models, code, attributes = ["id"]) => {
+    return (await models.language.findOne({
+        attributes,
+        where: {
+            code
+        }
+    })).id;
+}
+
 module.exports = {
     checkUserAuth,
     yupValidation,
     forbiddenError,
-    throwForbiddenError
+    throwForbiddenError,
+    getLanguageByCode,
+    getLanguageIdByCode
 }

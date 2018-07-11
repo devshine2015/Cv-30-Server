@@ -1,20 +1,17 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
 
 const handleTeam = async (teamDetails, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.input, { teamDetails });
 
-    const company = await models.company.findOne({ where: { id: teamDetails.companyId } });
+    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: teamDetails.companyId } });
     if (!company)
         return { status: false, error: 'Company not found' };
     
     if (company.userId != user.id)
         throwForbiddenError();
-
-    if (teamDetails.id && !await models.team.findOne({ where: { id: teamDetails.id } }))
-        return { status: false, error: 'Team not found' }
 
     teamDetails.id = teamDetails.id || uuid();
     teamDetails.coverBackground = teamDetails.profileBackgroundColor;
@@ -27,15 +24,15 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
 
-    const team = await models.team.findOne({ where: { id: teamId } });
+    const team = await models.team.findOne({ attributes: ["id", "companyId"], where: { id: teamId } });
     if (!team)
         return { status: false, error: 'Team not found' };
 
-    const company = await models.company.findOne({ where: { id: team.companyId } });
+    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
     if (!company || company.userId != user.id)
         throwForbiddenError();
 
-    const member = await models.user.findOne({ where: { id: memberId } });
+    const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
     if (!member)
         return { status: false, error: 'Member not found' };
 
@@ -48,15 +45,15 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
 
-    const team = await models.team.findOne({ where: { id: teamId } });
+    const team = await models.team.findOne({ attributes: ["id", "companyId"], where: { id: teamId } });
     if (!team)
         return { status: false, error: 'Team not found' };
 
-    const company = await models.company.findOne({ where: { id: team.companyId } });
+    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
     if (!company || company.userId != user.id)
         throwForbiddenError();
 
-    const member = await models.user.findOne({ where: { id: memberId } });
+    const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
     if (!member)
         return { status: false, error: 'Member not found' };
 
@@ -68,28 +65,18 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
 const team = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.one, { id, language });
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
     return models.team.findOne({
         where: { id },
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 
 const all = async (language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.all, { language });
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
     return models.team.findAll({
         where: {},
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 

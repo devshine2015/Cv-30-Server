@@ -1,18 +1,12 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.job.input, {
         language,
         jobDetails
-    });
-
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
     });
 
     const company = await models.company.findOne({ where: { id: jobDetails.companyId } });
@@ -29,7 +23,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
         jobDetails.jobId = jobDetails.id;
-        jobDetails.languageId = language.id;
+        jobDetails.languageId = await getLanguageIdByCode(models, language);
         await models.jobText.upsert(jobDetails, { transaction: t });
     });
 
@@ -40,15 +34,9 @@ const job = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.job.one, { id, language });
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
     return models.job.findOne({
         where: { id },
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 
@@ -56,14 +44,8 @@ const all = async (language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.job.all, { language });
 
-    language = await models.language.findOne({
-        where: {
-            code: language
-        }
-    });
-
     return models.job.findAll({
-        ...includeForFind(language.id)
+        ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }
 
