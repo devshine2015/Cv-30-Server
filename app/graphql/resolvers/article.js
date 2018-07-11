@@ -47,7 +47,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             code: language
         }
     });
-
+    
     await models.sequelize.transaction(async t => {
         if (article) {
             article.id = article.id || uuid();
@@ -110,14 +110,30 @@ const handleArticle = async (language, article, options, { user, models }) => {
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
             const company = await models.company.findOne({ attributes: ["id"], where: { id: options.companyId } });
-            if (options.isFeatured) await company.addFeaturedArticle(article, { transaction: t });
-            if (options.isAtOffice) await company.addOfficeArticle(article, { transaction: t });
-            if (options.isMoreStories) await company.addStoriesArticle(article, { transaction: t });
+            if (options.isFeatured) {
+                await company.addFeaturedArticle(article, { transaction: t });
+            } else {
+                await company.removeFeaturedArticle(article, { transaction: t });
+            }
+            if (options.isAtOffice) {
+                await company.addOfficeArticle(article, { transaction: t });
+            } else {
+                await company.removeOfficeArticle(article, { transaction: t });
+            }
+            if (options.isMoreStories) {
+                await company.addStoriesArticle(article, { transaction: t });
+            } else {
+                await company.removeStoriesArticle(article, { transaction: t });
+            }
         }
-        if (options && options.articleId && options.teamId && options.isAtOffice) {
+        if (options && options.articleId && options.teamId) {
             article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId } });
             const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId } });
-            await team.addOfficeArticle(article, { transaction: t });
+            if (options.isAtOffice) {
+                await team.addOfficeArticle(article, { transaction: t });
+            } else {
+                await team.removeOfficeArticle(article, { transaction: t });
+            }
         }
     });
 
