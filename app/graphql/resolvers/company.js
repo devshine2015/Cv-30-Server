@@ -90,8 +90,9 @@ const includeForFind = (languageId) => {
         }, {
             association: 'featuredArticles',
             include: [
-                { association: 'featuredImage', include: [{ association: 'i18n' }] },
-                { association: 'images', include: [{ association: 'i18n' }] },
+                { association: 'featuredImage', include: [{ association: 'i18n', where: { languageId } }] },
+                { association: 'images', include: [{ association: 'i18n', where: { languageId } }] },
+                { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] },
                 { association: 'i18n', where: { languageId } }
             ]
         }, {
@@ -99,14 +100,16 @@ const includeForFind = (languageId) => {
             include: [
                 { association: 'featuredImage', include: [{ association: 'i18n' }] },
                 { association: 'i18n', where: { languageId } },
-                { association: 'images', include: [{ association: 'i18n' }] }
+                { association: 'images', include: [{ association: 'i18n' }] },
+                { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
             ]
         }, {
             association: 'storiesArticles',
             include: [
                 { association: 'featuredImage', include: [{ association: 'i18n' }] },
                 { association: 'i18n', where: { languageId } },
-                { association: 'images', include: [{ association: 'i18n' }] }
+                { association: 'images', include: [{ association: 'i18n' }] },
+                { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
             ]
         }, {
             association: 'faqs',
