@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.BOOLEAN,
 			field: 'has_profile_cover'
 		},
+		coverContentType: {
+			allowNull: true,
+			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
+			field: 'cover_content_type'
+		},
 		coverBackground: {
 			allowNull: true,
 			defaultValue: '',

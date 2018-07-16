@@ -7,13 +7,15 @@ module.exports = `
         officeArticles: [Article]
         jobs: [Job]
         hasProfileCover: Boolean
-        profileBackgroundColor: String
+        coverContentType: ImageType
+        coverBackground: String
     }
     input TeamInput {
         id: String
         companyId: String
         name: String
         hasProfileCover: Boolean
-        profileBackgroundColor: String
+        coverContentType: ImageType
+        coverBackground: String
     }
 `;

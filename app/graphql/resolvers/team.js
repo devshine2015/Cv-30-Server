@@ -14,7 +14,6 @@ const handleTeam = async (teamDetails, { user, models }) => {
         throwForbiddenError();
 
     teamDetails.id = teamDetails.id || uuid();
-    teamDetails.coverBackground = teamDetails.profileBackgroundColor;
     await models.team.upsert(teamDetails);
 
     return { status: true };
