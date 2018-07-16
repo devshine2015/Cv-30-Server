@@ -15,9 +15,9 @@ module.exports = {
             name: yup.string().trim().max(255),
             headline: yup.string().trim().max(255),
             description: yup.string().trim(),
-            activityField: yup.string().trim().required().max(255),
-            noOfEmployees: yup.string().trim().required().max(255),
-            location: yup.string().trim().required().max(255),
+            activityField: yup.string().trim().max(255),
+            noOfEmployees: yup.string().trim().max(255),
+            location: yup.string().trim().max(255),
             place: yup.object().shape({
                 addressComponents: yup.string().trim().nullable(),
                 formattedAddress: yup.string().trim().nullable(),
