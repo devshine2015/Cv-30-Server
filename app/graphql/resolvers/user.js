@@ -50,7 +50,7 @@ const all = async (language, { user, models }) => {
 const setAvatar = async (status, contentType, { user, models }) => {
     checkUserAuth(user);
     try {
-        if (models.profile.upsert({ userId: user.id, hasAvatar: status, avatarContentType: contentType })) {
+        if (await models.profile.upsert({ userId: user.id, hasAvatar: status, avatarContentType: contentType })) {
             return { status: true };
         }
     } catch (err) {
@@ -141,16 +141,16 @@ const setStory = async (language, { title, description }, { user, models }) => {
             await models.story.upsert({
                 userId: user.id
             }, {
-                transaction: t
-            });
+                    transaction: t
+                });
             await models.storyText.upsert({
                 userId: user.id,
                 languageId,
                 title,
                 description
             }, {
-                transaction: t
-            });
+                    transaction: t
+                });
             response.status = true;
         })
     } catch (error) {
@@ -212,7 +212,7 @@ const setValues = async (values, language, { user, models }) => {
             if (existingValues.length) await user.addValues(existingValues, { transaction: t });
         });
     }
-    return { status: true};
+    return { status: true };
 }
 
 const removeValue = async (id, { user, models }) => {
@@ -385,18 +385,18 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
                 sourceType: item.sourceType,
                 path: item.path
             }, {
-                updateOnDuplicate: ["isFeatured", "path"],
-                transaction: t
-            })));
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                })));
             await Promise.all(images.map(item => models.imageText.upsert({
                 imageId: item.id,
                 title: item.title,
                 description: item.description,
                 languageId
             }, {
-                updateOnDuplicate: ["title", "description"],
-                transaction: t
-            })));
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                })));
         }
         if (videos && videos.length > 0) {
             // await models.video.bulkCreate(videos.map(item => ({
@@ -416,9 +416,9 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
                 sourceType: item.sourceType,
                 path: item.path
             }, {
-                updateOnDuplicate: ["isFeatured", "path"],
-                transaction: t
-            })));
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                })));
             // await models.videoText.upsert(videos.map(item => ({
             //     videoId: item.id,
             //     title: item.title,
@@ -496,18 +496,18 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
                 target: item.target,
                 path: item.path
             })), {
-                updateOnDuplicate: ["isFeatured", "path"],
-                transaction: t
-            });
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
             await models.imageText.upsert(images.map(item => ({
                 imageId: item.id,
                 title: item.title,
                 description: item.description,
                 languageId
             })), {
-                updateOnDuplicate: ["title", "description"],
-                transaction: t
-            });
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });
         }
         if (videos && videos.length > 0) {
             await models.video.upsert(videos.map(item => ({
@@ -518,9 +518,9 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
                 sourceType: item.sourceType,
                 path: item.path
             }))[0], {
-                updateOnDuplicate: ["isFeatured", "path"],
-                transaction: t
-            });
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
             // await models.videoText.upsert(videos.map(item => ({
             //     videoId: item.id,
             //     title: item.title,
