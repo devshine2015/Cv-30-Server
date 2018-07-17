@@ -31,6 +31,25 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.DATE,
 			field: 'expire_date'
 		},
+		phone: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'phone_numbers'
+		},
+		email: {
+			allowNull: true,
+			type: DataTypes.STRING(255)
+		},
+		facebook: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'facebook'
+		},
+		linkedin: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'linkedin'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

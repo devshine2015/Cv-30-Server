@@ -17,6 +17,10 @@ module.exports = {
             title: yup.string().trim().max(255),
             description: yup.string().trim(),
             idealCandidate: yup.string().trim(),
+            phone: yup.string().trim().max(255),
+            email: yup.string().trim().max(255),
+            facebook: yup.string().trim().max(255),
+            linkedin: yup.string().trim().max(255),
             expireDate: yup.date()
         })
     })

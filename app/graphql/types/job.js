@@ -3,6 +3,10 @@ module.exports = `
         id: String!
         name: String
         expireDate: Date
+        phone: String
+        email: String
+        facebook: String
+        linkedin: String
         createdAt: Date
         updatedAt: Date
         i18n: [JobText]
@@ -21,6 +25,10 @@ module.exports = `
         title: String
         description: String
         idealCandidate: String
+        phone: String
+        email: String
+        facebook: String
+        linkedin: String
         expireDate: Date
     }
 `;

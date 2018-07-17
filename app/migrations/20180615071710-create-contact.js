@@ -28,7 +28,8 @@ module.exports = {
 			},
 			linkedin: {
 				allowNull: true,
-				type: Sequelize.STRING(255)
+				type: Sequelize.STRING(255),
+				field: 'linkedin'
 			},
 			createdAt: {
 				allowNull: false,
