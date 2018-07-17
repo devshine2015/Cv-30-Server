@@ -25,7 +25,7 @@ module.exports = {
 	},
 	Mutation: {
 		avatar: (_, { status, contentType }, context) => userResolvers.setAvatar(status, contentType, context),
-		profileCover: (_, { status }, context) => userResolvers.setHasProfileCover(status, context),
+		profileCover: (_, { status, contentType }, context) => userResolvers.setHasProfileCover(status, contentType, context),
 		setCoverBackground: (_, { color }, context) => userResolvers.setCoverBackground(color, context),
 		setSalary: (_, { salary }, context) => userResolvers.setSalary(salary, context),
 		setStory: (_, { language, story }, context) => userResolvers.setStory(language, story, context),
@@ -38,7 +38,7 @@ module.exports = {
 
 		setProject: (_, { project, language }, context) => userResolvers.setProject(project, language, context),
 		removeProject: (_, { id }, context) => userResolvers.removeProject(id, context),
-		
+
 		setExperience: (_, { experience, language }, context) => userResolvers.setExperience(experience, language, context),
 		removeExperience: (_, { id }, context) => userResolvers.removeExperience(id, context),
 
@@ -53,7 +53,7 @@ module.exports = {
 		removeMemberFromTeam: (_, { teamId, memberId }, context) => teamResolvers.removeMemberFromTeam(teamId, memberId, context),
 
 		handleFAQ: (_, { language, faq }, context) => companyResolvers.handleFAQ(language, faq, context),
-		
+
 		handleJob: (_, { language, jobDetails }, context) => jobResolvers.handleJob(language, jobDetails, context),
 
 		register: (_, { nickname, email, password }, context) => authResolvers.createAccount(nickname, email, password, context),

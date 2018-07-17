@@ -62,10 +62,10 @@ const setAvatar = async (status, contentType, { user, models }) => {
     }
 }
 
-const setHasProfileCover = async (status, { user, models }) => {
+const setHasProfileCover = async (status, contentType, { user, models }) => {
     checkUserAuth(user);
     try {
-        await models.profile.upsert({ userId: user.id, hasProfileCover: status });
+        await models.profile.upsert({ userId: user.id, hasProfileCover: status, profileCoverContentType: contentType });
         return { status: true };
     } catch (error) {
         console.log(error);

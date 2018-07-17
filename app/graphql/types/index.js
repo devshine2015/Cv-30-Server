@@ -51,7 +51,7 @@ const Query = `
 	}
 	type Mutation {
 		avatar ( status: Boolean, contentType: ImageType ): StandardResponse
-		profileCover ( status: Boolean ): StandardResponse
+		profileCover ( status: Boolean, contentType: ImageType ): StandardResponse
 		setCoverBackground ( color: String ): StandardResponse
 		setStory(
 			story: StoryInput
