@@ -16,10 +16,9 @@ const handleCompany = async(language, details, { user, models }) => {
         if (!company) return { status: false, error: 'Company not found' }
         if (company.userId != user.id) throwForbiddenError();
     }
-
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
-        details.userId = user.id;
+        details.user_id = user.id;
         await models.company.upsert(details, {transaction: t});
         details.companyId = details.id;
         details.languageId = await getLanguageIdByCode(models, language);
