@@ -2,30 +2,30 @@ const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
 
-const handleCompany = async(language, details, { user, models }) => {
+const handleCompany = async (language, details, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.input, { language, details });
-    
+
     if (details.id) {
         const company = await models.company.findOne({
             where: {
                 id: details.id
             }
         });
-        
+
         if (!company) return { status: false, error: 'Company not found' }
-        if (company.userId != user.id) throwForbiddenError();
+        if (company.user_id != user.id) throwForbiddenError();
     }
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
         details.user_id = user.id;
-        await models.company.upsert(details, {transaction: t});
+        await models.company.upsert(details, { transaction: t });
         details.companyId = details.id;
         details.languageId = await getLanguageIdByCode(models, language);
-        await models.companyText.upsert(details, {transaction: t});
+        await models.companyText.upsert(details, { transaction: t });
         if (details.place) {
             details.place.companyId = details.id;
-            await models.place.upsert(details.place, {transaction: t});
+            await models.place.upsert(details.place, { transaction: t });
         }
     });
 
@@ -119,7 +119,7 @@ const handleFAQ = async (language, details, { user, models }) => {
     const company = await models.company.findOne({ where: { id: details.companyId } });
     if (!company)
         return { status: false, error: 'Company not found' };
-    
+
     if (company.userId != user.id)
         throwForbiddenError();
 
@@ -189,7 +189,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
             if (existingTags.length) await company.addTags(existingTags, { transaction: t });
         });
     }
-    
+
     return { status: true };
 }
 
@@ -203,8 +203,8 @@ const removeTag = async (id, companyId, { user, models }) => {
 
     const model = models.sequelize.define('companyTag', {
     }, {
-        tableName: 'company_tags'
-    });
+            tableName: 'company_tags'
+        });
 
     if (await model.destroy({
         where: {
