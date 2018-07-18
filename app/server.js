@@ -46,7 +46,18 @@ if (cluster.isMaster) {
                 schema,
                 context: { user, models, res },
                 graphiql: true,
-                formatError: error => console.log(error),
+                formatError: error => {
+                    console.log(error);
+                    if (typeof error == "object" && Object.keys(error).indexOf('message') != -1) {
+                        return [{ message: error.message }];
+                    }
+                    try {
+                        result = JSON.parse(error.message);
+                        return typeof result == "array" ? result : [result];
+                    } catch (_) {
+                        return [{ message: error.message }];
+                    }
+                },
                 debug: true
             };
         })
