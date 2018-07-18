@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
 		phone: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
-			field: 'phone_numbers'
+			field: 'phone'
 		},
 		email: {
 			allowNull: true,
