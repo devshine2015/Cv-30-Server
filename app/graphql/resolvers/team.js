@@ -6,11 +6,11 @@ const handleTeam = async (teamDetails, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.input, { teamDetails });
 
-    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: teamDetails.companyId } });
+    const company = await models.company.findOne({ attributes: ["id", "user_id"], where: { id: teamDetails.companyId } });
     if (!company)
         return { status: false, error: 'Company not found' };
-    
-    if (company.userId != user.id)
+
+    if (company.user_id != user.id)
         throwForbiddenError();
 
     teamDetails.id = teamDetails.id || uuid();
