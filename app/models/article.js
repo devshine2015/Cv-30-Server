@@ -10,7 +10,7 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'id'
 		},
-		userId: {
+		ownerId: {
 			allowNull: false,
 			type: DataTypes.UUID,
 			validate: {

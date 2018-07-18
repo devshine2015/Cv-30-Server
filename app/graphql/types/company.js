@@ -1,6 +1,7 @@
 module.exports = `
     type Company {
         id: String!
+        owner: User!
         name: String
         createdAt: Date
         updatedAt: Date
