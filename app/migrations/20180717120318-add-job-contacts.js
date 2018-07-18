@@ -42,6 +42,11 @@ module.exports = {
 		];
 	},
   	down: (queryInterface, Sequelize) => {
-		
+		return [
+			queryInterface.removeColumn('jobs', 'phone'),
+			queryInterface.removeColumn('jobs', 'email'),
+			queryInterface.removeColumn('jobs', 'facebook'),
+			queryInterface.removeColumn('jobs', 'linkedin')
+		];
 	}
 };
