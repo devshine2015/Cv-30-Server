@@ -93,7 +93,8 @@ const includeForFind = (languageId) => {
             {
                 association: 'company',
                 include: [
-                    { association: 'i18n', where: { languageId } }
+                    { association: 'i18n', where: { languageId } },
+                    { association: 'owner' }
                 ]
             },
             {
