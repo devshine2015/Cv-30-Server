@@ -629,6 +629,20 @@ const createProfileResponse = async (user, models, languageId) => {
                     { association: 'videos' },
                     { association: 'featuredImage' }
                 ]
+            },
+            { association: 'followers' },
+            { association: 'followees' },
+            {
+                association: 'followingCompanies',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            },
+            {
+                association: 'followingJobs',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
             }
         ]
     });

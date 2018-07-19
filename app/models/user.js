@@ -105,7 +105,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.hasOne(models.story, { as: 'story', foreignKey: 'user_id' });
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followers', foreignKey: 'user_id' });
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followees', foreignKey: 'follower_id' });
-        User.belongsToMany(models.company, { through: 'company_followers', as: 'followingCompany', foreignKey: 'follower_id' });
+        User.belongsToMany(models.company, { through: 'company_followers', as: 'followingCompanies', foreignKey: 'follower_id' });
         User.belongsToMany(models.job, { through: 'job_followers', as: 'followingJobs', foreignKey: 'follower_id' });
     }
     return User;

@@ -32,6 +32,10 @@ const Profile = `
         story: Story
         salary: Salary
         errors: [Error]
+        followers: [User]
+        followees: [User]
+        followingCompanies: [Company]
+        followingJobs: [Job]
     }
     type CurrentPosition {
         experience: Experience
