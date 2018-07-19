@@ -212,7 +212,6 @@ const attemptLogin = async (email, password, { models, res }) => {
     tokens.lastName = user.lastName;
     tokens.hasAvatar = !!(user.profile && user.profile.hasAvatar)
     tokens.avatarContentType = user.profile.avatarContentType;
-    console.log(tokens);
     return tokens;
 }
 
