@@ -62,8 +62,8 @@ const createAccount = async (nickname, email, password, { models }) => {
             updatedAt: new Date()
         }
     }, {
-        include: [ { association: 'profile' } ]
-    });
+            include: [{ association: 'profile' }]
+        });
 
     if (!user) {
         response.error = 'Sorry ... we could not create your account';
@@ -205,11 +205,14 @@ const attemptLogin = async (email, password, { models, res }) => {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true
     });
+
     tokens.id = user.id;
     tokens.email = user.email;
     tokens.firstName = user.firstName;
     tokens.lastName = user.lastName;
     tokens.hasAvatar = !!(user.profile && user.profile.hasAvatar)
+    tokens.avatarContentType = user.profile.avatarContentType;
+    console.log(tokens);
     return tokens;
 }
 
@@ -353,7 +356,7 @@ const updateUserSettings = async ({ firstName, lastName, oldPassword, newPasswor
         oldPassword,
         newPassword
     });
-    
+
     user.firstName = firstName.trim();
     user.lastName = lastName.trim();
     await user.save();
