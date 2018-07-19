@@ -106,7 +106,9 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followers', foreignKey: 'user_id' });
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followees', foreignKey: 'follower_id' });
         User.belongsToMany(models.company, { through: 'company_followers', as: 'followingCompanies', foreignKey: 'follower_id' });
+        User.belongsToMany(models.team, { through: 'team_followers', as: 'followingTeams', foreignKey: 'follower_id' });
         User.belongsToMany(models.job, { through: 'job_followers', as: 'followingJobs', foreignKey: 'follower_id' });
+        User.belongsToMany(models.job, { through: 'job_applicants', as: 'appliedJobs', foreignKey: 'applicant_id' });
     }
     return User;
 };

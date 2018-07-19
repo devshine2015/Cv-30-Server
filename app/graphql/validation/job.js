@@ -23,5 +23,9 @@ module.exports = {
             linkedin: yup.string().trim().max(255),
             expireDate: yup.date()
         })
+    }),
+    handleApplyToJob: yup.object().shape({
+        jobId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
+        isApplying: yup.boolean().required()
     })
 };

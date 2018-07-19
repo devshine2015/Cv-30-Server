@@ -148,6 +148,10 @@ const Query = `
 		handleFollower (
 			details: FollowerInput!
 		): StandardResponse
+		handleApplyToJob (
+			jobId: String!
+			isApplying: Boolean!
+		): StandardResponse
 	}
 `;
 

@@ -71,13 +71,40 @@ const includeForFind = (languageId) => {
                         ]
                     }
                 ]
+            }, {
+                association: 'applicants',
+                include: [
+                    { association: 'skills', include: [{ association: 'i18n', where: { languageId } }] },
+                    { association: 'values', include: [{ association: 'i18n', where: { languageId } }] },
+                    { association: 'profile', include: [{ association: 'salary' }] },
+                    { association: 'articles' },
+                    { association: 'experience', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
+                    { association: 'projects', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
+                    { association: 'story', include: [{ association: 'i18n', where: { languageId } }] },
+                    { association: 'contact' }
+                ]
             }
         ]
     }
 }
 
+const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.job.handleApplyToJob, { jobId, isApplying });
+
+    const job = await models.job.findOne({ attributes: ["id"], where: { id: jobId } });
+    if (!job) return { status: false, error: 'Job not found' };
+    if (isApplying)
+        await job.addApplicant(user);
+    else
+        await job.removeApplicant(user);
+
+    return { status: true };
+}
+
 module.exports = {
     handleJob,
     job,
-    all
+    all,
+    handleApplyToJob
 }

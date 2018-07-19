@@ -35,7 +35,9 @@ const Profile = `
         followers: [User]
         followees: [User]
         followingCompanies: [Company]
+        followingTeams: [Team]
         followingJobs: [Job]
+        appliedJobs: [Job]
     }
     type CurrentPosition {
         experience: Experience

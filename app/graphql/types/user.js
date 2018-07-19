@@ -21,6 +21,7 @@ const User = `
         followingId: String
         companyId: String
         jobId: String
+        teamId: String
         isFollowing: Boolean!
     }
 `;

@@ -67,5 +67,6 @@ module.exports = {
 		updateUserSettings: (_, { userSettings }, context) => authResolvers.updateUserSettings(userSettings, context),
 
 		handleFollower: (_, { details }, context) => userResolvers.handleFollower(details, context),
+		handleApplyToJob: (_, { jobId, isApplying }, context) => jobResolvers.handleApplyToJob(jobId, isApplying, context),
 	}
 };

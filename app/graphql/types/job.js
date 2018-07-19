@@ -12,6 +12,7 @@ module.exports = `
         i18n: [JobText]
         company: Company
         team: Team
+        applicants: [Profile]
     }
     type JobText {
         title: String

@@ -552,18 +552,20 @@ const removeExperience = async (id, { user, models }) => {
     return response;
 }
 
-const handleFollower = async ( { followingId, companyId, jobId, isFollowing }, { user, models }) => {
+const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.handleFollower, {
         followingId,
         companyId,
         jobId,
+        teamId,
         isFollowing
     });
 
     let userToFollow = undefined;
     let company = undefined;
     let job = undefined;
+    let team = undefined;
 
     if (followingId) {
         userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: followingId } });
@@ -583,15 +585,23 @@ const handleFollower = async ( { followingId, companyId, jobId, isFollowing }, {
             return { status: false, error: 'Job not found' };
     }
 
+    if (teamId) {
+        team = await models.team.findOne({ attributes: ["id"], where: { id: teamId } });
+        if (!team)
+            return { status: false, error: 'Team not found' };
+    }
+
     await models.sequelize.transaction(async t => {
         if (isFollowing) {
             if (userToFollow) await userToFollow.addFollower(user, { transaction: t });
             if (company) await company.addFollower(user, { transaction: t });
             if (job) await job.addFollower(user, { transaction: t });
+            if (team) await team.addFollower(user, { transaction: t });
         } else {
             if (userToFollow) await userToFollow.removeFollower(user, { transaction: t });
             if (company) await company.removeFollower(user, { transaction: t });
             if (job) await job.removeFollower(user, { transaction: t });
+            if (team) await team.removeFollower(user, { transaction: t });
         }
     });
     
@@ -637,9 +647,15 @@ const createProfileResponse = async (user, models, languageId) => {
                 include: [
                     { association: 'i18n', where: { languageId } }
                 ]
-            },
-            {
+            }, {
                 association: 'followingJobs',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            }, {
+                association: 'followingTeams'
+            }, {
+                association: 'appliedJobs',
                 include: [
                     { association: 'i18n', where: { languageId } }
                 ]
