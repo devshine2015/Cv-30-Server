@@ -13,7 +13,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
     if (!company)
         return { status: false, error: 'Company not found' };
 
-    if (company.userId != user.id)
+    if (company.user_id != user.id)
         throwForbiddenError();
 
     await models.sequelize.transaction(async t => {
