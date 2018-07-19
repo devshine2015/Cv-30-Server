@@ -218,20 +218,15 @@ const setValues = async (values, language, { user, models }) => {
 const removeValue = async (id, { user, models }) => {
     checkUserAuth(user);
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
     if (await models.userValues.destroy({
         where: {
             value_id: id,
             user_id: user.id
         }
     })) {
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Value not found';
+        return { status: false, error: 'Value not found' };
     }
 
     return response;
@@ -294,23 +289,16 @@ const setSkills = async (skills, language, { user, models }) => {
 const removeSkill = async (id, { user, models }) => {
     checkUserAuth(user);
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
     if (await models.userSkills.destroy({
         where: {
             skill_id: id,
             user_id: user.id
         }
     })) {
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Skill not found';
+        return { status: false, error: 'Skill not found' };
     }
-
-    return response;
 }
 
 const setContact = async ({ phone, email, facebook, linkedin }, { user, models }) => {
@@ -322,11 +310,6 @@ const setContact = async ({ phone, email, facebook, linkedin }, { user, models }
         linkedin
     });
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
     await models.contact.upsert({
         userId: user.id,
         phone: phone ? phone.trim() : null,
@@ -335,8 +318,7 @@ const setContact = async ({ phone, email, facebook, linkedin }, { user, models }
         linkedin: linkedin ? linkedin.trim() : null
     });
 
-    response.status = true;
-    return response;
+    return { status: true };
 }
 
 const setProject = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
@@ -358,6 +340,7 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
     // Get language
     const languageId = await getLanguageIdByCode(models, language);
 
+    let result = false;
     await models.sequelize.transaction(async t => {
         const projectId = id ? id : uuid();
         await models.project.upsert({
@@ -368,7 +351,7 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
             position,
             company,
             startDate: new Date(startDate),
-            endDate: new Date(endDate),
+            endDate: endDate ? new Date(endDate) : null,
         }, { transaction: t });
         await models.projectText.upsert({
             projectId,
@@ -376,78 +359,21 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
             title,
             description
         }, { transaction: t });
-        if (images && images.length > 0) {
-            await Promise.all(images.map(item => models.image.upsert({
-                id: item.id,
-                userId: user.id,
-                isFeatured: item.isFeatured,
-                sourceId: item.source ? item.source : projectId,
-                sourceType: item.sourceType,
-                path: item.path
-            }, {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                })));
-            await Promise.all(images.map(item => models.imageText.upsert({
-                imageId: item.id,
-                title: item.title,
-                description: item.description,
-                languageId
-            }, {
-                    updateOnDuplicate: ["title", "description"],
-                    transaction: t
-                })));
-        }
-        if (videos && videos.length > 0) {
-            // await models.video.bulkCreate(videos.map(item => ({
-            //     id: item.id,
-            //     userId: user.id,
-            //     isFeatured: item.isFeatured ? item.isFeatured : false,
-            //     sourceId: item.source ? item.source : projectId,
-            //     sourceType: item.sourceType,
-            //     path: item.path
-            // })));
-
-            await Promise.all(videos.map(item => models.video.upsert({
-                id: item.id,
-                userId: user.id,
-                isFeatured: item.isFeatured ? item.isFeatured : false,
-                sourceId: item.source ? item.source : projectId,
-                sourceType: item.sourceType,
-                path: item.path
-            }, {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                })));
-            // await models.videoText.upsert(videos.map(item => ({
-            //     videoId: item.id,
-            //     title: item.title,
-            //     description: item.description,
-            //     languageId
-            // })), {
-            //     updateOnDuplicate: ["title", "description"],
-            //     transaction: t
-            // });
-        }
-    })
-    return { status: true };
+        await upsertImages(images, languageId, projectId, user.id, models, t);
+        await upsertVideos(videos, languageId, projectId, user.id, models, t);
+        result = true;
+    });
+    return { status: result };
 }
 
 const removeProject = async (id, { user, models }) => {
     checkUserAuth(user);
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
     if (await models.project.destroy({ where: { id } })) {
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Project not found';
+        return { status: false, error: 'Project not found' };
     }
-
-    return response;
 }
 
 const setExperience = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
@@ -468,6 +394,7 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
 
     const languageId = await getLanguageIdByCode(models, language);
 
+    let result = false;
     await models.sequelize.transaction(async t => {
         const experienceId = id ? id : uuid();
         await models.experience.upsert({
@@ -478,7 +405,7 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
             position,
             company,
             startDate: new Date(startDate),
-            endDate: new Date(endDate),
+            endDate: endDate ? new Date(endDate) : null,
         }, { transaction: t });
         await models.experienceText.upsert({
             experienceId: experienceId,
@@ -486,70 +413,71 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
             title,
             description
         }, { transaction: t });
-        if (images && images.length > 0) {
-            await models.image.upsert(images.map(item => ({
-                id: item.id,
-                userId: user.id,
-                isFeatured: item.isFeatured,
-                sourceId: id,
-                sourceType: item.sourceType,
-                target: item.target,
-                path: item.path
-            })), {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                });
-            await models.imageText.upsert(images.map(item => ({
-                imageId: item.id,
-                title: item.title,
-                description: item.description,
-                languageId
-            })), {
-                    updateOnDuplicate: ["title", "description"],
-                    transaction: t
-                });
-        }
-        if (videos && videos.length > 0) {
-            await models.video.upsert(videos.map(item => ({
-                id: item.id,
-                userId: user.id,
-                isFeatured: item.isFeatured ? item.isFeatured : false,
-                sourceId: experienceId,
-                sourceType: item.sourceType,
-                path: item.path
-            }))[0], {
-                    updateOnDuplicate: ["isFeatured", "path"],
-                    transaction: t
-                });
-            // await models.videoText.upsert(videos.map(item => ({
-            //     videoId: item.id,
-            //     title: item.title,
-            //     description: item.description,
-            //     languageId
-            // })), {
-            //     updateOnDuplicate: ["title", "description"],
-            //     transaction: t
-            // });
-        }
+        await upsertImages(images, languageId, experienceId, user.id, models, t);
+        await upsertVideos(videos, languageId, experienceId, user.id, models, t);
+        result = true;
     });
-    return { status: true };
+    return { status: result };
 }
 
 const removeExperience = async (id, { user, models }) => {
     checkUserAuth(user);
 
-    let response = {
-        status: false,
-        error: ''
-    };
-
     if (await models.experience.destroy({ where: { id } })) {
-        response.status = true;
+        return { status: true };
     } else {
-        response.error = 'Experience not found';
+        return { status: false, error: 'Experience not found' };
     }
+}
 
-    return response;
+const upsertImages = async (images, languageId, sourceId, userId, models, transaction) => {
+    if (images && images.length > 0) {
+        await Promise.all(images.map(item => models.image.upsert({
+            id: item.id,
+            userId,
+            isFeatured: item.isFeatured,
+            sourceId: item.source ? item.source : sourceId,
+            sourceType: item.sourceType,
+            path: item.path
+        }, {
+            updateOnDuplicate: ["isFeatured", "path"],
+            transaction
+        })));
+        await Promise.all(images.map(item => models.imageText.upsert({
+            imageId: item.id,
+            title: item.title,
+            description: item.description,
+            languageId
+        }, {
+            updateOnDuplicate: ["title", "description"],
+            transaction
+        })));
+    }
+}
+
+const upsertVideos = async (videos, languageId, sourceId, userId, models, transaction) => {
+    if (videos && videos.length > 0) {
+        await Promise.all(videos.map(item => models.video.upsert({
+            id: item.id,
+            userId,
+            isFeatured: item.isFeatured ? item.isFeatured : false,
+            sourceId: item.source ? item.source : sourceId,
+            sourceType: item.sourceType,
+            path: item.path
+        }, {
+            updateOnDuplicate: ["isFeatured", "path"],
+            transaction
+        })));
+        // await models.videoText.upsert(videos.map(item => ({
+        //     videoId: item.id,
+        //     title: item.title,
+        //     description: item.description,
+        //     languageId
+        // })), {
+        //     updateOnDuplicate: ["title", "description"],
+        //     transaction
+        // });
+    }
 }
 
 const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
@@ -591,6 +519,7 @@ const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollow
             return { status: false, error: 'Team not found' };
     }
 
+    let result = false;
     await models.sequelize.transaction(async t => {
         if (isFollowing) {
             if (userToFollow) await userToFollow.addFollower(user, { transaction: t });
@@ -603,9 +532,10 @@ const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollow
             if (job) await job.removeFollower(user, { transaction: t });
             if (team) await team.removeFollower(user, { transaction: t });
         }
+        result = true;
     });
     
-    return { status: true };
+    return { status: result };
 }
 
 const createProfileResponse = async (user, models, languageId) => {
