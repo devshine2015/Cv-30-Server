@@ -10,7 +10,7 @@ const handleTeam = async (teamDetails, { user, models }) => {
     if (!company)
         return { status: false, error: 'Company not found' };
 
-    if (company.user_id != user.id)
+    if (company.ownerId != user.id)
         throwForbiddenError();
 
     teamDetails.id = teamDetails.id || uuid();
@@ -28,7 +28,7 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
         return { status: false, error: 'Team not found' };
 
     const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
-    if (!company || company.userId != user.id)
+    if (!company || company.ownerId != user.id)
         throwForbiddenError();
 
     const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
@@ -49,7 +49,7 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
         return { status: false, error: 'Team not found' };
 
     const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
-    if (!company || company.userId != user.id)
+    if (!company || company.ownerId != user.id)
         throwForbiddenError();
 
     const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });

@@ -24,7 +24,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
         if (options.companyId) {
             const foundCompany = await models.company.findOne({ attributes: ["id", "userId"], where: { id: options.companyId } });
             if (!foundCompany) return { status: false, error: 'Company not found' }
-            if (foundCompany.userId != user.id) throwForbiddenError();
+            if (foundcompany.ownerId != user.id) throwForbiddenError();
         }
 
         if (options.teamId) {
@@ -36,7 +36,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                 ]
             });
             if (!foundTeam) return { status: false, error: 'Team not found' }
-            if (foundTeam.company.userId != user.id) throwForbiddenError();
+            if (foundTeam.company.ownerId != user.id) throwForbiddenError();
         }
     }
 

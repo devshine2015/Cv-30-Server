@@ -14,7 +14,7 @@ const handleCompany = async (language, details, { user, models }) => {
         });
 
         if (!company) return { status: false, error: 'Company not found' }
-        if (company.user_id != user.id) throwForbiddenError();
+        if (company.ownerId != user.id) throwForbiddenError();
     }
     await models.sequelize.transaction(async t => {
         details.id = details.id || uuid();
@@ -120,7 +120,7 @@ const handleFAQ = async (language, details, { user, models }) => {
     if (!company)
         return { status: false, error: 'Company not found' };
 
-    if (company.userId != user.id)
+    if (company.ownerId != user.id)
         throwForbiddenError();
 
     if (details.id && !await models.faq.findOne({ where: { id: details.id } }))
@@ -146,7 +146,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
 
     const company = await models.company.findOne({ where: { id: tagsInput.companyId } });
     if (!company) return { status: false, error: 'Company not found' }
-    if (company.userId != user.id) throwForbiddenError();
+    if (company.ownerId != user.id) throwForbiddenError();
 
     const cleanInputTags = tagsInput.tags.map(item => item.trim().toLowerCase());
 
@@ -199,7 +199,7 @@ const removeTag = async (id, companyId, { user, models }) => {
 
     const company = await models.company.findOne({ where: { id: companyId } });
     if (!company) return { status: false, error: 'Company not found' }
-    if (company.userId != user.id) throwForbiddenError();
+    if (company.ownerId != user.id) throwForbiddenError();
 
     const model = models.sequelize.define('companyTag', {
     }, {
