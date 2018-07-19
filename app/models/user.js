@@ -103,6 +103,10 @@ module.exports = (Sequelize, DataTypes) => {
         User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.story, { as: 'story', foreignKey: 'user_id' });
+        User.belongsToMany(models.user, { through: 'user_followers', as: 'followers', foreignKey: 'user_id' });
+        User.belongsToMany(models.user, { through: 'user_followers', as: 'followees', foreignKey: 'follower_id' });
+        User.belongsToMany(models.company, { through: 'company_followers', as: 'followingCompany', foreignKey: 'follower_id' });
+        User.belongsToMany(models.job, { through: 'job_followers', as: 'followingJobs', foreignKey: 'follower_id' });
     }
     return User;
 };

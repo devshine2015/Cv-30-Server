@@ -74,6 +74,7 @@ module.exports = (sequelize, DataTypes) => {
 		Job.hasMany(models.jobText, { as: 'i18n', foreignKey: 'job_id' });
 		Job.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
 		Job.belongsTo(models.team, { as: 'team', foreignKey: 'team_id' });
+		Job.belongsToMany(models.user, { through: 'job_followers', as: 'followers', foreignKey: 'job_id' });
 	};
 	return Job;
 };

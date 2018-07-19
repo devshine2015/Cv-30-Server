@@ -71,6 +71,7 @@ module.exports = (sequelize, DataTypes) => {
 		Company.belongsToMany(models.tag, { as: 'tags', through: 'company_tags', foreignKey: 'company_id' });
 		Company.hasMany(models.faq, { as: 'faqs', foreignKey: 'company_id' });
 		Company.hasMany(models.team, { as: 'teams', foreignKey: 'company_id' });
+		Company.belongsToMany(models.user, { through: 'company_followers', as: 'followers', foreignKey: 'company_id' });
 	};
 	return Company;
 };

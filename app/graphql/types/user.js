@@ -17,6 +17,12 @@ const User = `
         oldPassword: String
         newPassword: String
     }
+    input FollowerInput {
+        followingId: String
+        companyId: String
+        jobId: String
+        isFollowing: Boolean!
+    }
 `;
 
 module.exports = () => [User, Scalars];

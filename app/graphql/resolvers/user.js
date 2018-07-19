@@ -552,6 +552,52 @@ const removeExperience = async (id, { user, models }) => {
     return response;
 }
 
+const handleFollower = async ( { followingId, companyId, jobId, isFollowing }, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.user.handleFollower, {
+        followingId,
+        companyId,
+        jobId,
+        isFollowing
+    });
+
+    let userToFollow = undefined;
+    let company = undefined;
+    let job = undefined;
+
+    if (followingId) {
+        userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: followingId } });
+        if (!userToFollow)
+            return { status: false, error: 'Following user not found' };
+    }
+
+    if (companyId) {
+        company = await models.company.findOne({ attributes: ["id"], where: { id: companyId } });
+        if (!company)
+            return { status: false, error: 'Company not found' };
+    }
+    
+    if (jobId) {
+        job = await models.job.findOne({ attributes: ["id"], where: { id: jobId } });
+        if (!job)
+            return { status: false, error: 'Job not found' };
+    }
+
+    await models.sequelize.transaction(async t => {
+        if (isFollowing) {
+            if (userToFollow) await userToFollow.addFollower(user, { transaction: t });
+            if (company) await company.addFollower(user, { transaction: t });
+            if (job) await job.addFollower(user, { transaction: t });
+        } else {
+            if (userToFollow) await userToFollow.removeFollower(user, { transaction: t });
+            if (company) await company.removeFollower(user, { transaction: t });
+            if (job) await job.removeFollower(user, { transaction: t });
+        }
+    });
+    
+    return { status: true };
+}
+
 const createProfileResponse = async (user, models, languageId) => {
     const newUser = await models.user.findOne({
         where: {
@@ -609,5 +655,6 @@ module.exports = {
     removeProject,
     setExperience,
     removeExperience,
-    all
+    all,
+    handleFollower
 };
