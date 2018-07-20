@@ -27,13 +27,8 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
     if (!team)
         return { status: false, error: 'Team not found' };
 
-<<<<<<< Updated upstream
     const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
     if (!company || company.ownerId != user.id)
-=======
-    const company = await models.company.findOne({ attributes: ["id", "user_id"], where: { id: team.companyId } });
-    if (!company || company.user_id != user.id)
->>>>>>> Stashed changes
         throwForbiddenError();
 
     const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
