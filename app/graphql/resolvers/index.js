@@ -66,7 +66,7 @@ module.exports = {
 		activateAccount: (_, { token }, context) => authResolvers.activateAccount(token, context),
 		updateUserSettings: (_, { userSettings }, context) => authResolvers.updateUserSettings(userSettings, context),
 
-		handleFollower: (_, { details }, context) => userResolvers.handleFollower(details, context),
+		handleFollow: (_, { details }, context) => userResolvers.handleFollow(details, context),
 		handleApplyToJob: (_, { jobId, isApplying }, context) => jobResolvers.handleApplyToJob(jobId, isApplying, context),
 	}
 };

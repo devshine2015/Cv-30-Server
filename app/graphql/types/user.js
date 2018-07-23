@@ -17,8 +17,8 @@ const User = `
         oldPassword: String
         newPassword: String
     }
-    input FollowerInput {
-        followingId: String
+    input FollowInput {
+        userToFollowId: String
         companyId: String
         jobId: String
         teamId: String

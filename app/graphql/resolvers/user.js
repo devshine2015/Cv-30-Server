@@ -479,10 +479,10 @@ const upsertVideos = async (videos, languageId, sourceId, userId, models, transa
     }
 }
 
-const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
+const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.handleFollower, {
-        followingId,
+    yupValidation(schema.user.handleFollow, {
+        userToFollowId,
         companyId,
         jobId,
         teamId,
@@ -495,7 +495,7 @@ const handleFollower = async ( { followingId, companyId, jobId, teamId, isFollow
     let team = undefined;
 
     if (followingId) {
-        userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: followingId } });
+        userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: userToFollowId } });
         if (!userToFollow)
             return { status: false, error: 'Following user not found' };
     }
@@ -615,5 +615,5 @@ module.exports = {
     setExperience,
     removeExperience,
     all,
-    handleFollower
+    handleFollow
 };

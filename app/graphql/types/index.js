@@ -145,8 +145,8 @@ const Query = `
 		): StandardResponse
 		activateAccount (token: String!): StandardResponse
 		updateUserSettings (userSettings: UserSettingsInput): StandardResponse
-		handleFollower (
-			details: FollowerInput!
+		handleFollow (
+			details: FollowInput!
 		): StandardResponse
 		handleApplyToJob (
 			jobId: String!
