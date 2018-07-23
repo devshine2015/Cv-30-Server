@@ -16,6 +16,11 @@ module.exports = `
         faqs: [Faq]
         jobs: [Job]
         teams: [Team]
+        hasLogo: Boolean
+        logoContentType: ImageType
+        hasCover: Boolean
+        coverContentType: ImageType
+        coverBackground: String
     }
     input CompanyInput {
         id: String
@@ -26,6 +31,11 @@ module.exports = `
         noOfEmployees: String
         location: String
         place: PlaceInput
+        hasLogo: Boolean
+        logoContentType: ImageType
+        hasCover: Boolean
+        coverContentType: ImageType
+        coverBackground: String
     }
     input PlaceInput {
         addressComponents: String

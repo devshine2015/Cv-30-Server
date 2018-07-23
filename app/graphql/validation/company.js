@@ -33,7 +33,12 @@ module.exports = {
                 types: yup.string().trim().nullable(),
                 googleUrl: yup.string().trim().nullable(),
                 website: yup.string().trim().nullable()
-            })
+            }),
+            hasCover: yup.boolean(),
+            coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+            coverBackground: yup.string().trim(100).nullable(),
+            hasLogo: yup.boolean(),
+            logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable()
         })
     }),
     faqInput: yup.object().shape({

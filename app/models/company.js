@@ -42,6 +42,34 @@ module.exports = (sequelize, DataTypes) => {
 			field: 'location',
 			unique: true
 		},
+		hasLogo: {
+			allowNull: true,
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'has_logo'
+		},
+		logoContentType: {
+			allowNull: true,
+			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
+			field: 'logo_content_type'
+		},
+		hasCover: {
+			allowNull: true,
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'has_cover'
+		},
+		coverContentType: {
+			allowNull: true,
+			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
+			field: 'cover_content_type'
+		},
+		coverBackground: {
+			allowNull: true,
+			defaultValue: '',
+			type: DataTypes.STRING(255),
+			field: 'cover_background'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
