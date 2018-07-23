@@ -15,8 +15,7 @@ const profile = async (id, language, { user, models }) => {
         return await createProfileResponse(user, models, languageId);
     }
 }
-const all = async (language, { user, models }) => {
-    checkUserAuth(user);
+const all = async (language, { models }) => {
     yupValidation(schema.user.all, { language });
 
     const languageId = await getLanguageIdByCode(models, language);

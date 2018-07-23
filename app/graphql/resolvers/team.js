@@ -70,8 +70,7 @@ const team = async (id, language, { user, models }) => {
     });
 }
 
-const all = async (language, { user, models }) => {
-    checkUserAuth(user);
+const all = async (language, { models }) => {
     yupValidation(schema.team.all, { language });
     return models.team.findAll({
         where: {},

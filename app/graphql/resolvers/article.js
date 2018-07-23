@@ -143,8 +143,7 @@ const article = async (id, language, { user, models }) => {
     });
 }
 
-const all = async (language, { user, models }) => {
-    checkUserAuth(user);
+const all = async (language, { models }) => {
     yupValidation(schema.article.all, { language });
     return models.article.findAll({
         where: {},
