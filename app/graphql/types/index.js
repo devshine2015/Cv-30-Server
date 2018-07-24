@@ -158,7 +158,7 @@ const Query = `
 		): StandardResponse
 		handleLandingPage (
 			language: LanguageCodeType!
-			details: LandingPageInput
+			details: LandingPageInput!
 		): StandardResponse
 	}
 `;
