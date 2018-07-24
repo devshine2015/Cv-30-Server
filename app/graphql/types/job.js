@@ -35,7 +35,8 @@ module.exports = `
 
     extend type Query {
         jobs(
-			language: LanguageCodeType!
+            language: LanguageCodeType!
+            companyId: String
 		): [Job]
 		job(
 			id: String!
