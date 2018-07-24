@@ -52,11 +52,21 @@ const getLanguageIdByCode = async (models, code, attributes = ["id"]) => {
     })).id;
 }
 
+const validateCompany = async (id, user, models) => {
+    const company = await models.company.findOne({ attributes: ["id", "ownerId"], where: { id } });
+
+    if (!company) return { status: false, error: 'Company not found' };
+    if (company.ownerId != user.id) throwForbiddenError();
+    
+    return true;
+}
+
 module.exports = {
     checkUserAuth,
     yupValidation,
     forbiddenError,
     throwForbiddenError,
     getLanguageByCode,
-    getLanguageIdByCode
+    getLanguageIdByCode,
+    validateCompany
 }

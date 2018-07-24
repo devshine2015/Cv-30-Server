@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, getLanguageIdByCode } = require('./common');
+const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, getLanguageIdByCode, validateCompany } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
@@ -11,20 +11,17 @@ const handleArticle = async (language, article, options, { user, models }) => {
     });
 
     if (article && article.id) {
-        const foundArticle = await models.article.findOne({ where: { id: article.id } });
-        if (foundArticle && foundArticle.userId != user.id) throwForbiddenError();
+        await validateArticle(article.id, user, models);
     }
 
     if (options) {
         if (options.articleId) {
-            const foundArticle = await models.article.findOne({ attributes: ["id", "userId"], where: { id: options.articleId } });
-            if (foundArticle && foundArticle.userId != user.id) throwForbiddenError();
+            await validateArticle(options.articleId, user, models);
         }
 
         if (options.companyId) {
-            const foundCompany = await models.company.findOne({ attributes: ["id", "userId"], where: { id: options.companyId } });
-            if (!foundCompany) return { status: false, error: 'Company not found' }
-            if (foundcompany.ownerId != user.id) throwForbiddenError();
+            const companyOk = await validateCompany(options.companyId, user, models);
+            if (companyOk !== true) return companyOk;
         }
 
         if (options.teamId) {
@@ -32,7 +29,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                 attributes: ["id"], 
                 where: { id: options.teamId },
                 include: [
-                    { association: 'company', attributes: ["id", "userId"] }
+                    { association: 'company', attributes: ["id", "ownerId"] }
                 ]
             });
             if (!foundTeam) return { status: false, error: 'Team not found' }
@@ -42,14 +39,14 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     language = await getLanguageByCode(models, language);
 
+    let result = false;
     await models.sequelize.transaction(async t => {
         if (article) {
             article.id = article.id || uuid();
-            article.userId = user.id;
+            article.ownerId = user.id;
             await models.article.upsert(article, { transaction: t });
             article.articleId = article.id;
             article.languageId = language.id;
-            if (article.title) article.slug = slugify(article.title);
             if (article.images && article.images.length > 0) {
                 await models.image.bulkCreate(article.images.map(item => ({
                     id: item.id,
@@ -98,6 +95,19 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     });
             }
             if (!!article.title || !!article.description) {
+                if (article.title) {
+                    let newSlug = slugify(article.title);
+                    let newSlugBad = true;
+                    while (newSlugBad) {
+                        const existingArticleText = await models.articleText.findOne({ attributes: ["articleId", "slug"], where: { slug: newSlug }}, { transaction: t });
+                        if (!existingArticleText || existingArticleText.articleId === article.articleId) {
+                            newSlugBad = false;
+                        } else {
+                            newSlug = slugify(`${article.title} ${new Date().getTime()}`);
+                        }
+                    }
+                    article.slug = newSlug;
+                }
                 await models.articleText.upsert(article, { transaction: t });
             }
         }
@@ -129,9 +139,10 @@ const handleArticle = async (language, article, options, { user, models }) => {
                 await team.removeOfficeArticle(article, { transaction: t });
             }
         }
+        result = true;
     });
 
-    return { status: true };
+    return { status: result };
 }
 
 const article = async (id, language, { user, models }) => {
@@ -161,6 +172,11 @@ const includeForFind = (languageId) => {
             { association: 'featuredImage' }
         ]
     };
+}
+
+const validateArticle = async (id, user, models) => {
+    const foundArticle = await models.article.findOne({ attributes: ["id", "ownerId"], where: { id } });
+    if (foundArticle && foundArticle.ownerId != user.id) throwForbiddenError();
 }
 
 module.exports = {

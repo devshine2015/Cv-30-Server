@@ -1,17 +1,13 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany } = require('./common');
 
 const handleTeam = async (teamDetails, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.team.input, { teamDetails });
 
-    const company = await models.company.findOne({ attributes: ["id", "user_id"], where: { id: teamDetails.companyId } });
-    if (!company)
-        return { status: false, error: 'Company not found' };
-
-    if (company.ownerId != user.id)
-        throwForbiddenError();
+    const companyOk = await validateCompany(teamDetails.companyId, user, models);
+    if (companyOk !== true) return companyOk;
 
     teamDetails.id = teamDetails.id || uuid();
     await models.team.upsert(teamDetails);
@@ -27,9 +23,8 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
     if (!team)
         return { status: false, error: 'Team not found' };
 
-    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
-    if (!company || company.ownerId != user.id)
-        throwForbiddenError();
+    const companyOk = await validateCompany(team.companyId, user, models);
+    if (companyOk !== true) return companyOk;
 
     const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
     if (!member)
@@ -48,9 +43,8 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
     if (!team)
         return { status: false, error: 'Team not found' };
 
-    const company = await models.company.findOne({ attributes: ["id", "userId"], where: { id: team.companyId } });
-    if (!company || company.ownerId != user.id)
-        throwForbiddenError();
+    const companyOk = await validateCompany(team.companyId, user, models);
+    if (companyOk !== true) return companyOk;
 
     const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
     if (!member)

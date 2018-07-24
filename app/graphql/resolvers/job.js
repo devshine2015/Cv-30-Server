@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageIdByCode } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -9,12 +9,8 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         jobDetails
     });
 
-    const company = await models.company.findOne({ where: { id: jobDetails.companyId } });
-    if (!company)
-        return { status: false, error: 'Company not found' };
-
-    if (company.ownerId != user.id)
-        throwForbiddenError();
+    const companyOk = await validateCompany(jobDetails.companyId, user, models);
+    if (companyOk !== true) return companyOk;
 
     await models.sequelize.transaction(async t => {
         jobDetails.id = jobDetails.id || uuid();
