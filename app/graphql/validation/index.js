@@ -4,4 +4,5 @@ module.exports = {
     company: require('./company'),
     job: require('./job'),
     team: require('./team'),
+    landingPage: require('./landingPage'),
 };

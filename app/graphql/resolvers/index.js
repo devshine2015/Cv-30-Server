@@ -4,6 +4,7 @@ const companyResolvers = require('./company');
 const articleResolvers = require('./article');
 const jobResolvers = require('./job');
 const teamResolvers = require('./team');
+const landingPageResolvers = require('./landingPage');
 
 module.exports = {
 	Query: {
@@ -17,6 +18,7 @@ module.exports = {
 		article: (_, { id, language }, context) => articleResolvers.article(id, language, context),
 		teams: (_, { language }, context) => teamResolvers.all(language, context),
 		team: (_, { id, language }, context) => teamResolvers.team(id, language, context),
+		landingPage: (_, { language }, context) => landingPageResolvers.landingPage(language, context),
 		// profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
 		// userSkills: (_, __, context) => userResolvers.userSkills(context),
 		// userValues: (_, __, context) => userResolvers.userValues(context),
@@ -68,5 +70,7 @@ module.exports = {
 
 		handleFollow: (_, { details }, context) => userResolvers.handleFollow(details, context),
 		handleApplyToJob: (_, { jobId, isApplying }, context) => jobResolvers.handleApplyToJob(jobId, isApplying, context),
+
+		handleLandingPage: (_, { language, details }, context) => landingPageResolvers.handleLandingPage(language, details, context),
 	}
 };

@@ -7,6 +7,7 @@ const Salary = require('./salary');
 const Company = require('./company');
 const Job = require('./job');
 const Team = require('./team');
+const LandingPage = require('./landingPage');
 
 const Query = `
 	type Query {
@@ -48,6 +49,9 @@ const Query = `
 			id: String!
 			language: LanguageCodeType!
 		): Team
+		landingPage(
+			language: LanguageCodeType!
+		): LandingPage
 	}
 	type Mutation {
 		avatar ( status: Boolean, contentType: ImageType ): StandardResponse
@@ -152,6 +156,10 @@ const Query = `
 			jobId: String!
 			isApplying: Boolean!
 		): StandardResponse
+		handleLandingPage (
+			language: LanguageCodeType!
+			details: LandingPageInput
+		): StandardResponse
 	}
 `;
 
@@ -162,4 +170,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Company, Job, Team, Article, Salary, Query, User, Profile, Response, Error];
+module.exports = [SchemaDefinition, Company, Job, Team, Article, Salary, Query, User, Profile, Response, Error, LandingPage];
