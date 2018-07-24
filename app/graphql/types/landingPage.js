@@ -16,4 +16,17 @@ module.exports = `
         coverBackground: String
         headline: String
     }
+    
+    extend type Query {
+        landingPage(
+			language: LanguageCodeType!
+		): LandingPage
+    }
+
+    extend type Mutation {
+        handleLandingPage (
+			language: LanguageCodeType!
+			details: LandingPageInput!
+		): StandardResponse
+    }
 `;

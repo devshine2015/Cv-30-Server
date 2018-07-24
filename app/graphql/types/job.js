@@ -32,4 +32,25 @@ module.exports = `
         linkedin: String
         expireDate: Date
     }
+
+    extend type Query {
+        jobs(
+			language: LanguageCodeType!
+		): [Job]
+		job(
+			id: String!
+			language: LanguageCodeType!
+		): Job
+    }
+
+    extend type Mutation {
+        handleJob (
+			language: LanguageCodeType!
+			jobDetails: JobInput!
+		): StandardResponse
+        handleApplyToJob (
+			jobId: String!
+			isApplying: Boolean!
+		): StandardResponse
+    }
 `;

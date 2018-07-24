@@ -24,6 +24,55 @@ const User = `
         teamId: String
         isFollowing: Boolean!
     }
+
+    extend type Query {
+        profile(
+			id: String
+			language: LanguageCodeType!
+		): Profile
+		profiles(
+			language: LanguageCodeType!
+		): [Profile]
+    }
+
+    extend type Mutation {
+		avatar ( status: Boolean, contentType: ImageType ): StandardResponse
+		profileCover ( status: Boolean, contentType: ImageType ): StandardResponse
+		setCoverBackground ( color: String ): StandardResponse
+		setStory(
+			story: StoryInput
+			language: LanguageCodeType!
+		): StandardResponse
+		setSalary( salary: SalaryInput ): StandardResponse
+		setValues (
+			values: [String!]!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeValue ( id: Int ): StandardResponse
+		setSkills (
+			skills: [String!]!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeSkill (
+			id: Int
+		): StandardResponse
+		setContact ( contact: ContactInput ): StandardResponse
+		setProject (
+			project: ProjectInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeProject ( id: String ): StandardResponse
+		setExperience (
+			experience: ExperienceInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeExperience (
+			id: String
+		): StandardResponse
+		handleFollow (
+			details: FollowInput!
+		): StandardResponse
+	}
 `;
 
 module.exports = () => [User, Scalars];

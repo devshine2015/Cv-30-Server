@@ -81,5 +81,34 @@ module.exports = `
         companyId: String
         question: String
         answer: String
-	}
+    }
+    
+    extend type Query {
+        companies(
+			language: LanguageCodeType!
+		): [Company]
+		company(
+			id: String!
+			language: LanguageCodeType!
+		): Company
+    }
+
+    extend type Mutation {
+        handleCompany(
+			language: LanguageCodeType!
+			details: CompanyInput!
+        ): StandardResponse
+        setTags(
+			language: LanguageCodeType!
+			tagsInput: TagsInput!
+		): StandardResponse
+		removeTag (
+			id: Int!
+			companyId: String!
+        ): StandardResponse
+        handleFAQ (
+			language: LanguageCodeType!
+			faq: FaqInput!
+		): StandardResponse
+    }
 `;

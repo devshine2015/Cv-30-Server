@@ -35,6 +35,24 @@ const Article = `
         isMoreStories: Boolean
         teamId: String
     }
+
+    extend type Query {
+        articles(
+			language: LanguageCodeType!
+		): [Article]
+		article(
+			id: String!
+			language: LanguageCodeType!
+		): Article
+    }
+    
+    extend type Mutation {
+        handleArticle (
+			language: LanguageCodeType!
+			article: ArticleInput
+			options: ArticleOptions
+		): StandardResponse
+    }
 `;
 
 module.exports = () => [Article, Image, Video];
