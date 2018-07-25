@@ -13,6 +13,7 @@ module.exports = `
         company: Company
         team: Team
         applicants: [Profile]
+        location: String
     }
     type JobText {
         title: String
@@ -31,6 +32,7 @@ module.exports = `
         facebook: String
         linkedin: String
         expireDate: Date
+        location: String
     }
 
     extend type Query {

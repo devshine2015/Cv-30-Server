@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -9,8 +9,26 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         jobDetails
     });
 
-    const companyOk = await validateCompany(jobDetails.companyId, user, models);
-    if (companyOk !== true) return companyOk;
+    // Check that existing job belongs to the user
+    let job = undefined;
+    if (jobDetails.id) {
+        job = await models.job.findOne({
+            attributes: ["id", "companyId", "teamId"],
+            include: [{
+                association: 'company',
+                attributes: ["id", "ownerId"]
+            }],
+            where: { id: jobDetails.id }
+        });
+    }
+    if (job) {
+        if (job.company.ownerId != user.id) throwForbiddenError();
+        jobDetails.companyId = job.company.id;
+        jobDetails.teamId = job.teamId;
+    } else {
+        const companyOk = await validateCompany(jobDetails.companyId, user, models);
+        if (companyOk !== true) return companyOk;
+    }
 
     await models.sequelize.transaction(async t => {
         jobDetails.id = jobDetails.id || uuid();

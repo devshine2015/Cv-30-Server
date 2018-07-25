@@ -50,6 +50,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING(255),
 			field: 'linkedin'
 		},
+		location: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'location'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

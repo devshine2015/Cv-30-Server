@@ -22,7 +22,8 @@ module.exports = {
             email: yup.string().trim().max(255),
             facebook: yup.string().trim().max(255),
             linkedin: yup.string().trim().max(255),
-            expireDate: yup.date()
+            expireDate: yup.date(),
+            location: yup.string().trim().max(255)
         })
     }),
     handleApplyToJob: yup.object().shape({
