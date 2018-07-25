@@ -4,7 +4,7 @@ const Video = require('./video');
 const Article = `
     type Article {
         id: String!
-        author: User
+        author: Profile
         featuredImage: Image
         images: [Image]
         videos: [Video]

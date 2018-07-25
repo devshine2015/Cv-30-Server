@@ -591,10 +591,9 @@ const createProfileResponse = async (user, models, languageId) => {
             }
         ]
     });
-    const profile = newUser.profile ? await newUser.profile.get() : {};
     return {
-        ...await newUser.get(),
-        ...profile
+        ...newUser.get(),
+        ...(newUser.profile ? newUser.profile.get() : {}),
     };
 }
 

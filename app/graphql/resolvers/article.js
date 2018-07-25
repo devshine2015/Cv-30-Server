@@ -148,10 +148,11 @@ const handleArticle = async (language, article, options, { user, models }) => {
 const article = async (id, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.one, { id, language });
+
     return models.article.findOne({
         where: { id },
         ...includeForFind(await getLanguageIdByCode(models, language))
-    });
+    }).then(mapArticle);
 }
 
 const all = async (language, { models }) => {
@@ -159,13 +160,26 @@ const all = async (language, { models }) => {
     return models.article.findAll({
         where: {},
         ...includeForFind(await getLanguageIdByCode(models, language))
-    });
+    }).then(articles => articles.map(mapArticle));
 }
+
+const mapArticle = article => ({
+    ...article.get(),
+    author: {
+        ...article.author.get(),
+        ...article.author.profile.get()
+    }
+});
 
 const includeForFind = (languageId) => {
     return {
         include: [
-            { association: 'author' },
+            {
+                association: 'author',
+                include: [
+                    { association: 'profile' }
+                ]
+            },
             { association: 'i18n', where: { languageId } },
             { association: 'images' },
             { association: 'videos' },
