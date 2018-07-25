@@ -15,8 +15,13 @@ module.exports = (sequelize, DataTypes) => {
             field: 'language_id'
 		},
 		headline: {
-			type: DataTypes.STRING(255),
+			type: DataTypes.TEXT,
 			allowNull: true
+		},
+		footerMessage: {
+			type: DataTypes.TEXT,
+			allowNull: true,
+			field: 'footer_message'
 		},
 		createdAt: {
 			allowNull: false,

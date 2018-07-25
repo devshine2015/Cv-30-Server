@@ -24,6 +24,23 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING(100),
 			field: 'cover_background'
 		},
+		hasFooterCover: {
+			allowNull: true,
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'has_footer_cover'
+		},
+		footerCoverContentType: {
+			allowNull: true,
+			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
+			field: 'footer_cover_content_type'
+		},
+		footerCoverBackground: {
+			allowNull: true,
+			defaultValue: '',
+			type: DataTypes.STRING(100),
+			field: 'footer_cover_background'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
