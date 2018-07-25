@@ -494,7 +494,7 @@ const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollo
     let job = undefined;
     let team = undefined;
 
-    if (followingId) {
+    if (userToFollowId) {
         userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: userToFollowId } });
         if (!userToFollow)
             return { status: false, error: 'Following user not found' };
