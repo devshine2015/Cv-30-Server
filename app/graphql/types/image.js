@@ -1,5 +1,4 @@
 const Image = `
-    union ImageSource = Article | Profile | Company | Job
     type Image {
         id: String
         author: User
