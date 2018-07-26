@@ -36,7 +36,7 @@ module.exports = {
             }),
             hasCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
-            coverBackground: yup.string().trim(100).nullable(),
+            coverBackground: yup.string().trim().max(4096).nullable(),
             hasLogo: yup.boolean(),
             logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable()
         })

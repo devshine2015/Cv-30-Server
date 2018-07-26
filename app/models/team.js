@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
 		coverBackground: {
 			allowNull: true,
 			defaultValue: '',
-			type: DataTypes.STRING(100),
+			type: DataTypes.TEXT,
 			field: 'cover_background'
 		},
 		createdAt: {

@@ -15,7 +15,7 @@ module.exports = {
             name: yup.string().trim().max(255),
             hasProfileCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
-            coverBackground: yup.string().trim(100).nullable()
+            coverBackground: yup.string().trim().max(4096).nullable()
         })
     }),
     addRemoveMemberInput: yup.object().shape({

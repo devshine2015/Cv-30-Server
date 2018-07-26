@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
 		coverBackground: {
 			allowNull: true,
 			defaultValue: '',
-			type: DataTypes.STRING(100),
+			type: DataTypes.TEXT,
 			field: 'cover_background'
 		},
 		hasFooterCover: {
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
 		footerCoverBackground: {
 			allowNull: true,
 			defaultValue: '',
-			type: DataTypes.STRING(100),
+			type: DataTypes.TEXT,
 			field: 'footer_cover_background'
 		},
 		createdAt: {

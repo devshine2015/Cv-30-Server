@@ -10,10 +10,10 @@ module.exports = {
         details: yup.object().shape({
             hasCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
-            coverBackground: yup.string().trim().max(100).nullable(),
+            coverBackground: yup.string().trim().max(4096).nullable(),
             hasFooterCover: yup.boolean(),
             footerCoverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
-            footerCoverBackground: yup.string().trim().max(100).nullable(),
+            footerCoverBackground: yup.string().trim().max(4096).nullable(),
             headline: yup.string().trim().max(4096),
             footerMessage: yup.string().trim().max(4096)
         })
