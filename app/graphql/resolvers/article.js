@@ -72,7 +72,6 @@ const handleArticle = async (language, article, options, { user, models }) => {
             }
 
             if (article.videos && article.videos.length > 0) {
-                console.log(article.videos);
                 await models.video.bulkCreate(article.videos.map(item => ({
                     id: item.id,
                     userId: user.id,
@@ -113,7 +112,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
         }
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId }, transaction: t });
-            const company = await models.company.findOne({ attributes: ["id"], where: { id: options.companyId } });
+            const company = await models.company.findOne({ attributes: ["id"], where: { id: options.companyId }, transaction: t });
             if (options.isFeatured) {
                 await company.addFeaturedArticle(article, { transaction: t });
             } else {
@@ -132,7 +131,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
         }
         if (options && options.articleId && options.teamId) {
             article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId }, transaction: t });
-            const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId } });
+            const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId }, transaction: t });
             if (options.isAtOffice) {
                 await team.addOfficeArticle(article, { transaction: t });
             } else {
