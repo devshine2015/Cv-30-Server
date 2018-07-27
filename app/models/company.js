@@ -21,26 +21,22 @@ module.exports = (sequelize, DataTypes) => {
 		name: {
 			type: DataTypes.STRING(255),
 			allowNull: true,
-			field: 'name',
-			unique: true
+			field: 'name'
 		},
 		activityField: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
-			field: 'activity_field',
-			unique: true
+			field: 'activity_field'
 		},
 		noOfEmployees: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
-			field: 'no_of_employees',
-			unique: true
+			field: 'no_of_employees'
 		},
 		location: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
-			field: 'location',
-			unique: true
+			field: 'location'
 		},
 		hasLogo: {
 			allowNull: true,
@@ -84,9 +80,6 @@ module.exports = (sequelize, DataTypes) => {
 		timestamps: true,
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
-		indexes: [
-			{  unique: true, fields: ['name'] }
-		]
 	});
 	Company.associate = models => {
 		Company.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
