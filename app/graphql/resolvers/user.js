@@ -3,7 +3,6 @@ const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode } = require('./common');
 
 const profile = async (id, language, { user, models }) => {
-    checkUserAuth(user);
     yupValidation(schema.user.one, { id, language });
     const languageId = await getLanguageIdByCode(models, language);
 

@@ -144,8 +144,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: result };
 }
 
-const article = async (id, language, { user, models }) => {
-    checkUserAuth(user);
+const article = async (id, language, { models }) => {
     yupValidation(schema.article.one, { id, language });
 
     return models.article.findOne({

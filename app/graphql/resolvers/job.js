@@ -41,8 +41,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
     return { status: true };
 }
 
-const job = async (id, language, { user, models }) => {
-    checkUserAuth(user);
+const job = async (id, language, { models }) => {
     yupValidation(schema.job.one, { id, language });
 
     return models.job.findOne({

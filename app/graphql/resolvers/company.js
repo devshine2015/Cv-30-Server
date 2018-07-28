@@ -26,8 +26,7 @@ const handleCompany = async (language, details, { user, models }) => {
     return { status: true };
 }
 
-const company = async (id, language, { user, models }) => {
-    checkUserAuth(user);
+const company = async (id, language, { models }) => {
     yupValidation(schema.company.one, { id, language });
 
     return models.company.findOne({

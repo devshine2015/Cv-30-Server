@@ -55,8 +55,7 @@ const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
     return { status: true };
 }
 
-const team = async (id, language, { user, models }) => {
-    checkUserAuth(user);
+const team = async (id, language, { models }) => {
     yupValidation(schema.team.one, { id, language });
     return models.team.findOne({
         where: { id },
