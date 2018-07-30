@@ -205,10 +205,14 @@ const removeTag = async (id, companyId, { user, models }) => {
 }
 
 module.exports = {
-    handleCompany,
-    handleFAQ,
-    setTags,
-    removeTag,
-    all,
-    company
+    Query: {
+        companies: (_, { language }, context) => all(language, context),
+        company: (_, { id, language }, context) => company(id, language, context)
+    },
+    Mutation: {
+        handleCompany: (_, { language, details }, context) => handleCompany(language, details, context),
+        setTags: (_, { language, tagsInput }, context) => setTags(language, tagsInput, context),
+        removeTag: (_, { id, companyId }, context) => removeTag(id, companyId, context),
+        handleFAQ: (_, { language, faq }, context) => handleFAQ(language, faq, context)
+    }
 }

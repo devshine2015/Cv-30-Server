@@ -192,10 +192,14 @@ const validateArticle = async (id, user, models) => {
 }
 
 module.exports = {
-    handleArticle,
-    article,
-    all
-}
+    Query: {
+        articles: (_, { language }, context) => all(language, context),
+		article: (_, { id, language }, context) => article(id, language, context),
+    },
+    Mutation: {
+        handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context)
+    }
+};
 
 function slugify(str) {
     str = str.replace(/^\s+|\s+$/g, ''); // trim

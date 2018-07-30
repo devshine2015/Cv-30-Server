@@ -113,9 +113,13 @@ const includeForFind = (languageId) => {
 }
 
 module.exports = {
-    handleTeam,
-    addMemberToTeam,
-    removeMemberFromTeam,
-    team,
-    all
+    Query: {
+        teams: (_, { language }, context) => all(language, context),
+        team: (_, { id, language }, context) => team(id, language, context)
+    },
+    Mutation: {
+        handleTeam: (_, { teamDetails }, context) => handleTeam(teamDetails, context),
+        addMemberToTeam: (_, { teamId, memberId }, context) => addMemberToTeam(teamId, memberId, context),
+        removeMemberFromTeam: (_, { teamId, memberId }, context) => removeMemberFromTeam(teamId, memberId, context),
+    }
 }

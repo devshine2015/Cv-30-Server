@@ -117,8 +117,12 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 }
 
 module.exports = {
-    handleJob,
-    job,
-    all,
-    handleApplyToJob
+    Query: {
+        jobs: (_, { language, companyId }, context) => all(language, companyId, context),
+        job: (_, { id, language }, context) => job(id, language, context)
+    },
+    Mutation: {
+        handleJob: (_, { language, jobDetails }, context) => handleJob(language, jobDetails, context),
+        handleApplyToJob: (_, { jobId, isApplying }, context) => handleApplyToJob(jobId, isApplying, context)
+    }
 }

@@ -506,13 +506,15 @@ const _sendEmail = async (sender, destination, subject, text, html) => {
 }
 
 module.exports = {
-    createAccount,
-    attemptLogin,
-    attemptLogout,
-    checkTokens,
-    forgotPasswordSendCode,
-    forgotPasswordUpdate,
-    forgotPasswordCheckToken,
-    activateAccount,
-    updateUserSettings
+    Mutation: {
+        register: (_, { nickname, email, password }, context) => createAccount(nickname, email, password, context),
+        login: (_, { email, password }, context) => attemptLogin(email, password, context),
+        logout: (_, __, context) => attemptLogout(context),
+        checkTokens: (_, { token, refreshToken }, context) => checkTokens(token, refreshToken, context),
+        forgotPassword: (_, { email }, context) => forgotPasswordSendCode(email, context),
+        checkResetToken: (_, { token }, context) => forgotPasswordCheckToken(token, context),
+        updateForgotPassword: (_, { token, password }, context) => forgotPasswordUpdate(token, password, context),
+        activateAccount: (_, { token }, context) => activateAccount(token, context),
+        updateUserSettings: (_, { userSettings }, context) => updateUserSettings(userSettings, context),
+    }
 };

@@ -597,21 +597,34 @@ const createProfileResponse = async (user, models, languageId) => {
 }
 
 module.exports = {
-    profile,
-    setAvatar,
-    setHasProfileCover,
-    setCoverBackground,
-    setSalary,
-    setStory,
-    setValues,
-    removeValue,
-    setSkills,
-    removeSkill,
-    setContact,
-    setProject,
-    removeProject,
-    setExperience,
-    removeExperience,
-    all,
-    handleFollow
+    Query: {
+        profile: (_, { id, language }, context) => profile(id, language, context),
+        profiles: (_, { language }, context) => all(language, context),
+        // profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
+        // userSkills: (_, __, context) => userResolvers.userSkills(context),
+        // userValues: (_, __, context) => userResolvers.userValues(context),
+        // userExperience: (_, __, context) => userResolvers.userExperience(context),
+        // userProjects: (_, __, context) => userResolvers.userProjects(context)
+    },
+    Mutation: {
+        avatar: (_, { status, contentType }, context) => setAvatar(status, contentType, context),
+        profileCover: (_, { status, contentType }, context) => setHasProfileCover(status, contentType, context),
+        setCoverBackground: (_, { color }, context) => setCoverBackground(color, context),
+        setSalary: (_, { salary }, context) => setSalary(salary, context),
+        setStory: (_, { language, story }, context) => setStory(language, story, context),
+
+        setValues: (_, { values, language }, context) => setValues(values, language, context),
+        removeValue: (_, { id }, context) => removeValue(id, context),
+        setSkills: (_, { skills, language }, context) => setSkills(skills, language, context),
+        removeSkill: (_, { id }, context) => removeSkill(id, context),
+        setContact: (_, { contact }, context) => setContact(contact, context),
+
+        setProject: (_, { project, language }, context) => setProject(project, language, context),
+        removeProject: (_, { id }, context) => removeProject(id, context),
+
+        setExperience: (_, { experience, language }, context) => setExperience(experience, language, context),
+        removeExperience: (_, { id }, context) => removeExperience(id, context),
+
+        handleFollow: (_, { details }, context) => handleFollow(details, context),
+    }
 };

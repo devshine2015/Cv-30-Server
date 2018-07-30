@@ -38,6 +38,10 @@ const includeForFind = (languageId) => {
 }
 
 module.exports = {
-    handleLandingPage,
-    landingPage
+    Query: {
+        landingPage: (_, { language }, context) => landingPage(language, context),
+    },
+    Mutation: {
+        handleLandingPage: (_, { language, details }, context) => handleLandingPage(language, details, context),
+    }
 };
