@@ -163,59 +163,68 @@ const all = async (language, { models }) => {
 }
 
 const newsFeedAll = async (language, { user, models }) => {
-    checkUserAuth(user);
     yupValidation(schema.article.all, { language });
-
-    const userFollowees = await models.user.find({
-        where: {
-            id: user.id
-        },
-        include: [
-            {
-                association: 'followees',
-                attributes: ['id']
-            }
-        ]
-    }).then(u => u ? u.get().followees.map(i => i.id) : []);
 
     const languageId = await getLanguageIdByCode(models, language);
 
-    let followingArticles = [];
-    if (userFollowees && userFollowees.length > 0) {
-        followingArticles = await models.article.findAll(merge(
-            { 
-                ...includeForFind(languageId)
+    if (user) {
+        const userFollowees = await models.user.find({
+            where: {
+                id: user.id
             },
-            {
-                include: [
-                    {
-                        association: 'author',
-                        include: [
-                            { 
-                                association: 'followers',
-                                where: { id: user.id}
-                            },
-                            { association: 'profile' }
-                        ],
-                        required: true
-                    }
-                ],
-                order: [ [ 'createdAt', 'desc' ] ]
-            }
-        )).then(mapArticles);
-    }
-
-    const notFollowingArticles = await models.article.findAll({
-        where: {
-            ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
-        },
-        ...includeForFind(languageId),
-        order: [ [ 'createdAt', 'desc' ] ]
-    }).then(mapArticles);
+            include: [
+                {
+                    association: 'followees',
+                    attributes: ['id']
+                }
+            ]
+        }).then(u => u ? u.get().followees.map(i => i.id) : []);
     
-    return {
-        following: followingArticles,
-        others: notFollowingArticles
+        let followingArticles = [];
+        if (userFollowees && userFollowees.length > 0) {
+            followingArticles = await models.article.findAll(merge(
+                { 
+                    ...includeForFind(languageId)
+                },
+                {
+                    include: [
+                        {
+                            association: 'author',
+                            include: [
+                                { 
+                                    association: 'followers',
+                                    where: { id: user.id}
+                                },
+                                { association: 'profile' }
+                            ],
+                            required: true
+                        }
+                    ],
+                    order: [ [ 'createdAt', 'desc' ] ]
+                }
+            )).then(mapArticles);
+        }
+    
+        const notFollowingArticles = await models.article.findAll({
+            where: {
+                ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
+            },
+            ...includeForFind(languageId),
+            order: [ [ 'createdAt', 'desc' ] ]
+        }).then(mapArticles);
+        
+        return {
+            following: followingArticles,
+            others: notFollowingArticles
+        }
+    } else {
+        return {
+            following: models.article.findAll({
+                where: {},
+                ...includeForFind(languageId),
+                order: [ [ 'createdAt', 'desc' ] ]
+            }).then(mapArticles)
+        }
     }
 }
 

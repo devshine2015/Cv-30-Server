@@ -9,8 +9,8 @@ const Article = `
         images: [Image]
         videos: [Video]
         i18n: [ArticleText]
-        created_at: Date
-        updated_at: Date
+        createdAt: Date
+        updatedAt: Date
     }
     type ArticleText {
         title: String
