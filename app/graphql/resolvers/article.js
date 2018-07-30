@@ -1,4 +1,5 @@
 const uuid = require('uuidv4');
+const { merge } = require('lodash');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, getLanguageIdByCode, validateCompany } = require('./common');
 
@@ -158,8 +159,67 @@ const all = async (language, { models }) => {
     return models.article.findAll({
         where: {},
         ...includeForFind(await getLanguageIdByCode(models, language))
-    }).then(articles => articles.map(mapArticle));
+    }).then(mapArticles);
 }
+
+const newsFeedAll = async (language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.all, { language });
+
+    const userFollowees = await models.user.find({
+        where: {
+            id: user.id
+        },
+        include: [
+            {
+                association: 'followees',
+                attributes: ['id']
+            }
+        ]
+    }).then(u => u ? u.get().followees.map(i => i.id) : []);
+
+    const languageId = await getLanguageIdByCode(models, language);
+
+    let followingArticles = [];
+    if (userFollowees && userFollowees.length > 0) {
+        followingArticles = await models.article.findAll(merge(
+            { 
+                ...includeForFind(languageId)
+            },
+            {
+                include: [
+                    {
+                        association: 'author',
+                        include: [
+                            { 
+                                association: 'followers',
+                                where: { id: user.id}
+                            },
+                            { association: 'profile' }
+                        ],
+                        required: true
+                    }
+                ],
+                order: [ [ 'createdAt', 'desc' ] ]
+            }
+        )).then(mapArticles);
+    }
+
+    const notFollowingArticles = await models.article.findAll({
+        where: {
+            ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
+        },
+        ...includeForFind(languageId),
+        order: [ [ 'createdAt', 'desc' ] ]
+    }).then(mapArticles);
+    
+    return {
+        following: followingArticles,
+        others: notFollowingArticles
+    }
+}
+
+const mapArticles = articles => articles.map(mapArticle);
 
 const mapArticle = article => ({
     ...article.get(),
@@ -194,7 +254,8 @@ const validateArticle = async (id, user, models) => {
 module.exports = {
     Query: {
         articles: (_, { language }, context) => all(language, context),
-		article: (_, { id, language }, context) => article(id, language, context),
+        article: (_, { id, language }, context) => article(id, language, context),
+        newsFeedArticles: (_, { language }, context) => newsFeedAll(language, context),
     },
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context)

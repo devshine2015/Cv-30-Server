@@ -16,6 +16,10 @@ const Article = `
         title: String
         description: String
     }
+    type NewsFeedArticles {
+        following: [Article]
+        others: [Article]
+    }
     input ArticleInput {
         id: String
         isFeatured: Boolean
@@ -39,11 +43,14 @@ const Article = `
     extend type Query {
         articles(
 			language: LanguageCodeType!
-		): [Article]
+        ): [Article]
 		article(
 			id: String!
 			language: LanguageCodeType!
-		): Article
+        ): Article
+        newsFeedArticles(
+            language: LanguageCodeType!
+        ): NewsFeedArticles
     }
     
     extend type Mutation {
