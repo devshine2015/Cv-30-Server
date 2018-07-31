@@ -1,7 +1,15 @@
 const schema = require('../validation');
-const { yupValidation, getLanguageIdByCode } = require('./common');
+const { yupValidation, getLanguageIdByCode, checkUserAuth, throwForbiddenError } = require('./common');
 
-const handleLandingPage = async (language, details, { models }) => {
+const handleLandingPage = async (language, details, { user, models }) => {
+    checkUserAuth(user);
+    const foundUser = await models.user.findOne({
+        where: { id: user.id, god: true },
+        attributes: ["id"]
+    });
+    
+    if (!foundUser) throwForbiddenError();
+
     yupValidation(schema.landingPage.input, {
         language,
         details

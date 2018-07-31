@@ -77,6 +77,12 @@ module.exports = (Sequelize, DataTypes) => {
                 isUUID: 4
             },
             field: 'activation_token'
+        },
+        god: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+            field: 'god'
         }
     }, {
             timestamps: true,

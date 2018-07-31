@@ -9,6 +9,7 @@ module.exports = `
         hasAvatar: Boolean
         avatarContentType: ImageType
         error: String
+        god: Boolean
     }
     type CheckTokensResponse {
         token: String
