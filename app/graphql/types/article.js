@@ -55,6 +55,7 @@ const Article = `
             language: LanguageCodeType!
             userId: String
             companyId: String
+            teamId: String
         ): [Article]
     }
     

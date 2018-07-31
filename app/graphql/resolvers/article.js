@@ -228,8 +228,8 @@ const newsFeedAll = async (language, { user, models }) => {
     }
 }
 
-const feedArticles = async (language, userId, companyId, { models }) => {
-    yupValidation(schema.article.feed, { language, userId, companyId });
+const feedArticles = async (language, userId, companyId, teamId, { models }) => {
+    yupValidation(schema.article.feed, { language, userId, companyId, teamId });
 
     const languageId = await getLanguageIdByCode(models, language);
 
@@ -265,6 +265,18 @@ const feedArticles = async (language, userId, companyId, { models }) => {
                     association: 'moreStories',
                     where: { id: companyId },
                     required: false
+                }
+            ]),
+            order: [ [ 'createdAt', 'desc' ] ]
+        }).then(mapArticles);
+    }
+
+    if (teamId) {
+        return models.article.findAll({
+            include: includeForFind(languageId).include.concat([
+                {
+                    association: 'officeArticles',
+                    where: { id: teamId }
                 }
             ]),
             order: [ [ 'createdAt', 'desc' ] ]
@@ -311,7 +323,7 @@ module.exports = {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
         newsFeedArticles: (_, { language }, context) => newsFeedAll(language, context),
-        feedArticles: (_, { language, userId, companyId }, context) => feedArticles(language, userId, companyId, context),
+        feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context)

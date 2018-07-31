@@ -6,12 +6,17 @@ module.exports = {
     }),
     feed: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        userId: yup.string().when('companyId', {
-            is: (value) => !value,
-            then: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
-            otherwise: yup.string().oneOf([undefined, null], "userId cannot be set while companyId is set")
+        userId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+        companyId: yup.string().when('userId', {
+            is: (uid) => !uid,
+            then: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            otherwise: yup.string().oneOf([undefined, null], "Only one of userId, companyId, teamId can be set")
         }),
-        companyId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+        teamId: yup.string().when(['userId', 'companyId'], {
+            is: (uid, cid) => !uid && !cid,
+            then: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
+            otherwise: yup.string().oneOf([undefined, null], "Only one of userId, companyId, teamId can be set")
+        }),
     }),
     one: yup.object().shape({
         id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
