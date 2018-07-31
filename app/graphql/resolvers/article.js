@@ -228,6 +228,52 @@ const newsFeedAll = async (language, { user, models }) => {
     }
 }
 
+const feedArticles = async (language, userId, companyId, { models }) => {
+    yupValidation(schema.article.feed, { language, userId, companyId });
+
+    const languageId = await getLanguageIdByCode(models, language);
+
+    if (userId) {
+        return models.article.findAll({
+            where: { ownerId: userId },
+            ...includeForFind(languageId),
+            order: [ [ 'createdAt', 'desc' ] ]
+        }).then(mapArticles);
+    }
+
+    if (companyId) {
+        return models.article.findAll({
+            where: {
+                [models.Sequelize.Op.or]: [
+                    { '$featured.id$': { [models.Sequelize.Op.ne]: null } },
+                    { '$lifeAtTheOffice.id$': { [models.Sequelize.Op.ne]: null } },
+                    { '$moreStories.id$': { [models.Sequelize.Op.ne]: null } },
+                ]
+            },
+            include: includeForFind(languageId).include.concat([
+                {
+                    association: 'featured',
+                    where: { id: companyId },
+                    required: false
+                },
+                {
+                    association: 'lifeAtTheOffice',
+                    where: { id: companyId },
+                    required: false
+                },
+                {
+                    association: 'moreStories',
+                    where: { id: companyId },
+                    required: false
+                }
+            ]),
+            order: [ [ 'createdAt', 'desc' ] ]
+        }).then(mapArticles);
+    }
+
+    return [];
+}
+
 const mapArticles = articles => articles.map(mapArticle);
 
 const mapArticle = article => ({
@@ -265,6 +311,7 @@ module.exports = {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
         newsFeedArticles: (_, { language }, context) => newsFeedAll(language, context),
+        feedArticles: (_, { language, userId, companyId }, context) => feedArticles(language, userId, companyId, context),
     },
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context)

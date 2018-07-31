@@ -51,6 +51,11 @@ const Article = `
         newsFeedArticles(
             language: LanguageCodeType!
         ): NewsFeedArticles
+        feedArticles(
+            language: LanguageCodeType!
+            userId: String
+            companyId: String
+        ): [Article]
     }
     
     extend type Mutation {
