@@ -180,36 +180,33 @@ const newsFeedAll = async (language, { user, models }) => {
             ]
         }).then(u => u ? u.get().followees.map(i => i.id) : []);
     
-        let followingArticles = [];
-        if (userFollowees && userFollowees.length > 0) {
-            followingArticles = await models.article.findAll(merge(
-                {
-                    where: {
-                        [models.Sequelize.Op.or]: [
-                            { ownerId: { [models.Sequelize.Op.eq]: user.id } },
-                            { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
-                        ]
-                    },
-                    ...includeForFind(languageId)
+        const followingArticles = await models.article.findAll(merge(
+            {
+                where: {
+                    [models.Sequelize.Op.or]: [
+                        { ownerId: { [models.Sequelize.Op.eq]: user.id } },
+                        { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                    ]
                 },
-                {
-                    include: [
-                        {
-                            association: 'author',
-                            include: [
-                                { 
-                                    association: 'followers',
-                                    attributes: ['id']
-                                },
-                                { association: 'profile' }
-                            ],
-                            required: false
-                        }
-                    ],
-                    order: [ [ 'createdAt', 'desc' ] ]
-                }
-            )).then(mapArticles);
-        }
+                ...includeForFind(languageId)
+            },
+            {
+                include: [
+                    {
+                        association: 'author',
+                        include: [
+                            { 
+                                association: 'followers',
+                                attributes: ['id']
+                            },
+                            { association: 'profile' }
+                        ],
+                        required: false
+                    }
+                ],
+                order: [ [ 'createdAt', 'desc' ] ]
+            }
+        )).then(mapArticles);
     
         const notFollowingArticles = await models.article.findAll({
             where: {
