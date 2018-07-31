@@ -183,7 +183,13 @@ const newsFeedAll = async (language, { user, models }) => {
         let followingArticles = [];
         if (userFollowees && userFollowees.length > 0) {
             followingArticles = await models.article.findAll(merge(
-                { 
+                {
+                    where: {
+                        [models.Sequelize.Op.or]: [
+                            { ownerId: { [models.Sequelize.Op.eq]: user.id } },
+                            { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                        ]
+                    },
                     ...includeForFind(languageId)
                 },
                 {
@@ -193,11 +199,11 @@ const newsFeedAll = async (language, { user, models }) => {
                             include: [
                                 { 
                                     association: 'followers',
-                                    where: { id: user.id}
+                                    attributes: ['id']
                                 },
                                 { association: 'profile' }
                             ],
-                            required: true
+                            required: false
                         }
                     ],
                     order: [ [ 'createdAt', 'desc' ] ]
