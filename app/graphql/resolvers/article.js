@@ -145,6 +145,82 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: result };
 }
 
+const handleArticleTag = async(language, { title, articleId, isSet }, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.handleArticleTag, {
+        language,
+        title,
+        articleId,
+        isSet
+    });
+
+    const languageId = await getLanguageIdByCode(models, language);
+    title = title.trim().toLowerCase();
+
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        let articleTag = await models.articleTag.find({
+            include: [
+                { 
+                    association: 'i18n',
+                    where: {
+                        languageId,
+                        title: title
+                    }
+                 }
+            ]
+        }, { transaction: t });
+
+        if (!articleTag) {
+            articleTag = await models.articleTag.create({
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, { transaction: t });
+
+            await models.articleTagText.create({
+                tagId: articleTag.id,
+                languageId,
+                    title,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+            }, { transaction: t });
+        }
+
+        const foundUser = await models.user.find({ where: { id: user.id }}, { transaction: t });
+        if (isSet) {
+            const articleArticleTag = await models.articleArticleTag.create({
+                id: uuid(),
+                tagId: articleTag.id,
+                articleId,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, { transaction: t });
+            
+            await articleArticleTag.addUser(foundUser, { transaction: t });
+
+        } else {
+            const articleArticleTag = await models.articleArticleTag.find({
+                where: {
+                    tagId: articleTag.id,
+                    articleId
+                }
+            }, { transaction: t });
+            await articleArticleTag.removeUser(foundUser, { transaction: t });
+
+            await models.articleArticleTag.destroy({
+                where: {
+                    tagId: articleTag.id,
+                    articleId
+                }
+            }, { transaction: t });
+        }
+
+        result = true;
+    });
+
+    return { status: result };
+}
+
 const article = async (id, language, { models }) => {
     yupValidation(schema.article.one, { id, language });
 
@@ -296,7 +372,11 @@ const mapArticle = article => ({
     author: {
         ...article.author.get(),
         ...article.author.profile.get()
-    }
+    },
+    tags: article.tags.map(tag => ({
+        ...tag.tag.get(),
+        users: tag.users
+    }))
 });
 
 const includeForFind = (languageId) => {
@@ -311,7 +391,19 @@ const includeForFind = (languageId) => {
             { association: 'i18n', where: { languageId } },
             { association: 'images' },
             { association: 'videos' },
-            { association: 'featuredImage' }
+            { association: 'featuredImage' },
+            { 
+                association: 'tags',
+                include: [
+                    {
+                        association: 'tag',
+                        include: [
+                            { association: 'i18n', where: { languageId } }
+                        ]
+                    },
+                    { association: 'users' }
+                ]
+            }
         ]
     };
 }
@@ -329,7 +421,8 @@ module.exports = {
         feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
-        handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context)
+        handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
+        handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context)
     }
 };
 

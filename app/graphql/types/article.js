@@ -9,6 +9,7 @@ const Article = `
         images: [Image]
         videos: [Video]
         i18n: [ArticleText]
+        tags: [ArticleTag]
         createdAt: Date
         updatedAt: Date
     }
@@ -16,28 +17,16 @@ const Article = `
         title: String
         description: String
     }
+    type ArticleTag {
+        i18n: [ArticleTagText]
+        users: [Profile]
+    }
+    type ArticleTagText {
+        title: String
+    }
     type NewsFeedArticles {
         following: [Article]
         others: [Article]
-    }
-    input ArticleInput {
-        id: String
-        isFeatured: Boolean
-        isAboutMe: Boolean
-        images: [ImageInput]
-        videos: [VideoInput]
-        title: String
-        description: String
-        created_at: Date
-        updated_at: Date
-    }
-    input ArticleOptions {
-        articleId: String
-        companyId: String
-        isFeatured: Boolean
-        isAtOffice: Boolean
-        isMoreStories: Boolean
-        teamId: String
     }
 
     extend type Query {
@@ -58,12 +47,43 @@ const Article = `
             teamId: String
         ): [Article]
     }
+
+    input ArticleInput {
+        id: String
+        isFeatured: Boolean
+        isAboutMe: Boolean
+        images: [ImageInput]
+        videos: [VideoInput]
+        title: String
+        description: String
+        created_at: Date
+        updated_at: Date
+    }
+    input ArticleOptions {
+        articleId: String
+        companyId: String
+        isFeatured: Boolean
+        isAtOffice: Boolean
+        isMoreStories: Boolean
+        teamId: String
+    }
+
+    input ArticleTagInput {
+        title: String!
+        articleId: String!
+        isSet: Boolean
+    }
     
     extend type Mutation {
         handleArticle (
 			language: LanguageCodeType!
 			article: ArticleInput
 			options: ArticleOptions
+        ): StandardResponse
+        
+        handleArticleTag (
+			language: LanguageCodeType!
+			details: ArticleTagInput!
 		): StandardResponse
     }
 `;
