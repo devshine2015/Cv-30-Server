@@ -22,11 +22,12 @@ module.exports = {
         id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true })
     }),
-    input: yup.object().shape({
+    handleArticle: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         article: yup.object().shape({
             id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             isFeatured: yup.boolean(),
+            isPost: yup.boolean(),
             images: yup.array().of(yup.object().shape({
                 id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
                 title: yup.string().trim().max(255),

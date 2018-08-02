@@ -5,6 +5,7 @@ const Article = `
     type Article {
         id: String!
         author: Profile
+        isPost: Boolean
         featuredImage: Image
         images: [Image]
         videos: [Video]
@@ -53,6 +54,7 @@ const Article = `
         id: String
         isFeatured: Boolean
         isAboutMe: Boolean
+        isPost: Boolean
         images: [ImageInput]
         videos: [VideoInput]
         title: String

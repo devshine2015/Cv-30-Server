@@ -30,6 +30,12 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.BOOLEAN,
 			field: 'is_about_me'
 		},
+		isPost: {
+			allowNull: false,
+			defaultValue: false,
+			type: DataTypes.BOOLEAN,
+			field: 'is_post'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

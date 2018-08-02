@@ -5,7 +5,7 @@ const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, ge
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.article.input, {
+    yupValidation(schema.article.handleArticle, {
         language,
         article,
         options
