@@ -10,6 +10,7 @@ const Article = `
         videos: [Video]
         i18n: [ArticleText]
         tags: [ArticleTag]
+        endorsers: [Profile]
         createdAt: Date
         updatedAt: Date
     }
@@ -80,11 +81,14 @@ const Article = `
 			article: ArticleInput
 			options: ArticleOptions
         ): StandardResponse
-        
         handleArticleTag (
 			language: LanguageCodeType!
 			details: ArticleTagInput!
-		): StandardResponse
+        ): StandardResponse
+        endorseArticle (
+            articleId: String!
+            isEndorsing: Boolean
+        ): StandardResponse
     }
 `;
 

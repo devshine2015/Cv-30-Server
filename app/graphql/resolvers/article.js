@@ -221,6 +221,27 @@ const handleArticleTag = async(language, { title, articleId, isSet }, { user, mo
     return { status: result };
 }
 
+const endorseArticle = async(articleId, isEndorsing, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.endorseArticle, {
+        articleId,
+        isEndorsing
+    });
+
+    const foundUser = await models.user.findOne({ attributes: ["id"], where: { id: user.id }});
+    const foundArticle = await models.article.findOne({ attributes: ["id"], where: { id: articleId }});
+    if (!foundUser) return { status: false, error: "User not found!" };
+    if (!foundArticle) return { status: false, error: "Article not found!" };
+
+    if (isEndorsing) {
+        await foundArticle.addEndorser(foundUser);
+    } else {
+        await foundArticle.removeEndorser(foundUser);
+    }
+
+    return { status: true };
+}
+
 const article = async (id, language, { models }) => {
     yupValidation(schema.article.one, { id, language });
 
@@ -403,7 +424,8 @@ const includeForFind = (languageId) => {
                     },
                     { association: 'users' }
                 ]
-            }
+            },
+            { association: 'endorsers' }
         ]
     };
 }
@@ -422,7 +444,8 @@ module.exports = {
     },
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
-        handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context)
+        handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context),
+        endorseArticle: (_, { articleId, isEndorsing }, context) => endorseArticle(articleId, isEndorsing, context)
     }
 };
 
