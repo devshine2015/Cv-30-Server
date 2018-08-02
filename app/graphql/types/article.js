@@ -20,6 +20,7 @@ const Article = `
         description: String
     }
     type ArticleTag {
+        id: String!
         i18n: [ArticleTagText]
         users: [Profile]
     }

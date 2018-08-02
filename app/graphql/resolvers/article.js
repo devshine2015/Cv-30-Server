@@ -396,6 +396,7 @@ const mapArticle = article => ({
     },
     tags: article.tags.map(tag => ({
         ...tag.tag.get(),
+        id: tag.tag.i18n[0].title,
         users: tag.users
     }))
 });
