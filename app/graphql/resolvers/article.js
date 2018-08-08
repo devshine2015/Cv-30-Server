@@ -187,24 +187,27 @@ const handleArticleTag = async(language, { title, articleId, isSet }, { user, mo
         }
 
         const foundUser = await models.user.find({ where: { id: user.id }}, { transaction: t });
-        if (isSet) {
-            const articleArticleTag = await models.articleArticleTag.create({
-                id: uuid(),
+        let articleArticleTag = await models.articleArticleTag.find({
+            where: {
                 tagId: articleTag.id,
-                articleId,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, { transaction: t });
+                articleId
+            }
+        }, { transaction: t });
+        
+        if (isSet) {
+            if (!articleArticleTag) {
+                articleArticleTag = await models.articleArticleTag.create({
+                    id: uuid(),
+                    tagId: articleTag.id,
+                    articleId,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }, { transaction: t });
+            }
             
             await articleArticleTag.addUser(foundUser, { transaction: t });
 
         } else {
-            const articleArticleTag = await models.articleArticleTag.find({
-                where: {
-                    tagId: articleTag.id,
-                    articleId
-                }
-            }, { transaction: t });
             await articleArticleTag.removeUser(foundUser, { transaction: t });
 
             await models.articleArticleTag.destroy({
