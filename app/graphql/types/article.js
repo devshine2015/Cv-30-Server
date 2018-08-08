@@ -77,6 +77,11 @@ const Article = `
         articleId: String!
         isSet: Boolean
     }
+    input ArticleTagsInput {
+        titles: [String!]!
+        articleId: String!
+        isSet: Boolean
+    }
     
     extend type Mutation {
         handleArticle (
@@ -87,6 +92,10 @@ const Article = `
         handleArticleTag (
 			language: LanguageCodeType!
 			details: ArticleTagInput!
+        ): StandardResponse
+        handleArticleTags (
+			language: LanguageCodeType!
+			details: ArticleTagsInput!
         ): StandardResponse
         endorseArticle (
             articleId: String!

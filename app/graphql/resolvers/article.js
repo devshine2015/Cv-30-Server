@@ -224,6 +224,90 @@ const handleArticleTag = async(language, { title, articleId, isSet }, { user, mo
     return { status: result };
 }
 
+const handleArticleTags = async(language, { titles, articleId, isSet }, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.handleArticleTags, {
+        language,
+        titles,
+        articleId,
+        isSet
+    });
+    
+    const languageId = await getLanguageIdByCode(models, language);
+    titles = titles.map(title => title.trim().toLowerCase());
+
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        const foundUser = await models.user.findOne({ where: { id: user.id }}, { transaction: t });
+
+        // TODO: optimize to reduce db operations
+        for (let i = 0; i < titles.length; i++) {
+            const title = titles[i];
+            let articleTag = await models.articleTag.findOne({
+                include: [
+                    { 
+                        association: 'i18n',
+                        where: {
+                            languageId,
+                            title: title
+                        }
+                     }
+                ]
+            }, { transaction: t });
+    
+            if (!articleTag) {
+                articleTag = await models.articleTag.create({
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }, { transaction: t });
+    
+                await models.articleTagText.create({
+                    tagId: articleTag.id,
+                    languageId,
+                        title,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                }, { transaction: t });
+            }
+            
+            let articleArticleTag = await models.articleArticleTag.findOne({
+                where: {
+                    tagId: articleTag.id,
+                    articleId
+                }
+            }, { transaction: t });
+            
+            if (isSet) {
+                if (!articleArticleTag) {
+                    articleArticleTag = await models.articleArticleTag.create({
+                        id: uuid(),
+                        tagId: articleTag.id,
+                        articleId,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    }, { transaction: t });
+                }
+                
+                await articleArticleTag.addUser(foundUser, { transaction: t });
+    
+            } else {
+                await articleArticleTag.removeUser(foundUser, { transaction: t });
+    
+                await models.articleArticleTag.destroy({
+                    where: {
+                        tagId: articleTag.id,
+                        articleId
+                    }
+                }, { transaction: t });
+            }
+        };
+
+        result = true;
+    });
+
+    return { status: result };
+}
+
 const endorseArticle = async(articleId, isEndorsing, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.endorseArticle, {
@@ -449,6 +533,7 @@ module.exports = {
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
         handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context),
+        handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
         endorseArticle: (_, { articleId, isEndorsing }, context) => endorseArticle(articleId, isEndorsing, context)
     }
 };
