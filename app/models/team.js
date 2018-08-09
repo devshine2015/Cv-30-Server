@@ -57,6 +57,7 @@ module.exports = (sequelize, DataTypes) => {
 		Team.belongsToMany(models.article, { as: 'officeArticles', through: 'team_office_articles', foreignKey: 'team_id' });
 		Team.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
 		Team.belongsToMany(models.user, { as: 'members', through: 'team_members', foreignKey: 'team_id' });
+		Team.belongsToMany(models.shallowUser, { as: 'shallowMembers', through: 'team_shallow_members', foreignKey: 'team_id' });
 		Team.hasMany(models.job, { as: 'jobs', foreignKey: 'team_id' });
 		Team.belongsToMany(models.user, { as: 'followers', through: 'team_followers', foreignKey: 'team_id' });
 	};

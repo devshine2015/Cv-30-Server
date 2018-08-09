@@ -5,4 +5,5 @@ module.exports = {
     job: require('./job'),
     team: require('./team'),
     landingPage: require('./landingPage'),
+    shallowUser: require('./shallowUser'),
 };

@@ -9,6 +9,7 @@ const Company = require('./company');
 const Job = require('./job');
 const Team = require('./team');
 const LandingPage = require('./landingPage');
+const ShallowUser = require('./shallowUser');
 
 const Query = `
 	type Query {
@@ -26,4 +27,4 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, Company, Job, Team, Article, Salary, Auth, User, Profile, Response, Error, LandingPage];
+module.exports = [SchemaDefinition, Query, Company, Job, Team, Article, Salary, Auth, User, Profile, Response, Error, LandingPage, ShallowUser];
