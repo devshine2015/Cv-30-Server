@@ -100,6 +100,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.skill, { through: 'user_skills', as: 'skills' });
         User.belongsToMany(models.value, { through: 'user_values', as: 'values' });
         User.hasOne(models.profile, { as: 'profile', foreignKey: 'user_id' });
+        User.hasMany(models.company, { as: 'ownedCompanies', foreignKey: 'user_id' });
         User.hasMany(models.article, { as: 'featuredArticles', foreignKey: 'user_id', scope: { is_featured: true } } );
         User.hasMany(models.article, { as: 'aboutMeArticles', foreignKey: 'user_id', scope: { is_about_me: true } });
         User.hasMany(models.article, { as: 'articles', foreignKey: 'user_id' });

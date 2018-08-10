@@ -1,4 +1,3 @@
-const Scalars = require('./scalars');
 const Article = require('./article');
 const Skill = require('./skill');
 const Value = require('./value');
@@ -7,8 +6,6 @@ const Project = require('./project');
 const Contact = require('./contact');
 const Salary = require('./salary');
 const Story = require('./story');
-const Image = require('./image');
-const Error = require('./error');
 
 const Profile = `
     type Profile {
@@ -38,6 +35,7 @@ const Profile = `
         followingTeams: [Team]
         followingJobs: [Job]
         appliedJobs: [Job]
+        ownedCompanies: [Company]
     }
     type CurrentPosition {
         experience: Experience

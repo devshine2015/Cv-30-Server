@@ -1,6 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode } = require('./common');
+const  { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
 
 const profile = async (id, language, { user, models }) => {
     yupValidation(schema.user.one, { id, language });
@@ -24,6 +25,10 @@ const all = async (language, { models }) => {
         include: [
             { association: 'skills', include: [{ association: 'i18n' }] },
             { association: 'values', include: [{ association: 'i18n' }] },
+            {
+                association: 'ownedCompanies',
+                ...companyAssociationForUserProfile(languageId)
+            },
             { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }, { association: 'i18n' }] },
             { association: 'contact' },
@@ -544,6 +549,10 @@ const createProfileResponse = async (user, models, languageId) => {
         include: [
             { association: 'skills', include: [{ association: 'i18n' }] },
             { association: 'values', include: [{ association: 'i18n' }] },
+            {
+                association: 'ownedCompanies',
+                ...companyAssociationForUserProfile(languageId)
+            },
             { association: 'profile', include: [{ association: 'salary' }] },
             { association: 'articles' },
             { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
