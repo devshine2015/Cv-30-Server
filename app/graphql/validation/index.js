@@ -1,4 +1,5 @@
 module.exports = {
+    auth: require('./auth'),
     user: require('./user'),
     article: require('./article'),
     company: require('./company'),

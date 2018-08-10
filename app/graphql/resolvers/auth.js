@@ -350,7 +350,7 @@ const forgotPasswordUpdate = async (token, password, { models }) => {
 }
 const updateUserSettings = async ({ firstName, lastName, oldPassword, newPassword }, { user, res }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.settings, {
+    yupValidation(schema.auth.settings, {
         firstName,
         lastName,
         oldPassword,

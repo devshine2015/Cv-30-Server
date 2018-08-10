@@ -8,16 +8,6 @@ module.exports = {
         id: yup.string().trim().nullable().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).notRequired(),
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true })
     }),
-    settings: yup.object().shape({
-        firstName: yup.string().required(),
-        lastName: yup.string().required(),
-        oldPassword: yup.string(),
-        newPassword: yup.string().when('oldPassword', {
-            is: oldPassword => oldPassword.trim() !== "",  // alternatively: (val) => val == true
-            then: yup.string().required().min(4).max(30),
-            otherwise: yup.string().notRequired().min(0)
-        })
-    }),
     salary: yup.object().shape({
         amount: yup.number().positive().required(),
         currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
