@@ -4,6 +4,7 @@ module.exports = `
         name: String
         company: Company
         members: [User]
+        shallowMembers: [ShallowUser]
         officeArticles: [Article]
         jobs: [Job]
         hasProfileCover: Boolean

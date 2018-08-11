@@ -103,6 +103,9 @@ const includeForFind = (languageId) => {
                 ]
             },
             {
+                association: 'shallowMembers'
+            },
+            {
                 association: 'jobs',
                 include: [
                     { association: 'i18n', where: { languageId } }
