@@ -49,15 +49,20 @@ module.exports = {
     }),
     project: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        location: yup.string().trim().max(255),
+        location: yup.string().trim().max(255).required('Please enter a location'),
         isCurrent: yup.boolean(),
         position: yup.string()
-            .max(255, 'Project position cannot be longer than 255 chars')
+            .max(255, 'Experience position cannot be longer than 255 chars')
             .required(),
         company: yup.string()
-            .max(255, 'Project company cannot be longer than 255 chars'),
-        startDate: yup.date().required(),
-        endDate: yup.date().nullable(),
+            .required('Company cannot be null')
+            .max(255, 'Experience company cannot be longer than 255 chars'),
+        startDate: yup.date().required('Please provide a start date.'),
+        endDate: yup.date().when('isCurrent', {
+            is: true,
+            then: yup.date().oneOf([undefined, null], "Cannot be current and set end date."),
+            otherwise: yup.date().required('Please select an end date.')
+        }),
         title: yup.string().trim()
             .max(255, 'Project title cannot be longer than 255 chars')
             .nullable(),
@@ -83,15 +88,20 @@ module.exports = {
     }),
     experience: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        location: yup.string().trim().max(255),
+        location: yup.string().trim().max(255).required('Please enter a location'),
         isCurrent: yup.boolean(),
         position: yup.string()
             .max(255, 'Experience position cannot be longer than 255 chars')
             .required(),
         company: yup.string()
+            .required('Company cannot be null')
             .max(255, 'Experience company cannot be longer than 255 chars'),
-        startDate: yup.date().required(),
-        endDate: yup.date().nullable(),
+        startDate: yup.date().required('Please provide a start date.'),
+        endDate: yup.date().when('isCurrent', {
+            is: true,
+            then: yup.date().oneOf([undefined, null], "Cannot be current and set end date."),
+            otherwise: yup.date().required('Please select an end date.')
+        }),
         title: yup.string().trim()
             .max(255, 'Experience title cannot be longer than 255 chars')
             .nullable(),
