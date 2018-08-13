@@ -13,7 +13,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     if (article) {
         if (article.id) {
-            const articleOk = await validateArticle(article.id, user, models);
+            const articleOk = await validateArticle(article.id, user, models, {});
             if (articleOk !== true) return articleOk;
         }
 
@@ -30,7 +30,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
     if (options) {
         if (options.articleId) {
-            const articleOk = await validateArticle(options.articleId, user, models);
+            const articleOk = await validateArticle(options.articleId, user, models, {});
             if (articleOk !== true) return articleOk;
         }
 

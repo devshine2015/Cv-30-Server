@@ -74,10 +74,12 @@ const validateTeam = async (id, user, models) => {
     return true;
 }
 
-const validateArticle = async (id, user, models) => {
+const validateArticle = async (id, user, models, options = { 
+    testFoundArticle: true
+}) => {
     const foundArticle = await models.article.findOne({ attributes: ["id", "ownerId"], where: { id } });
-    if (!foundArticle) return { status: false, error: 'Article not found' }
-    if (foundArticle.ownerId !== user.id) throwForbiddenError();
+    if (options.testFoundArticle && !foundArticle) return { status: false, error: 'Article not found' }
+    if (foundArticle && foundArticle.ownerId !== user.id) throwForbiddenError();
 
     return true;
 }
