@@ -332,7 +332,7 @@ const all = async (language, { models }) => {
     }).then(mapArticles);
 }
 
-const newsFeedAll = async (language, { user, models }) => {
+const newsFeedArticles = async (language, { user, models }) => {
     yupValidation(schema.article.all, { language });
 
     const languageId = await getLanguageIdByCode(models, language);
@@ -408,7 +408,10 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
 
     if (userId) {
         return models.article.findAll({
-            where: { ownerId: userId },
+            where: { 
+                ownerId: userId,
+                postAs: 'profile'
+            },
             ...includeForFind(languageId),
             order: [ [ 'createdAt', 'desc' ] ]
         }).then(mapArticles);
@@ -417,41 +420,21 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
     if (companyId) {
         return models.article.findAll({
             where: {
-                [models.Sequelize.Op.or]: [
-                    { '$featured.id$': { [models.Sequelize.Op.ne]: null } },
-                    { '$lifeAtTheOffice.id$': { [models.Sequelize.Op.ne]: null } },
-                    { '$moreStories.id$': { [models.Sequelize.Op.ne]: null } },
-                ]
+                postAs: 'company',
+                postingCompanyId: companyId
             },
-            include: includeForFind(languageId).include.concat([
-                {
-                    association: 'featured',
-                    where: { id: companyId },
-                    required: false
-                },
-                {
-                    association: 'lifeAtTheOffice',
-                    where: { id: companyId },
-                    required: false
-                },
-                {
-                    association: 'moreStories',
-                    where: { id: companyId },
-                    required: false
-                }
-            ]),
+            ...includeForFind(languageId),
             order: [ [ 'createdAt', 'desc' ] ]
         }).then(mapArticles);
     }
 
     if (teamId) {
         return models.article.findAll({
-            include: includeForFind(languageId).include.concat([
-                {
-                    association: 'officeArticles',
-                    where: { id: teamId }
-                }
-            ]),
+            where: {
+                    postAs: 'team',
+                    postingTeamId: teamId
+            },
+            ...includeForFind(languageId),
             order: [ [ 'createdAt', 'desc' ] ]
         }).then(mapArticles);
     }
@@ -499,15 +482,8 @@ const includeForFind = (languageId) => {
                     { association: 'users' }
                 ]
             },
-            {
-                association: 'postingCompany',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
-            },
-            {
-                association: 'postingTeam'
-            }
+            { association: 'postingCompany' },
+            { association: 'postingTeam' }
         ]
     };
 }
@@ -516,7 +492,7 @@ module.exports = {
     Query: {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
-        newsFeedArticles: (_, { language }, context) => newsFeedAll(language, context),
+        newsFeedArticles: (_, { language }, context) => newsFeedArticles(language, context),
         feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
