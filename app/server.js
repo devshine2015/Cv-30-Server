@@ -47,15 +47,16 @@ if (cluster.isMaster) {
                 context: { user, models, res },
                 graphiql: true,
                 formatError: error => {
-                    console.log(error);
-                    if (typeof error == "object" && Object.keys(error).indexOf('message') != -1) {
-                        return [{ message: error.message }];
-                    }
-                    try {
-                        result = JSON.parse(error.message);
-                        return typeof result == "array" ? result : [result];
-                    } catch (_) {
-                        return [{ message: error.message }];
+                    if (typeof error === "object" && Object.keys(error).indexOf('message') !== -1) {
+                        if (typeof error.message === 'string') {
+                            try {
+                                let result = JSON.parse(error.message);
+                                return Array.isArray(result) ? result : [result];
+                            }
+                            catch (err) {
+                                return [{ message: error.message }];
+                            }
+                        }
                     }
                 },
                 debug: true
