@@ -2,16 +2,23 @@ const Image = require('./image');
 const Video = require('./video');
 
 const Article = `
+    enum PostAs {
+        profile
+        company
+        team
+    }
     type Article {
         id: String!
         author: Profile
         isPost: Boolean
+        postAs: PostAs!
+        postingCompany: Company
+        postingTeam: Team
         featuredImage: Image
         images: [Image]
         videos: [Video]
         i18n: [ArticleText]
         tags: [ArticleTag]
-        endorsers: [Profile]
         createdAt: Date
         updatedAt: Date
     }
@@ -56,6 +63,9 @@ const Article = `
         isFeatured: Boolean
         isAboutMe: Boolean
         isPost: Boolean
+        postAs: PostAs
+        postingCompanyId: String
+        postingTeamId: String
         images: [ImageInput]
         videos: [VideoInput]
         title: String

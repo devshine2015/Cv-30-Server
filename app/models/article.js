@@ -36,6 +36,28 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.BOOLEAN,
 			field: 'is_post'
 		},
+		postAs: {
+			allowNull: false,
+			defaultValue: 'profile',
+			type: DataTypes.ENUM('profile', 'team', 'company'),
+			field: 'post_as'
+		},
+		postingCompanyId: {
+			type: DataTypes.UUID,
+			allowNull: true,
+			validate: {
+				isUUID: 4
+			},
+			field: 'posting_company_id'
+		},
+		postingTeamId: {
+			type: DataTypes.UUID,
+			allowNull: true,
+			validate: {
+				isUUID: 4
+			},
+			field: 'posting_team_id'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -67,7 +89,8 @@ module.exports = (Sequelize, DataTypes) => {
 		Article.belongsToMany(models.company, { as: 'moreStories', through: 'company_stories_articles', foreignKey: 'article_id' })
 		Article.belongsToMany(models.team, { as: 'officeArticles', through: 'team_office_articles', foreignKey: 'article_id' });
 		Article.hasMany(models.articleArticleTag, { as: 'tags', foreignKey: 'article_id'});
-		Article.belongsToMany(models.user, { as: 'endorsers', through: 'article_endorsers', foreignKey: 'article_id' });
+		Article.belongsTo(models.company, { as: 'postingCompany', foreignKey: 'posting_company_id' });
+		Article.belongsTo(models.team, { as: 'postingTeam', foreignKey: 'posting_team_id' });
 	};
 	return Article;
 };

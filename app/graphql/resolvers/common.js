@@ -5,8 +5,7 @@ const checkUserAuth = (user) => {
 
 const throwForbiddenError = () => {
     const errors = [ forbiddenError() ];
-    console.log(errors);
-    throw new Error(errors);
+    throw new Error(JSON.stringify(errors));
 }
 
 const forbiddenError = () => {
@@ -56,8 +55,30 @@ const validateCompany = async (id, user, models) => {
     const company = await models.company.findOne({ attributes: ["id", "ownerId"], where: { id } });
 
     if (!company) return { status: false, error: 'Company not found' };
-    if (company.ownerId != user.id) throwForbiddenError();
+    if (company.ownerId !== user.id) throwForbiddenError();
     
+    return true;
+}
+
+const validateTeam = async (id, user, models) => {
+    const team = await models.team.findOne({
+        attributes: ["id"], 
+        where: { id },
+        include: [
+            { association: 'company', attributes: ["id", "ownerId"] }
+        ]
+    });
+    if (!team) return { status: false, error: 'Team not found' }
+    if (team.company.ownerId !== user.id) throwForbiddenError();
+
+    return true;
+}
+
+const validateArticle = async (id, user, models) => {
+    const foundArticle = await models.article.findOne({ attributes: ["id", "ownerId"], where: { id } });
+    if (!foundArticle) return { status: false, error: 'Article not found' }
+    if (foundArticle.ownerId !== user.id) throwForbiddenError();
+
     return true;
 }
 
@@ -68,5 +89,7 @@ module.exports = {
     throwForbiddenError,
     getLanguageByCode,
     getLanguageIdByCode,
-    validateCompany
+    validateCompany,
+    validateTeam,
+    validateArticle
 }

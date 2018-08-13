@@ -10,7 +10,7 @@ module.exports = {
         companyId: yup.string().when('userId', {
             is: (uid) => !uid,
             then: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            otherwise: yup.string().oneOf([undefined, null], "Only one of userId, companyId, teamId can be set")
+            otherwise: yup.string().oneOf([undefined, null], "Only one of userId, companyId, teamId can bemerg set")
         }),
         teamId: yup.string().when(['userId', 'companyId'], {
             is: (uid, cid) => !uid && !cid,
@@ -28,6 +28,23 @@ module.exports = {
             id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             isFeatured: yup.boolean(),
             isPost: yup.boolean(),
+            postAs: yup.string().matches(/(profile|company|team)/, { excludeEmptyString: true }),
+            postingCompanyId: yup.string().when('postAs', {
+                is: (postAs) => postAs === "company",
+                then: yup.string()
+                    .trim()
+                    .matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
+                    .required("postingCompanyId is required when postAs is company"),
+                otherwise: yup.string().oneOf([undefined], "postingCompanyId is not allowed when postAs is not company")
+            }),
+            postingTeamId: yup.string().when('postAs', {
+                is: (postAs) => postAs === "team",
+                then: yup.string()
+                    .trim()
+                    .matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
+                    .required("postingTeamId is required when postAs is team"),
+                otherwise: yup.string().oneOf([undefined], "postingTeamId is not allowed when postAs is not team")
+            }),
             images: yup.array().of(yup.object().shape({
                 id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
                 title: yup.string().trim().max(255),
@@ -69,9 +86,5 @@ module.exports = {
         titles: yup.array().of(yup.string().trim().max(255).required()).required(),
         articleId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
         isSet: yup.boolean()
-    }),
-    endorseArticle: yup.object().shape({
-        articleId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
-        isEndorsing: yup.boolean()
     })
 }

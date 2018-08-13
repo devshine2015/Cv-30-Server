@@ -86,6 +86,7 @@ module.exports = (sequelize, DataTypes) => {
 		Company.hasOne(models.place, { as: 'place', foreignKey: 'company_id' });
 		Company.hasMany(models.companyText, { as: 'i18n', foreignKey: 'company_id' });
 		Company.hasMany(models.job, { as: 'jobs', foreignKey: 'company_id' });
+		Company.hasMany(models.article, { as: 'articles', foreignKey: 'posting_company_id' });
 		Company.belongsToMany(models.article, { as: 'featuredArticles', through: 'company_featured_articles', foreignKey: 'company_id' });
 		Company.belongsToMany(models.article, { as: 'officeArticles', through: 'company_office_articles', foreignKey: 'company_id' });
 		Company.belongsToMany(models.article, { as: 'storiesArticles', through: 'company_stories_articles', foreignKey: 'company_id' });

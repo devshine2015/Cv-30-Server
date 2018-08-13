@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const { merge } = require('lodash');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError, getLanguageByCode, getLanguageIdByCode, validateCompany } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageByCode, getLanguageIdByCode, validateCompany, validateTeam, validateArticle } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
@@ -11,13 +11,27 @@ const handleArticle = async (language, article, options, { user, models }) => {
         options
     });
 
-    if (article && article.id) {
-        await validateArticle(article.id, user, models);
+    if (article) {
+        if (article.id) {
+            const articleOk = await validateArticle(article.id, user, models);
+            if (articleOk !== true) return articleOk;
+        }
+
+        if (article.postingCompanyId) {
+            const postingCompanyOk = await validateCompany(article.postingCompanyId, user, models);
+            if (postingCompanyOk !== true) return postingCompanyOk;
+        }
+
+        if (article.postingTeamId) {
+            const postingTeamOk = await validateTeam(article.postingTeamId, user, models);
+            if (postingTeamOk !== true) return postingTeamOk;
+        }
     }
 
     if (options) {
         if (options.articleId) {
-            await validateArticle(options.articleId, user, models);
+            const articleOk = await validateArticle(options.articleId, user, models);
+            if (articleOk !== true) return articleOk;
         }
 
         if (options.companyId) {
@@ -26,15 +40,8 @@ const handleArticle = async (language, article, options, { user, models }) => {
         }
 
         if (options.teamId) {
-            const foundTeam = await models.team.findOne({
-                attributes: ["id"], 
-                where: { id: options.teamId },
-                include: [
-                    { association: 'company', attributes: ["id", "ownerId"] }
-                ]
-            });
-            if (!foundTeam) return { status: false, error: 'Team not found' }
-            if (foundTeam.company.ownerId != user.id) throwForbiddenError();
+            const teamOk = await validateTeam(options.teamId, user, models);
+            if (teamOk !== true) return teamOk;
         }
     }
 
@@ -308,27 +315,6 @@ const handleArticleTags = async(language, { titles, articleId, isSet }, { user, 
     return { status: result };
 }
 
-const endorseArticle = async(articleId, isEndorsing, { user, models }) => {
-    checkUserAuth(user);
-    yupValidation(schema.article.endorseArticle, {
-        articleId,
-        isEndorsing
-    });
-
-    const foundUser = await models.user.findOne({ attributes: ["id"], where: { id: user.id }});
-    const foundArticle = await models.article.findOne({ attributes: ["id"], where: { id: articleId }});
-    if (!foundUser) return { status: false, error: "User not found!" };
-    if (!foundArticle) return { status: false, error: "Article not found!" };
-
-    if (isEndorsing) {
-        await foundArticle.addEndorser(foundUser);
-    } else {
-        await foundArticle.removeEndorser(foundUser);
-    }
-
-    return { status: true };
-}
-
 const article = async (id, language, { models }) => {
     yupValidation(schema.article.one, { id, language });
 
@@ -513,14 +499,17 @@ const includeForFind = (languageId) => {
                     { association: 'users' }
                 ]
             },
-            { association: 'endorsers' }
+            {
+                association: 'postingCompany',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            },
+            {
+                association: 'postingTeam'
+            }
         ]
     };
-}
-
-const validateArticle = async (id, user, models) => {
-    const foundArticle = await models.article.findOne({ attributes: ["id", "ownerId"], where: { id } });
-    if (foundArticle && foundArticle.ownerId != user.id) throwForbiddenError();
 }
 
 module.exports = {
@@ -534,7 +523,6 @@ module.exports = {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
         handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context),
         handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
-        endorseArticle: (_, { articleId, isEndorsing }, context) => endorseArticle(articleId, isEndorsing, context)
     }
 };
 

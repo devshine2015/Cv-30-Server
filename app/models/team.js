@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
 		createdAt: 'created_at'
 	});
 	Team.associate = function(models) {
+		Team.hasMany(models.article, { as: 'articles', foreignKey: 'posting_team_id' });
 		Team.belongsToMany(models.article, { as: 'officeArticles', through: 'team_office_articles', foreignKey: 'team_id' });
 		Team.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
 		Team.belongsToMany(models.user, { as: 'members', through: 'team_members', foreignKey: 'team_id' });
