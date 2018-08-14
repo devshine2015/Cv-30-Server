@@ -116,6 +116,7 @@ module.exports = (Sequelize, DataTypes) => {
         User.belongsToMany(models.team, { through: 'team_followers', as: 'followingTeams', foreignKey: 'follower_id' });
         User.belongsToMany(models.job, { through: 'job_followers', as: 'followingJobs', foreignKey: 'follower_id' });
         User.belongsToMany(models.job, { through: 'job_applicants', as: 'appliedJobs', foreignKey: 'applicant_id' });
+        User.belongsToMany(models.articleArticleTag, { as: 'articleTags', through: 'article_article_tag_users', foreignKey: 'user_id' });
     }
     return User;
 };

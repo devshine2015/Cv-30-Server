@@ -45,7 +45,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
         }
     }
 
-    language = await getLanguageByCode(models, language);
+    const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
     await models.sequelize.transaction(async t => {
@@ -54,7 +54,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
             article.ownerId = user.id;
             await models.article.upsert(article, { transaction: t });
             article.articleId = article.id;
-            article.languageId = language.id;
+            article.languageId = languageId;
             if (article.images && article.images.length > 0) {
                 await models.image.bulkCreate(article.images.map(item => ({
                     id: item.id,
@@ -72,7 +72,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     imageId: item.id,
                     title: item.title,
                     description: item.description,
-                    languageId: language.id
+                    languageId
                 })), {
                         updateOnDuplicate: ["title", "description"],
                         transaction: t
@@ -95,7 +95,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     videoId: item.id,
                     title: item.title,
                     description: item.description,
-                    languageId: language.id
+                    languageId
                 })), {
                         updateOnDuplicate: ["title", "description"],
                         transaction: t
@@ -116,6 +116,10 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     article.slug = newSlug;
                 }
                 await models.articleText.upsert(article, { transaction: t });
+            }
+
+            if (article.tags) {
+                await storeArticleTags(article.tags, article.id, languageId, undefined, user, models, t);
             }
         }
         if (options && options.articleId && options.companyId) {
@@ -152,83 +156,96 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: result };
 }
 
-const handleArticleTag = async(language, { title, articleId, isSet }, { user, models }) => {
-    checkUserAuth(user);
-    yupValidation(schema.article.handleArticleTag, {
-        language,
-        title,
-        articleId,
-        isSet
-    });
-
-    const languageId = await getLanguageIdByCode(models, language);
-    title = title.trim().toLowerCase();
-
-    let result = false;
-    await models.sequelize.transaction(async t => {
-        let articleTag = await models.articleTag.find({
-            include: [
-                { 
-                    association: 'i18n',
-                    where: {
-                        languageId,
-                        title: title
-                    }
-                 }
-            ]
-        }, { transaction: t });
-
-        if (!articleTag) {
-            articleTag = await models.articleTag.create({
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, { transaction: t });
-
-            await models.articleTagText.create({
-                tagId: articleTag.id,
-                languageId,
-                    title,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-            }, { transaction: t });
+const storeArticleTags = async (titles, articleId, languageId, isSet, user, models, transaction) => {
+    const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
+    const foundUser = await models.user.findOne({
+        attributes: ['id'],
+        where: {
+            id: user.id
         }
+    }, { transaction});
 
-        const foundUser = await models.user.find({ where: { id: user.id }}, { transaction: t });
-        let articleArticleTag = await models.articleArticleTag.find({
+    const existingTags = await models.articleTag.findAll({
+        include: [
+            { 
+                association: 'i18n',
+                where: {
+                    languageId,
+                    title: {
+                        [models.Sequelize.Op.in]: cleanedInputTags
+                    }
+                }
+             }
+        ]
+    }, { transaction });
+
+    let newTags = [];
+    if (existingTags.length === 0) newTags = cleanedInputTags;
+    else newTags = cleanedInputTags.filter(item => !existingTags.find(el => el.i18n[0].title === item));
+
+    let newArticleArticleTags = [];
+
+    if (newTags.length) {
+        const createdTags = await models.articleTag.bulkCreate(newTags.map(_ => { }), { transaction });
+
+        // Create tag texts - need tag_id from tags
+        const mappedTagTexts = newTags.map((title, i) => {
+            return {
+                tagId: createdTags[i].id,
+                languageId,
+                title
+            };
+        });
+
+        await models.articleTagText.bulkCreate(mappedTagTexts, { transaction });
+
+        // Link new tags with article
+        newArticleArticleTags = articleArticleTag = await models.articleArticleTag.bulkCreate(createdTags.map(newTag => ({
+            id: uuid(),
+            tagId: newTag.id,
+            articleId
+        })), { transaction });
+    }
+
+    let existingArticleArticleTag = [];
+    if (existingTags.length) {
+        existingArticleArticleTag = await models.articleArticleTag.findAll({
+            attributes: ['id', 'tagId'],
             where: {
-                tagId: articleTag.id,
+                tagId: {
+                    [models.Sequelize.Op.in]: existingTags.map(tag => tag.id)
+                },
                 articleId
             }
-        }, { transaction: t });
-        
-        if (isSet) {
-            if (!articleArticleTag) {
-                articleArticleTag = await models.articleArticleTag.create({
+        }, { transaction });
+
+        if (existingArticleArticleTag.length !== existingTags.length) {
+            const missingArticleArticleTags = existingTags.filter(item => !existingArticleArticleTag.find(el => el.tagId === item.id));
+            if (missingArticleArticleTags.length) {
+                const newMissingArticleArticleTags = await models.articleArticleTag.bulkCreate(missingArticleArticleTags.map(newTag => ({
                     id: uuid(),
-                    tagId: articleTag.id,
-                    articleId,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }, { transaction: t });
-            }
-            
-            await articleArticleTag.addUser(foundUser, { transaction: t });
-
-        } else {
-            await articleArticleTag.removeUser(foundUser, { transaction: t });
-
-            await models.articleArticleTag.destroy({
-                where: {
-                    tagId: articleTag.id,
+                    tagId: newTag.id,
                     articleId
-                }
-            }, { transaction: t });
+                })), { transaction });
+
+                existingArticleArticleTag = existingArticleArticleTag.concat(newMissingArticleArticleTags);
+            }
         }
-
-        result = true;
-    });
-
-    return { status: result };
+    }
+    
+    const mergedArticleArticleTags = newArticleArticleTags.concat(existingArticleArticleTag);
+    
+    if (isSet !== undefined) {
+        if (isSet) {
+            if (mergedArticleArticleTags.length) {
+                await foundUser.addArticleTags(mergedArticleArticleTags, { transaction });
+            }
+        } else {
+            if (existingArticleArticleTag.length) {
+                await foundUser.removeArticleTags(existingArticleArticleTag, { transaction });
+            }
+        }
+    }
 }
 
 const handleArticleTags = async(language, { titles, articleId, isSet }, { user, models }) => {
@@ -241,74 +258,10 @@ const handleArticleTags = async(language, { titles, articleId, isSet }, { user, 
     });
     
     const languageId = await getLanguageIdByCode(models, language);
-    titles = titles.map(title => title.trim().toLowerCase());
 
     let result = false;
     await models.sequelize.transaction(async t => {
-        const foundUser = await models.user.findOne({ where: { id: user.id }}, { transaction: t });
-
-        // TODO: optimize to reduce db operations
-        for (let i = 0; i < titles.length; i++) {
-            const title = titles[i];
-            let articleTag = await models.articleTag.findOne({
-                include: [
-                    { 
-                        association: 'i18n',
-                        where: {
-                            languageId,
-                            title: title
-                        }
-                     }
-                ]
-            }, { transaction: t });
-    
-            if (!articleTag) {
-                articleTag = await models.articleTag.create({
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }, { transaction: t });
-    
-                await models.articleTagText.create({
-                    tagId: articleTag.id,
-                    languageId,
-                        title,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                }, { transaction: t });
-            }
-            
-            let articleArticleTag = await models.articleArticleTag.findOne({
-                where: {
-                    tagId: articleTag.id,
-                    articleId
-                }
-            }, { transaction: t });
-            
-            if (isSet) {
-                if (!articleArticleTag) {
-                    articleArticleTag = await models.articleArticleTag.create({
-                        id: uuid(),
-                        tagId: articleTag.id,
-                        articleId,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                    }, { transaction: t });
-                }
-                
-                await articleArticleTag.addUser(foundUser, { transaction: t });
-    
-            } else {
-                await articleArticleTag.removeUser(foundUser, { transaction: t });
-    
-                await models.articleArticleTag.destroy({
-                    where: {
-                        tagId: articleTag.id,
-                        articleId
-                    }
-                }, { transaction: t });
-            }
-        };
-
+        await storeArticleTags(titles, articleId, languageId, isSet, user, models, t);
         result = true;
     });
 
@@ -479,7 +432,7 @@ const includeForFind = (languageId) => {
                             { association: 'i18n', where: { languageId } }
                         ]
                     },
-                    { association: 'users' }
+                    { association: 'users', required: false }
                 ]
             },
             { association: 'postingCompany' },
@@ -497,7 +450,6 @@ module.exports = {
     },
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
-        handleArticleTag: (_, { language, details }, context) => handleArticleTag(language, details, context),
         handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
     }
 };

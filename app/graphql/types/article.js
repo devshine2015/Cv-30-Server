@@ -70,6 +70,7 @@ const Article = `
         videos: [VideoInput]
         title: String
         description: String
+        tags: [String!]
         created_at: Date
         updated_at: Date
     }
@@ -98,10 +99,6 @@ const Article = `
 			language: LanguageCodeType!
 			article: ArticleInput
 			options: ArticleOptions
-        ): StandardResponse
-        handleArticleTag (
-			language: LanguageCodeType!
-			details: ArticleTagInput!
         ): StandardResponse
         handleArticleTags (
 			language: LanguageCodeType!
