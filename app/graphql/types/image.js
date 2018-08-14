@@ -3,7 +3,7 @@ const Image = `
         id: String
         author: User
         isFeatured: Boolean
-        source: String
+        sourceId: String
         sourceType: MediaSourceType
         path: String
         originalFilename: String
