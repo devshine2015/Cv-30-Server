@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const { merge } = require('lodash');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageByCode, getLanguageIdByCode, validateCompany, validateTeam, validateArticle } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);

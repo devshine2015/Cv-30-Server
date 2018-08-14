@@ -99,6 +99,8 @@ const setTags = async (language, tagsInput, { user, models }) => {
 
     if (newTags.length || existingTags.length) {
         await models.sequelize.transaction(async t => {
+            const company = await models.company.findOne({ attributes: ["id", "ownerId"], where: { id }, transaction: t } );
+
             if (newTags.length) {
                 const createdTags = await models.tag.bulkCreate(newTags.map(_ => { }), { transaction: t });
 
