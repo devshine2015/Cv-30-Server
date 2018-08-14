@@ -38,6 +38,11 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.TEXT,
 			field: 'cover_background'
 		},
+		position: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+            fieldName: 'position'
+        },
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

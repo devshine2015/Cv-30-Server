@@ -131,5 +131,8 @@ module.exports = {
         jobId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
         teamId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
         isFollowing: yup.boolean().required()
+    }),
+    setPosition: yup.object().shape({
+        position: yup.string().trim().max(255).nullable()
     })
 };

@@ -541,6 +541,28 @@ const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollo
     return { status: result };
 }
 
+const setPosition = async (position, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.user.setPosition, {
+        position
+    });
+
+    const profile = await models.profile.findOne({ 
+        where: {
+            userId: user.id
+        }
+    });
+    profile.position = position;
+    
+    const result = await profile.save();
+    if (result !== profile) {
+        console.log(result);
+        throw new Error(JSON.stringify(result.errors));
+    }
+
+    return { status: true };
+}
+
 const createProfileResponse = async (user, models, languageId) => {
     const newUser = await models.user.findOne({
         where: {
@@ -635,5 +657,7 @@ module.exports = {
         removeExperience: (_, { id }, context) => removeExperience(id, context),
 
         handleFollow: (_, { details }, context) => handleFollow(details, context),
+
+        setPosition: (_, { position }, context) => setPosition(position, context),
     }
 };

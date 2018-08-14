@@ -26,6 +26,7 @@ const Profile = `
         profileCoverContentType: ImageType
         coverBackground: String
         currentPosition: CurrentPosition
+        position: String
         story: Story
         salary: Salary
         errors: [Error]

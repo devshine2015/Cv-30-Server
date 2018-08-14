@@ -72,6 +72,9 @@ const User = `
 		handleFollow (
 			details: FollowInput!
 		): StandardResponse
+		setPosition(
+			position: String
+		): StandardResponse
 	}
 `;
 
