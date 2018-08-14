@@ -25,6 +25,10 @@ const Image = `
         sourceType: MediaSourceType
         path: String
     }
+
+    extend type Query {
+        images: [Image]
+    }
 `;
 
 module.exports = () => [Image];
