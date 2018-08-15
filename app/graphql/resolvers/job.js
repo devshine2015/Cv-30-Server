@@ -30,15 +30,30 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         if (companyOk !== true) return companyOk;
     }
 
+    let result = false;
     await models.sequelize.transaction(async t => {
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
         jobDetails.jobId = jobDetails.id;
         jobDetails.languageId = await getLanguageIdByCode(models, language);
         await models.jobText.upsert(jobDetails, { transaction: t });
+        if (jobDetails.jobTypes && jobDetails.jobTypes.length) {
+            const jobTypes = await models.jobType.findAll({
+                where: {
+                    id: {
+                        [models.Sequelize.Op.in]: jobDetails.jobTypes
+                    }
+                }
+            });
+
+            if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
+            job = await models.job.findOne({ where: { id: jobDetails.id }, attributes: ['id'], transaction: t });
+            await job.addJobTypes(jobTypes, { transaction: t });
+        }
+        result = true;
     });
 
-    return { status: true };
+    return { status: result };
 }
 
 const job = async (id, language, { models }) => {
@@ -56,6 +71,18 @@ const all = async (language, companyId, { models }) => {
     return models.job.findAll({
         where: companyId ? { companyId } : {},
         ...includeForFind(await getLanguageIdByCode(models, language))
+    });
+}
+
+const jobTypes = async (language, { models }) => {
+    yupValidation(schema.job.jobTypes, { language });
+
+    const languageId = await getLanguageIdByCode(models, language);
+
+    return models.jobType.findAll({
+        include: [
+            { association: 'i18n', where: { languageId } }
+        ]
     });
 }
 
@@ -97,6 +124,11 @@ const includeForFind = (languageId) => {
                     { association: 'story', include: [{ association: 'i18n', where: { languageId } }] },
                     { association: 'contact' }
                 ]
+            }, {
+                association: 'jobTypes',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
             }
         ]
     }
@@ -119,7 +151,8 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 module.exports = {
     Query: {
         jobs: (_, { language, companyId }, context) => all(language, companyId, context),
-        job: (_, { id, language }, context) => job(id, language, context)
+        job: (_, { id, language }, context) => job(id, language, context),
+        jobTypes: (_, { language }, context) => jobTypes(language, context)
     },
     Mutation: {
         handleJob: (_, { language, jobDetails }, context) => handleJob(language, jobDetails, context),

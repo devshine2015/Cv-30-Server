@@ -14,12 +14,21 @@ module.exports = `
         team: Team
         applicants: [Profile]
         location: String
+        jobTypes: [JobType]
     }
     type JobText {
         title: String
         description: String
         idealCandidate: String
     }
+    type JobType {
+        id: Int
+        i18n: [JobTypeText]
+    }
+    type JobTypeText {
+        title: String
+    }
+
     input JobInput {
         id: String
         companyId: String
@@ -33,6 +42,7 @@ module.exports = `
         linkedin: String
         expireDate: Date
         location: String
+        jobTypes: [Int]
     }
 
     extend type Query {
@@ -43,7 +53,10 @@ module.exports = `
 		job(
 			id: String!
 			language: LanguageCodeType!
-		): Job
+        ): Job
+        jobTypes(
+            language: LanguageCodeType!
+        ): [JobType]
     }
 
     extend type Mutation {
