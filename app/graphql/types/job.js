@@ -15,6 +15,7 @@ module.exports = `
         applicants: [Profile]
         location: String
         jobTypes: [JobType]
+        salary: JobSalary
     }
     type JobText {
         title: String
@@ -27,6 +28,12 @@ module.exports = `
     }
     type JobTypeText {
         title: String
+    }
+    type JobSalary {
+        amountMin: Float
+        amountMax: Float
+        currency: Currency
+        isPublic: Boolean
     }
 
     input JobInput {
@@ -43,6 +50,13 @@ module.exports = `
         expireDate: Date
         location: String
         jobTypes: [Int]
+        salary: JobSalaryInput
+    }
+    input JobSalaryInput {
+        amountMin: Float!
+        amountMax: Float!
+        currency: Currency!
+        isPublic: Boolean!
     }
 
     extend type Query {

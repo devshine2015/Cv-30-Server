@@ -27,7 +27,13 @@ module.exports = {
             linkedin: yup.string().trim().max(255),
             expireDate: yup.date(),
             location: yup.string().trim().max(255),
-            jobTypes: yup.array().of(yup.number().positive().integer())
+            jobTypes: yup.array().of(yup.number().positive().integer()),
+            salary: yup.object().shape({
+                amountMin: yup.number().positive().required().lessThan(yup.ref('amountMax')),
+                amountMax: yup.number().positive().required(),
+                currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
+                isPublic: yup.boolean().required()
+            })
         })
     }),
     handleApplyToJob: yup.object().shape({

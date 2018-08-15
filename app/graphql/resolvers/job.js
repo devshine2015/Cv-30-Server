@@ -37,6 +37,11 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         jobDetails.jobId = jobDetails.id;
         jobDetails.languageId = await getLanguageIdByCode(models, language);
         await models.jobText.upsert(jobDetails, { transaction: t });
+        if (jobDetails.salary) {
+            jobDetails.salary.jobId = jobDetails.id;
+            await models.jobSalary.upsert(jobDetails.salary, { transaction: t });
+        }
+
         if (jobDetails.jobTypes && jobDetails.jobTypes.length) {
             const jobTypes = await models.jobType.findAll({
                 where: {
@@ -129,6 +134,8 @@ const includeForFind = (languageId) => {
                 include: [
                     { association: 'i18n', where: { languageId } }
                 ]
+            }, { 
+                association: 'salary'
             }
         ]
     }
