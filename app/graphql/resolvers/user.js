@@ -164,17 +164,18 @@ const setStory = async (language, { title, description }, { user, models }) => {
     return response;
 }
 
-const setValues = async (values, language, { user, models }) => {
+const setValues = async (addValues, removeValues, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.values, {
         language,
-        values
+        addValues,
+        removeValues
     });
 
     // Get existing values
     const languageId = await getLanguageIdByCode(models, language);
 
-    const cleanedInputValues = values.map(item => item.trim().toLowerCase());
+    const cleanedInputValues = addValues.map(item => item.trim().toLowerCase());
 
     const existingValues = await models.value.findAll({
         include: [{
@@ -192,10 +193,11 @@ const setValues = async (values, language, { user, models }) => {
     if (!existingValues.length) newValues = cleanedInputValues
     else newValues = cleanedInputValues.filter(item => !existingValues.find(el => el.i18n[0].title == item));
 
+    let result = false;
     if (newValues.length || existingValues.length) {
-        await models.sequelize.transaction(async t => {
+        await models.sequelize.transaction(async transaction => {
             if (newValues.length) {
-                const createdValues = await models.value.bulkCreate(newValues.map(_ => { }), { transaction: t });
+                const createdValues = await models.value.bulkCreate(newValues.map(_ => { }), { transaction });
 
                 // Create value texts - need value_id from values
                 const mappedValueTexts = newValues.map((title, i) => {
@@ -206,74 +208,80 @@ const setValues = async (values, language, { user, models }) => {
                     };
                 });
 
-                await models.valueText.bulkCreate(mappedValueTexts, { transaction: t });
+                await models.valueText.bulkCreate(mappedValueTexts, { transaction });
                 // Add new values to user
-                if (createdValues.length) await user.addValues(createdValues, { transaction: t });
+                if (createdValues.length) await user.addValues(createdValues, { transaction });
             }
 
             // Add existing values to user
-            if (existingValues.length) await user.addValues(existingValues, { transaction: t });
+            if (existingValues.length) await user.addValues(existingValues, { transaction });
+
+            // Remove values
+            if (removeValues.length) {
+                const valuesToRemove = await models.value.findAll({
+                    include: [{
+                        association: 'i18n',
+                        where: {
+                            languageId,
+                            title: {
+                                [models.Sequelize.Op.in]: removeValues.map(item => item.trim().toLowerCase())
+                            }
+                        },
+                    }],
+                    transaction
+                });
+
+                await user.removeValues(valuesToRemove, { transaction });
+            }
+            result = true;
         });
     }
-    return { status: true };
+    return { status: result };
 }
 
-const removeValue = async (id, { user, models }) => {
-    checkUserAuth(user);
-
-    if (await models.userValues.destroy({
-        where: {
-            value_id: id,
-            user_id: user.id
-        }
-    })) {
-        return { status: true };
-    } else {
-        return { status: false, error: 'Value not found' };
-    }
-
-    return response;
-}
-
-const setSkills = async (skills, language, { user, models }) => {
+const setSkills = async (addSkills, removeSkills, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.skills, {
         language,
-        skills
+        addSkills,
+        removeSkills
     });
 
     // Get existing values
     const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
-    await models.sequelize.transaction(async t => {
-        const { createdSkills, existingSkills } = await storeSkills(skills, languageId, models, t);
+    await models.sequelize.transaction(async transaction => {
+        const { createdSkills, existingSkills } = await storeSkills(addSkills, languageId, models, transaction);
 
         // Add new skills to user
-        if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t });
+        if (createdSkills.length) await user.addSkills(createdSkills, { transaction });
 
         // Add existing values to user
-        if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t });
+        if (existingSkills.length) await user.addSkills(existingSkills, { transaction });
+
+        // Remove skills
+        if (removeSkills.length) {
+            const skillsToRemove = await models.skill.findAll({
+                include: [{
+                    association: 'i18n',
+                    where: {
+                        languageId,
+                        title: {
+                            [models.Sequelize.Op.in]: removeSkills.map(item => item.trim().toLowerCase())
+                        }
+                    },
+                }],
+                transaction
+            });
+
+            await user.removeSkills(skillsToRemove, { transaction });
+        }
 
         result = true;
     });
 
     return { status: result };
-}
-
-const removeSkill = async (id, { user, models }) => {
-    checkUserAuth(user);
-
-    if (await models.userSkills.destroy({
-        where: {
-            skill_id: id,
-            user_id: user.id
-        }
-    })) {
-        return { status: true };
-    } else {
-        return { status: false, error: 'Skill not found' };
-    }
 }
 
 const setContact = async ({ phone, email, facebook, linkedin }, { user, models }) => {
@@ -616,10 +624,8 @@ module.exports = {
         setSalary: (_, { salary }, context) => setSalary(salary, context),
         setStory: (_, { language, story }, context) => setStory(language, story, context),
 
-        setValues: (_, { values, language }, context) => setValues(values, language, context),
-        removeValue: (_, { id }, context) => removeValue(id, context),
-        setSkills: (_, { skills, language }, context) => setSkills(skills, language, context),
-        removeSkill: (_, { id }, context) => removeSkill(id, context),
+        setValues: (_, { addValues, removeValues, language }, context) => setValues(addValues, removeValues, language, context),
+        setSkills: (_, { addSkills, removeSkills, language }, context) => setSkills(addSkills, removeSkills, language, context),
         setContact: (_, { contact }, context) => setContact(contact, context),
 
         setProject: (_, { project, language }, context) => setProject(project, language, context),

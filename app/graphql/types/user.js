@@ -43,16 +43,14 @@ module.exports = `
 		): StandardResponse
 		setSalary( salary: SalaryInput ): StandardResponse
 		setValues (
-			values: [String!]!
+			addValues: [String!]!
+			removeValues: [String!]!
 			language: LanguageCodeType!
 		): StandardResponse
-		removeValue ( id: Int ): StandardResponse
 		setSkills (
-			skills: [String!]!
+			addSkills: [String!]!
+			removeSkills: [String!]!
 			language: LanguageCodeType!
-		): StandardResponse
-		removeSkill (
-			id: Int
 		): StandardResponse
 		setContact ( contact: ContactInput ): StandardResponse
 		setProject (
