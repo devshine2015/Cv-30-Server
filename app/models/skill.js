@@ -23,9 +23,8 @@ module.exports = (Sequelize, DataTypes) => {
 		createdAt: 'created_at'
     });
     Skill.associate = models => {
-		Skill.belongsToMany(models.user, {
-			through: Sequelize.define('UserSkills', {})
-		});
+		Skill.belongsToMany(models.user, { through: Sequelize.define('UserSkills', {})});
+		Skill.belongsToMany(models.job, { as: 'jobs', through: 'job_skills', foreignKey: 'skill_id' });
 		Skill.hasMany(models.skillText, { as: 'i18n', foreignKey: 'skill_id' } );
     };
     return Skill;

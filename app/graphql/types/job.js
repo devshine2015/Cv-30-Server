@@ -17,6 +17,7 @@ module.exports = `
         jobTypes: [JobType]
         salary: JobSalary
         activityField: ActivityField
+        skills: [Skill]
     }
     type JobText {
         title: String
@@ -53,6 +54,7 @@ module.exports = `
         jobTypes: [Int]
         salary: JobSalaryInput
         activityField: String
+        skills: [String]
     }
     input JobSalaryInput {
         amountMin: Float!

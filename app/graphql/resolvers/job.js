@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError, storeSkills } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -65,6 +65,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             await models.jobSalary.upsert(jobDetails.salary, { transaction: t });
         }
 
+        job = await models.job.findOne({ where: { id: jobDetails.id }, attributes: ['id'], transaction: t });
         if (jobDetails.jobTypes && jobDetails.jobTypes.length) {
             const jobTypes = await models.jobType.findAll({
                 where: {
@@ -77,9 +78,18 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             });
 
             if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
-            job = await models.job.findOne({ where: { id: jobDetails.id }, attributes: ['id'], transaction: t });
             await job.addJobTypes(jobTypes, { transaction: t });
         }
+        if (jobDetails.skills && jobDetails.skills.length) {
+            const { createdSkills, existingSkills } = await storeSkills(jobDetails.skills, languageId, models, t);
+
+            // Add new skills to job
+            if (createdSkills.length) await job.addSkills(createdSkills, { transaction: t });
+
+            // Add existing values to job
+            if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
+        }
+
         result = true;
     });
 
@@ -161,6 +171,16 @@ const includeForFind = (languageId) => {
                 ]
             }, { 
                 association: 'salary'
+            }, {
+                association: 'activityField',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
+            }, {
+                association: 'skills',
+                include: [
+                    { association: 'i18n', where: { languageId } }
+                ]
             }
         ]
     }

@@ -84,6 +84,47 @@ const validateArticle = async (id, user, models, options = {
     return true;
 }
 
+const storeSkills = async (skills, languageId, models, transaction) => {
+    const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
+
+    const existingSkills = await models.skill.findAll({
+        include: [{
+            association: 'i18n',
+            where: {
+                languageId,
+                title: {
+                    [models.Sequelize.Op.in]: cleanedInputSkills
+                }
+            },
+        }],
+        transaction
+    });
+
+    let newSkills = [];
+    if (!existingSkills.length) newSkills = cleanedInputSkills
+    else newSkills = cleanedInputSkills.filter(item => !existingSkills.find(el => el.i18n[0].title == item));
+
+    let createdSkills = [];
+    if (newSkills.length) {
+        createdSkills = await models.skill.bulkCreate(newSkills.map(_ => { }), { transaction });
+
+        // Create skill texts - need skill_id from skills
+        const mappedSkillTexts = newSkills.map((title, i) => {
+            return {
+                skillId: createdSkills[i].dataValues.id,
+                languageId,
+                title,
+            };
+        });
+
+        const createdSkillTexts = await models.skillText.bulkCreate(mappedSkillTexts, { transaction });
+        if (createdSkills.length !== newSkills.length || createdSkillTexts.length !== newSkills.length)
+            throw new Error("Skill storage failed");
+    }
+
+    return { createdSkills, existingSkills };
+}
+
 module.exports = {
     checkUserAuth,
     yupValidation,
@@ -93,5 +134,6 @@ module.exports = {
     getLanguageIdByCode,
     validateCompany,
     validateTeam,
-    validateArticle
+    validateArticle,
+    storeSkills
 }

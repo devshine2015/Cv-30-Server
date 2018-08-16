@@ -34,7 +34,12 @@ module.exports = {
                 currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
                 isPublic: yup.boolean().required()
             }),
-            activityField: yup.string().trim().max(255)
+            activityField: yup.string().trim().max(255),
+            skills: yup.array().of(
+                yup.string().trim()
+                    .required('Skill needs a title')
+                    .max(100, 'Skill title cannot be longer than 100 chars')
+            )
         })
     }),
     handleApplyToJob: yup.object().shape({

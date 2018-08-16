@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode } = require('./common');
-const  { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
+const { checkUserAuth, yupValidation, getLanguageIdByCode, storeSkills } = require('./common');
+const { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
 
 const profile = async (id, language, { user, models }) => {
     yupValidation(schema.user.one, { id, language });
@@ -245,48 +245,20 @@ const setSkills = async (skills, language, { user, models }) => {
     // Get existing values
     const languageId = await getLanguageIdByCode(models, language);
 
-    const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        const { createdSkills, existingSkills } = await storeSkills(skills, languageId, models, t);
 
-    const existingSkills = await models.skill.findAll({
-        include: [{
-            association: 'i18n',
-            where: {
-                languageId,
-                title: {
-                    [models.Sequelize.Op.in]: cleanedInputSkills
-                }
-            },
-        }]
+        // Add new skills to user
+        if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t });
+
+        // Add existing values to user
+        if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t });
+
+        result = true;
     });
 
-    let newSkills = [];
-    if (!existingSkills.length) newSkills = cleanedInputSkills
-    else newSkills = cleanedInputSkills.filter(item => !existingSkills.find(el => el.i18n[0].title == item));
-
-    if (newSkills.length || existingSkills.length) {
-        await models.sequelize.transaction(async t => {
-            if (newSkills.length) {
-                const createdSkills = await models.skill.bulkCreate(newSkills.map(_ => { }), { transaction: t });
-
-                // Create skill texts - need skill_id from skills
-                const mappedSkillTexts = newSkills.map((title, i) => {
-                    return {
-                        skillId: createdSkills[i].dataValues.id,
-                        languageId,
-                        title,
-                    };
-                });
-
-                await models.skillText.bulkCreate(mappedSkillTexts, { transaction: t });
-                // Add new skills to user
-                if (createdSkills.length) await user.addSkills(createdSkills, { transaction: t });
-            }
-
-            // Add existing values to user
-            if (existingSkills.length) await user.addSkills(existingSkills, { transaction: t });
-        });
-    }
-    return { status: true };
+    return { status: result };
 }
 
 const removeSkill = async (id, { user, models }) => {
@@ -443,18 +415,18 @@ const upsertImages = async (images, languageId, sourceId, userId, models, transa
             sourceType: item.sourceType,
             path: item.path
         }, {
-            updateOnDuplicate: ["isFeatured", "path"],
-            transaction
-        })));
+                updateOnDuplicate: ["isFeatured", "path"],
+                transaction
+            })));
         await Promise.all(images.map(item => models.imageText.upsert({
             imageId: item.id,
             title: item.title,
             description: item.description,
             languageId
         }, {
-            updateOnDuplicate: ["title", "description"],
-            transaction
-        })));
+                updateOnDuplicate: ["title", "description"],
+                transaction
+            })));
     }
 }
 
@@ -468,9 +440,9 @@ const upsertVideos = async (videos, languageId, sourceId, userId, models, transa
             sourceType: item.sourceType,
             path: item.path
         }, {
-            updateOnDuplicate: ["isFeatured", "path"],
-            transaction
-        })));
+                updateOnDuplicate: ["isFeatured", "path"],
+                transaction
+            })));
         // await models.videoText.upsert(videos.map(item => ({
         //     videoId: item.id,
         //     title: item.title,
@@ -483,7 +455,7 @@ const upsertVideos = async (videos, languageId, sourceId, userId, models, transa
     }
 }
 
-const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
+const handleFollow = async ({ userToFollowId, companyId, jobId, teamId, isFollowing }, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.handleFollow, {
         userToFollowId,
@@ -509,7 +481,7 @@ const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollo
         if (!company)
             return { status: false, error: 'Company not found' };
     }
-    
+
     if (jobId) {
         job = await models.job.findOne({ attributes: ["id"], where: { id: jobId } });
         if (!job)
@@ -537,7 +509,7 @@ const handleFollow = async ( { userToFollowId, companyId, jobId, teamId, isFollo
         }
         result = true;
     });
-    
+
     return { status: result };
 }
 
@@ -547,13 +519,13 @@ const setPosition = async (position, { user, models }) => {
         position
     });
 
-    const profile = await models.profile.findOne({ 
+    const profile = await models.profile.findOne({
         where: {
             userId: user.id
         }
     });
     profile.position = position;
-    
+
     const result = await profile.save();
     if (result !== profile) {
         console.log(result);
