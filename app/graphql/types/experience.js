@@ -1,6 +1,4 @@
-const Scalars = require('./scalars');
-
-const Experience = `
+module.exports = `
     type Experience {
         id: String
         position: String
@@ -14,6 +12,11 @@ const Experience = `
         videos: [Video]
         images: [Image]
     }
+    type ExperienceText {
+        title: String
+        description: String
+    }
+
     input ExperienceInput {
         id: String
         location: String
@@ -28,12 +31,3 @@ const Experience = `
         images: [ImageInput]
     }
 `;
-
-const ExperienceText = `
-    type ExperienceText {
-        title: String
-        description: String
-    }
-`;
-
-module.exports = () => [Experience, ExperienceText];

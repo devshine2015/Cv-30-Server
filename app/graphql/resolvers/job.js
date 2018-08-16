@@ -29,13 +29,36 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         const companyOk = await validateCompany(jobDetails.companyId, user, models);
         if (companyOk !== true) return companyOk;
     }
+    const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
     await models.sequelize.transaction(async t => {
+        let activityFieldText = await models.activityFieldText.findOne({
+            where: {
+                title: jobDetails.activityField,
+            },
+            attributes: [ 'activityFieldId' ],
+            transaction: t
+        });
+        if (!activityFieldText) {
+            const activityField = await models.activityField.create({
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, { transaction: t });
+            activityFieldText = await models.activityFieldText.create({
+                activityFieldId: activityField.id,
+                languageId,
+                title: jobDetails.activityField,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }, { transaction: t });
+        }
+
+        jobDetails.activityFieldId = activityFieldText.activityFieldId;
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
         jobDetails.jobId = jobDetails.id;
-        jobDetails.languageId = await getLanguageIdByCode(models, language);
+        jobDetails.languageId = languageId;
         await models.jobText.upsert(jobDetails, { transaction: t });
         if (jobDetails.salary) {
             jobDetails.salary.jobId = jobDetails.id;
@@ -48,7 +71,9 @@ const handleJob = async (language, jobDetails, { user, models }) => {
                     id: {
                         [models.Sequelize.Op.in]: jobDetails.jobTypes
                     }
-                }
+                },
+                attributes: ['id'],
+                transaction: t
             });
 
             if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");

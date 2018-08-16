@@ -33,7 +33,8 @@ module.exports = {
                 amountMax: yup.number().positive().required(),
                 currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
                 isPublic: yup.boolean().required()
-            })
+            }),
+            activityField: yup.string().trim().max(255)
         })
     }),
     handleApplyToJob: yup.object().shape({

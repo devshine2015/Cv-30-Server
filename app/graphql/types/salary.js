@@ -1,4 +1,4 @@
-const Salary = `
+module.exports = `
     type Salary {
         amount: Float
         currency: Currency
@@ -10,5 +10,3 @@ const Salary = `
         isPublic: Boolean
     }
 `;
-
-module.exports = () => [Salary];

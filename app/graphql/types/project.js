@@ -1,6 +1,4 @@
-const Scalars = require('./scalars');
-
-const Project = `
+module.exports = `
     type Project {
         id: String
         position: String
@@ -14,6 +12,11 @@ const Project = `
         videos: [Video]
         images: [Image]
     }
+    type ProjectText {
+        title: String
+        description: String
+    }
+
     input ProjectInput {
         id: String
         location: String
@@ -28,12 +31,3 @@ const Project = `
         images: [ImageInput]
     }
 `;
-
-const ProjectText = `
-    type ProjectText {
-        title: String
-        description: String
-    }
-`;
-
-module.exports = () => [Project, ProjectText];

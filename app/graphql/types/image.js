@@ -1,4 +1,4 @@
-const Image = `
+module.exports = `
     type Image {
         id: String
         author: User
@@ -30,5 +30,3 @@ const Image = `
         images: [Image]
     }
 `;
-
-module.exports = () => [Image];

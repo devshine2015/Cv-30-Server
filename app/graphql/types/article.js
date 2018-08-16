@@ -1,7 +1,4 @@
-const Image = require('./image');
-const Video = require('./video');
-
-const Article = `
+module.exports = `
     enum PostAs {
         profile
         company
@@ -110,5 +107,3 @@ const Article = `
         ): StandardResponse
     }
 `;
-
-module.exports = () => [Article, Image, Video];

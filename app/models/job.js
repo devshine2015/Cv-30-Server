@@ -55,6 +55,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING(255),
 			field: 'location'
 		},
+		activityFieldId: {
+			allowNull: true,
+			type: DataTypes.INTEGER,
+			field: 'activity_field_id'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -83,6 +88,7 @@ module.exports = (sequelize, DataTypes) => {
 		Job.belongsToMany(models.user, { through: 'job_applicants', as: 'applicants', foreignKey: 'job_id' });
 		Job.belongsToMany(models.jobType, { through: 'job_job_types', as: 'jobTypes', foreignKey: 'job_id' });
 		Job.hasOne(models.jobSalary, { as: 'salary', foreignKey: 'job_id' });
+		Job.belongsTo(models.activityField, { as: "activityField", foreignKey: 'activity_field_id' });
 	};
 	return Job;
 };

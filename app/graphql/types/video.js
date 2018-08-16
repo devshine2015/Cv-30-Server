@@ -1,4 +1,4 @@
-const Video = `
+module.exports = `
     type Video {
         id: String
         author: User
@@ -26,5 +26,3 @@ const Video = `
         path: String
     }
 `;
-
-module.exports = () => [Video];

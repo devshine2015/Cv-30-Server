@@ -1,6 +1,4 @@
-const Scalars = require('./scalars');
-
-const User = `
+module.exports = `
 	type User {
     	id: String!
         email: String!
@@ -77,5 +75,3 @@ const User = `
 		): StandardResponse
 	}
 `;
-
-module.exports = () => [User, Scalars];

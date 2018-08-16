@@ -1,4 +1,4 @@
-const Contact = `
+module.exports = `
     type Contact {
         phone: String
         email: String
@@ -12,5 +12,3 @@ const Contact = `
         linkedin: String
     }
 `;
-
-module.exports = () => [Contact];

@@ -1,15 +1,5 @@
-const Auth = require('./auth');
-const User = require('./user');
-const Response = require('./response');
-const Profile = require('./profile');
-const Error = require('./error');
-const Article = require('./article');
-const Salary = require('./salary');
-const Company = require('./company');
-const Job = require('./job');
-const Team = require('./team');
-const LandingPage = require('./landingPage');
-const ShallowUser = require('./shallowUser');
+const glob = require('glob');
+const path = require('path');
 
 const Query = `
 	type Query {
@@ -27,4 +17,13 @@ const SchemaDefinition = `
  	}
 `;
 
-module.exports = [SchemaDefinition, Query, Company, Job, Team, Article, Salary, Auth, User, Profile, Response, Error, LandingPage, ShallowUser];
+const allTypes = () => {
+	const files = glob.sync(`${__dirname}/!(*.testCases|index).js`);
+	return files.map(file => require(`./${path.basename(file, '.js')}`));
+} 
+
+module.exports = [
+	SchemaDefinition,
+	Query,
+	...allTypes()
+];

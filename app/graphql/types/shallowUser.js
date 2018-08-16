@@ -1,4 +1,4 @@
-const ShallowUser = `
+module.exports = `
 	type ShallowUser {
     	id: String!
         email: String!
@@ -29,5 +29,3 @@ const ShallowUser = `
         ): StandardResponse
 	}
 `;
-
-module.exports = () => [ShallowUser];

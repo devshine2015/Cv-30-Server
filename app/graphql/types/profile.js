@@ -1,13 +1,4 @@
-const Article = require('./article');
-const Skill = require('./skill');
-const Value = require('./value');
-const Experience = require('./experience');
-const Project = require('./project');
-const Contact = require('./contact');
-const Salary = require('./salary');
-const Story = require('./story');
-
-const Profile = `
+module.exports = `
     type Profile {
         id: String
         email: String
@@ -43,6 +34,4 @@ const Profile = `
         project: Project
     }
 `;
-
-module.exports = () => [Profile, Story, Salary, Contact, Skill, Value, Article, Experience, Project];
 
