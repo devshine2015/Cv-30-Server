@@ -252,7 +252,7 @@ const setSkills = async (addSkills, removeSkills, language, { user, models }) =>
 
     let result = false;
     await models.sequelize.transaction(async transaction => {
-        const { createdSkills, existingSkills } = await storeSkills(addSkills, languageId, models, transaction);
+        const { createdSkills, existingSkills } = await storeSkills(addSkills, [], languageId, models, transaction);
 
         // Add new skills to user
         if (createdSkills.length) await user.addSkills(createdSkills, { transaction });

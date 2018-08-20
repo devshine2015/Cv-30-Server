@@ -65,7 +65,23 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             await models.jobSalary.upsert(jobDetails.salary, { transaction: t });
         }
 
-        job = await models.job.findOne({ where: { id: jobDetails.id }, attributes: ['id'], transaction: t });
+        job = await models.job.findOne({ 
+            where: { id: jobDetails.id },
+            include: [{
+                association: 'skills',
+                attributes: ['id'],
+                include: [
+                    {
+                        association: 'i18n',
+                        where: { languageId },
+                        attributes: ['title']
+                    }
+                ]
+            }],
+            attributes: ['id'],
+            transaction: t 
+        });
+
         if (jobDetails.jobTypes && jobDetails.jobTypes.length) {
             const jobTypes = await models.jobType.findAll({
                 where: {
@@ -80,14 +96,17 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
             await job.addJobTypes(jobTypes, { transaction: t });
         }
-        if (jobDetails.skills && jobDetails.skills.length) {
-            const { createdSkills, existingSkills } = await storeSkills(jobDetails.skills, languageId, models, t);
+        // If no skills => leave as before
+        if (jobDetails.skills) {
+            const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
 
             // Add new skills to job
             if (createdSkills.length) await job.addSkills(createdSkills, { transaction: t });
 
             // Add existing values to job
             if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
+
+            await job.removeSkills(associatedSkillsToRemove, { transaction: t});
         }
 
         result = true;
