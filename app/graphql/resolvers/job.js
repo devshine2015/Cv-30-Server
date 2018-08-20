@@ -77,12 +77,15 @@ const handleJob = async (language, jobDetails, { user, models }) => {
                         attributes: ['title']
                     }
                 ]
+            }, {
+                association: 'jobTypes',
+                attributes: ['id'],
             }],
             attributes: ['id'],
             transaction: t 
         });
 
-        if (jobDetails.jobTypes && jobDetails.jobTypes.length) {
+        if (jobDetails.jobTypes) {
             const jobTypes = await models.jobType.findAll({
                 where: {
                     id: {
@@ -94,7 +97,10 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             });
 
             if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
+
+            const jobTypesToRemove = job.jobTypes.filter(item => jobDetails.jobTypes.findIndex(el => el.id === item.id) === -1);
             await job.addJobTypes(jobTypes, { transaction: t });
+            await job.removeJobTypes(jobTypesToRemove, { transaction: t })
         }
         // If no skills => leave as before
         if (jobDetails.skills) {

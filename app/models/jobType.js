@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
 	const JobType = sequelize.define('jobType', {
-        id: {
+		id: {
 			allowNull: false,
 			autoIncrement: true,
 			primaryKey: true,
@@ -17,16 +17,16 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.DATE,
 			field: 'updated_at'
 		}
-    }, {
-        timestamps: true,
-		updatedAt: 'updated_at',
-		createdAt: 'created_at',
-		freezeTableName: true,
-		tableName: 'job_types'
-    });
-    JobType.associate = models => {
-		JobType.hasMany(models.jobTypeText, { as: 'i18n', foreignKey: 'job_type_id' } );
+	}, {
+			timestamps: true,
+			updatedAt: 'updated_at',
+			createdAt: 'created_at',
+			freezeTableName: true,
+			tableName: 'job_types'
+	});
+	JobType.associate = models => {
+		JobType.hasMany(models.jobTypeText, { as: 'i18n', foreignKey: 'job_type_id' });
 		JobType.belongsToMany(models.job, { as: 'jobs', through: 'job_job_types', foreignKey: 'job_type_id' });
-    };
-    return JobType;
+	};
+	return JobType;
 };
