@@ -158,6 +158,8 @@ const handleArticle = async (language, article, options, { user, models }) => {
 
 const storeArticleTags = async (titles, articleId, languageId, isSet, user, models, transaction) => {
     const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
+
+    // Get data before changes
     const foundUser = await models.user.findOne({
         attributes: ['id'],
         where: {
@@ -165,6 +167,24 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
         }
     }, { transaction});
 
+    const articleArticleTags = await models.articleArticleTag.findAll({
+        attributes: ['id', 'tagId'],
+        where: {
+            articleId
+        },
+        include: [
+            { association: 'users', attributes: ['id']},
+            {
+                association: 'tag',
+                attributes: ['id'],
+                include: [
+                    { association: 'i18n', attributes: ['title'], where: { languageId }}
+                ]
+            }
+        ]
+    }, { transaction });
+
+    // Start the changes. Find what's new, first.
     const existingTags = await models.articleTag.findAll({
         include: [
             { 
@@ -231,6 +251,26 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
                 existingArticleArticleTag = existingArticleArticleTag.concat(newMissingArticleArticleTags);
             }
         }
+    }
+
+    // Remove article tags
+    const articleArticleTagsToRemove = articleArticleTags.filter(aat => cleanedInputTags.findIndex(title => title === aat.tag.i18n[0].title) === -1);
+    if (articleArticleTagsToRemove.length) {
+        // Remove the associated users first
+        articleArticleTagsToRemove.forEach(aat => {
+            if (aat.users.length) {
+                aat.removeUsers(aat.users, { transaction })
+            }
+        });
+
+        // Remove the article article tags
+        await models.articleArticleTag.destroy({
+            where: {
+                id: {
+                    [models.Sequelize.Op.in]: articleArticleTagsToRemove.map(k => k.id)
+                }
+            }
+        }, { transaction });
     }
     
     const mergedArticleArticleTags = newArticleArticleTags.concat(existingArticleArticleTag);
