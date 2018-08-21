@@ -18,8 +18,10 @@ module.exports = `
         teams: [Team]
         hasLogo: Boolean
         logoContentType: ImageType
+        logoPath: String
         hasCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
     }
     input CompanyInput {
@@ -33,8 +35,10 @@ module.exports = `
         place: PlaceInput
         hasLogo: Boolean
         logoContentType: ImageType
+        logoPath: String
         hasCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
     }
     input PlaceInput {

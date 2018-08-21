@@ -21,6 +21,11 @@ module.exports = (Sequelize, DataTypes) => {
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'avatar_content_type'
 		},
+		avatarPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'avatar_path'
+		},
 		hasProfileCover: {
 			allowNull: true,
 			defaultValue: false,
@@ -31,6 +36,11 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: true,
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'profile_cover_content_type'
+		},
+		coverPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'cover_path'
 		},
 		coverBackground: {
 			allowNull: true,

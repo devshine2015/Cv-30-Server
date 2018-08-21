@@ -2,9 +2,11 @@ module.exports = `
     type LandingPage {
         hasCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
         hasFooterCover: Boolean
         footerCoverContentType: ImageType
+        footerCoverPath: String
         footerCoverBackground: String
         i18n: [LandingPageText]
         created_at: Date
@@ -17,9 +19,11 @@ module.exports = `
     input LandingPageInput {
         hasCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
         hasFooterCover: Boolean
         footerCoverContentType: ImageType
+        footerCoverPath: String
         footerCoverBackground: String
         headline: String
         footerMessage: String

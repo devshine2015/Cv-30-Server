@@ -8,6 +8,16 @@ module.exports = {
         id: yup.string().trim().nullable().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).notRequired(),
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true })
     }),
+    setAvatar: yup.object().shape({
+        status: yup.boolean(),
+        contentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+        path: yup.string().max(2048).nullable()
+    }),
+    setProfileCover: yup.object().shape({
+        status: yup.boolean(),
+        contentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+        path: yup.string().max(2048).nullable()
+    }),
     salary: yup.object().shape({
         amount: yup.number().positive().required(),
         currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),

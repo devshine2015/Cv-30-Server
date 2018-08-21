@@ -9,6 +9,7 @@ module.exports = `
         jobs: [Job]
         hasProfileCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
     }
     input TeamInput {
@@ -17,6 +18,7 @@ module.exports = `
         name: String
         hasProfileCover: Boolean
         coverContentType: ImageType
+        coverPath: String
         coverBackground: String
     }
 

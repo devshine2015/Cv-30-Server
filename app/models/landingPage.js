@@ -18,6 +18,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'cover_content_type'
 		},
+		coverPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'cover_path'
+		},
 		coverBackground: {
 			allowNull: true,
 			defaultValue: '',
@@ -34,6 +39,11 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true,
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'footer_cover_content_type'
+		},
+		footerCoverPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'footer_cover_path'
 		},
 		footerCoverBackground: {
 			allowNull: true,

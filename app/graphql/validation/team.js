@@ -15,6 +15,7 @@ module.exports = {
             name: yup.string().trim().max(255),
             hasProfileCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+            coverPath: yup.string().max(2048).nullable(),
             coverBackground: yup.string().trim().max(4096).nullable()
         })
     }),

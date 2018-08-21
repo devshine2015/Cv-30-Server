@@ -49,6 +49,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'logo_content_type'
 		},
+		logoPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'logo_path'
+		},
 		hasCover: {
 			allowNull: true,
 			defaultValue: false,
@@ -59,6 +64,11 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true,
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'cover_content_type'
+		},
+		coverPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'cover_path'
 		},
 		coverBackground: {
 			allowNull: true,

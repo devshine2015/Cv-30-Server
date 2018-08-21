@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.ENUM('jpeg', 'png', 'gif'),
 			field: 'cover_content_type'
 		},
+		coverPath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'cover_path'
+		},
 		coverBackground: {
 			allowNull: true,
 			defaultValue: '',

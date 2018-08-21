@@ -34,8 +34,8 @@ module.exports = `
     }
 
     extend type Mutation {
-		avatar ( status: Boolean, contentType: ImageType ): StandardResponse
-		profileCover ( status: Boolean, contentType: ImageType ): StandardResponse
+		avatar ( status: Boolean, contentType: ImageType, path: String ): StandardResponse
+		profileCover ( status: Boolean, contentType: ImageType, path: String ): StandardResponse
 		setCoverBackground ( color: String ): StandardResponse
 		setStory(
 			story: StoryInput

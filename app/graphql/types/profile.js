@@ -13,8 +13,10 @@ module.exports = `
         contact: Contact
         hasAvatar: Boolean
         avatarContentType: ImageType
+        avatarPath: String
         hasProfileCover: Boolean
         profileCoverContentType: ImageType
+        coverPath: String
         coverBackground: String
         currentPosition: CurrentPosition
         position: String

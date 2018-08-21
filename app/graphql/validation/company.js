@@ -36,9 +36,11 @@ module.exports = {
             }),
             hasCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+            coverPath: yup.string().max(2048).nullable(),
             coverBackground: yup.string().trim().max(4096).nullable(),
             hasLogo: yup.boolean(),
-            logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable()
+            logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
+            logoPath: yup.string().max(2048).nullable()
         })
     }),
     faqInput: yup.object().shape({

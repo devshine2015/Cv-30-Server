@@ -50,10 +50,17 @@ const all = async (language, { models }) => {
         }))
 };
 
-const setAvatar = async (status, contentType, { user, models }) => {
+const setAvatar = async (status, contentType, path, { user, models }) => {
     checkUserAuth(user);
+    yupValidation(schema.user.setAvatar, { status, contentType, path });
+
     try {
-        if (await models.profile.upsert({ userId: user.id, hasAvatar: status, avatarContentType: contentType })) {
+        if (await models.profile.upsert({
+            userId: user.id,
+            hasAvatar: status,
+            avatarContentType: contentType,
+            avatarPath: path
+        })) {
             return { status: true };
         }
     } catch (err) {
@@ -65,10 +72,17 @@ const setAvatar = async (status, contentType, { user, models }) => {
     }
 }
 
-const setHasProfileCover = async (status, contentType, { user, models }) => {
+const setProfileCover = async (status, contentType, path, { user, models }) => {
     checkUserAuth(user);
+    yupValidation(schema.user.setProfileCover, { status, contentType, path });
+
     try {
-        await models.profile.upsert({ userId: user.id, hasProfileCover: status, profileCoverContentType: contentType });
+        await models.profile.upsert({ 
+            userId: user.id,
+            hasProfileCover: status,
+            profileCoverContentType: contentType,
+            coverPath: path
+        });
         return { status: true };
     } catch (error) {
         console.log(error);
@@ -618,8 +632,8 @@ module.exports = {
         // userProjects: (_, __, context) => userResolvers.userProjects(context)
     },
     Mutation: {
-        avatar: (_, { status, contentType }, context) => setAvatar(status, contentType, context),
-        profileCover: (_, { status, contentType }, context) => setHasProfileCover(status, contentType, context),
+        avatar: (_, { status, contentType, path }, context) => setAvatar(status, contentType, path, context),
+        profileCover: (_, { status, contentType, path }, context) => setProfileCover(status, contentType, path, context),
         setCoverBackground: (_, { color }, context) => setCoverBackground(color, context),
         setSalary: (_, { salary }, context) => setSalary(salary, context),
         setStory: (_, { language, story }, context) => setStory(language, story, context),
