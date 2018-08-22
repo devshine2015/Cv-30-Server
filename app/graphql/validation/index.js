@@ -7,4 +7,5 @@ module.exports = {
     team: require('./team'),
     landingPage: require('./landingPage'),
     shallowUser: require('./shallowUser'),
+    newsFeed: require('./newsFeed'),
 };

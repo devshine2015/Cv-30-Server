@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
-	var Image = Sequelize.define('image', {
+	const Image = Sequelize.define('image', {
     	id: {
 			type: DataTypes.UUID,
 			allowNull: false,
@@ -82,6 +82,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Image.belongsTo(models.article, { as: 'article', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
+		Image.belongsTo(models.ad, {as: 'ad', foreignKey: 'source_id' });
 		Image.hasMany(models.imageText, { as: 'i18n', foreignKey: 'image_id' });
   	};
 	return Image;
