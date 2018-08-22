@@ -46,6 +46,8 @@ module.exports = `
         ): Article
         newsFeedArticles(
             language: LanguageCodeType!
+            peopleOrCompany: String
+            tags: [String]
         ): NewsFeedArticles
         feedArticles(
             language: LanguageCodeType!

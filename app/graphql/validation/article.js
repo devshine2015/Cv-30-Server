@@ -4,6 +4,11 @@ module.exports = {
     all: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true })
     }),
+    newsFeedArticles: yup.object().shape({
+        language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
+        peopleOrCompany: yup.string().trim().max(1024),
+        tags: yup.array().of(yup.string().trim().max(255).required())
+    }),
     feed: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         userId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),

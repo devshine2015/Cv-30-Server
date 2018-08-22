@@ -1,5 +1,4 @@
 const uuid = require('uuidv4');
-const { merge } = require('lodash');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle } = require('./common');
 
@@ -325,10 +324,15 @@ const all = async (language, { models }) => {
     }).then(mapArticles);
 }
 
-const newsFeedArticles = async (language, { user, models }) => {
-    yupValidation(schema.article.all, { language });
+const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models }) => {
+    yupValidation(schema.article.newsFeedArticles, {
+        language,
+        peopleOrCompany,
+        tags
+    });
 
     const languageId = await getLanguageIdByCode(models, language);
+    const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
 
     if (user) {
         const userFollowees = await models.user.find({
@@ -343,55 +347,131 @@ const newsFeedArticles = async (language, { user, models }) => {
             ]
         }).then(u => u ? u.get().followees.map(i => i.id) : []);
     
-        const followingArticles = await models.article.findAll(merge(
+        // Following articles
+        let where = {
+            [models.Sequelize.Op.and]: [{
+                [models.Sequelize.Op.or]: [
+                    { ownerId: { [models.Sequelize.Op.eq]: user.id } },
+                    { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                ]
+            }]
+        };
+        let include = [
             {
-                where: {
-                    [models.Sequelize.Op.or]: [
-                        { ownerId: { [models.Sequelize.Op.eq]: user.id } },
-                        { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
-                    ]
-                },
-                ...includeForFind(languageId)
-            },
-            {
+                association: 'author',
+                attributes: ['id'],
                 include: [
-                    {
-                        association: 'author',
-                        include: [
-                            { 
-                                association: 'followers',
-                                attributes: ['id']
-                            },
-                            { association: 'profile' }
-                        ],
-                        required: false
+                    { 
+                        association: 'followers',
+                        attributes: ['id']
                     }
                 ],
-                order: [ [ 'createdAt', 'desc' ] ]
+                required: false
             }
-        )).then(mapArticles);
+        ];
+        if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
+        if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
+
+        const followingArticlesIds = await models.article.findAll({
+            where,
+            attributes: ['id'],
+            include
+        });
+
+        const followingArticles = getArticlesByIds(followingArticlesIds, languageId, models);
     
-        const notFollowingArticles = await models.article.findAll({
-            where: {
-                ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
-            },
-            ...includeForFind(languageId),
-            order: [ [ 'createdAt', 'desc' ] ]
-        }).then(mapArticles);
+        // Not following articles - search first for ids
+        where = {
+            ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
+        };
+        include = [];
+        if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
+        if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
+
+        const notFollowingArticlesIds = await models.article.findAll({
+            where,
+            attributes: ['id'],
+            include
+        });
+
+        const notFollowingArticles = getArticlesByIds(notFollowingArticlesIds, languageId, models);
         
         return {
             following: followingArticles,
             others: notFollowingArticles
         }
     } else {
+        const where = {};
+        const include = [];
+        if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
+        if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
+
+        const followingArticlesIds = await models.article.findAll({
+            where,
+            attributes: ['id'],
+            include
+        });
+
         return {
-            following: models.article.findAll({
-                where: {},
-                ...includeForFind(languageId),
-                order: [ [ 'createdAt', 'desc' ] ]
-            }).then(mapArticles)
+            following: getArticlesByIds(followingArticlesIds, languageId, models)
         }
     }
+}
+
+const addPeopleOrCompanyToQueryParams = (where, include, peopleOrCompany, models) => {
+    where[models.Sequelize.Op.or] = [
+        { '$author.first_name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` } },
+        { '$author.last_name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` } },
+        { '$postingCompany.name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` }}
+    ];
+    const authorAss = include.find(ass => ass.association === 'author');
+    if (authorAss) {
+        authorAss.attributes = [...authorAss.attributes, 'lastName', 'firstName'];
+    } else {
+        include.push({
+            association: 'author',
+            attributes: [ 'id', 'lastName', 'firstName'],
+            required: false
+        });
+    }
+
+    include.push({
+        association: 'postingCompany',
+        attributes: ['id', 'name'],
+        required: false
+    });
+}
+
+const addTagsToQueryParams = (where, include, filteredTags, languageId, models) => {
+    where['$tags.tag.i18n.title$'] = { [models.Sequelize.Op.in]: filteredTags };
+    include.push({
+        association: 'tags',
+        attributes: ['id'],
+        include: [
+            {
+                association: 'tag',
+                attributes: ['id'],
+                include: [
+                    { association: 'i18n', where: { languageId }, attributes: ['title'] }
+                ]
+            },
+        ]
+    });
+}
+
+const getArticlesByIds = async (articleIds, languageId, models) => {
+    let articles = [];
+    if (articleIds.length) {
+        articles = await models.article.findAll({
+            where: {
+                id: { [models.Sequelize.Op.in]: articleIds.map(it => it.id) }
+            },
+            ...includeForFind(languageId),
+            order: [ [ 'createdAt', 'desc' ] ]
+        }).then(mapArticles);
+    }
+
+    return articles;
 }
 
 const feedArticles = async (language, userId, companyId, teamId, { models }) => {
@@ -485,7 +565,7 @@ module.exports = {
     Query: {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
-        newsFeedArticles: (_, { language }, context) => newsFeedArticles(language, context),
+        newsFeedArticles: (_, { language, peopleOrCompany, tags }, context) => newsFeedArticles(language, peopleOrCompany, tags, context),
         feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
