@@ -558,68 +558,94 @@ const setPosition = async (position, { user, models }) => {
 }
 
 const createProfileResponse = async (user, models, languageId) => {
-    const newUser = await models.user.findOne({
+    const userQuery = models.user.findOne({ where: { id: user.id }});
+
+    const userProfile = models.profile.findOne({
+        where: {
+            userId: user.id
+        },
+        include: [
+            { association: 'salary' }
+        ]
+    });
+
+    const promises = [userQuery, userProfile];
+    promises.push.apply(includeForFind(languageId).map(item => models.user.findOne({
         where: {
             id: user.id
         },
         include: [
-            { association: 'skills', include: [{ association: 'i18n' }] },
-            { association: 'values', include: [{ association: 'i18n' }] },
-            {
-                association: 'ownedCompanies',
-                ...companyAssociationForUserProfile(languageId)
-            },
-            { association: 'profile', include: [{ association: 'salary' }] },
-            { association: 'articles' },
-            { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
-            { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
-            { association: 'story', include: [{ association: 'i18n' }] },
-            { association: 'contact' },
-            {
-                association: 'featuredArticles', include: [
-                    { association: 'author' },
-                    { association: 'i18n', where: { languageId } },
-                    { association: 'images' },
-                    { association: 'videos' },
-                    { association: 'featuredImage' }
-                ]
-            },
-            {
-                association: 'aboutMeArticles', include: [
-                    { association: 'author' },
-                    { association: 'i18n', where: { languageId } },
-                    { association: 'images' },
-                    { association: 'videos' },
-                    { association: 'featuredImage' }
-                ]
-            },
-            { association: 'followers' },
-            { association: 'followees' },
-            {
-                association: 'followingCompanies',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
-            }, {
-                association: 'followingJobs',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
-            }, {
-                association: 'followingTeams'
-            }, {
-                association: 'appliedJobs',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
-            }
-        ]
+            item
+        ],
+        attributes: ['id']
+    })));
+
+    const newUserResults = await Promise.all(promises);
+
+    let final = {};
+    newUserResults.forEach(item => final = {
+        ...final,
+        ...item.get(),
     });
-    return {
-        ...newUser.get(),
-        ...(newUser.profile ? newUser.profile.get() : {}),
-    };
+
+    return final;
 }
+
+const includeForFind = (languageId) => [
+    { association: 'skills', include: [{ association: 'i18n' }] },
+    { association: 'values', include: [{ association: 'i18n' }] },
+    {
+        association: 'ownedCompanies',
+        ...companyAssociationForUserProfile(languageId)
+    },
+    //{ association: 'profile', include: [{ association: 'salary' }] },
+    { association: 'articles' },
+    { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
+    { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
+    { association: 'story', include: [{ association: 'i18n' }] },
+    { association: 'contact' },
+    {
+        association: 'featuredArticles', include: [
+            { association: 'author' },
+            { association: 'i18n', where: { languageId } },
+            { association: 'images' },
+            { association: 'videos' },
+            { association: 'featuredImage' }
+        ]
+    },
+    {
+        association: 'aboutMeArticles', include: [
+            { association: 'author' },
+            { association: 'i18n', where: { languageId } },
+            { association: 'images' },
+            { association: 'videos' },
+            { association: 'featuredImage' }
+        ]
+    },
+    { association: 'followers' },
+    { association: 'followees' },
+    {
+        association: 'followingCompanies',
+        include: [
+            { association: 'i18n', where: { languageId } }
+        ]
+    }, 
+    {
+        association: 'followingJobs',
+        include: [
+            { association: 'i18n', where: { languageId } }
+        ]
+    },
+    {
+        association: 'followingTeams'
+    },
+    {
+        association: 'appliedJobs',
+        include: [
+            { association: 'i18n', where: { languageId } }
+        ]
+    }
+];
 
 module.exports = {
     Query: {
