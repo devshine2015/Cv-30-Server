@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING(255),
 			field: 'activity_field'
 		},
+		industryId: {
+			allowNull: true,
+			type: DataTypes.INTEGER,
+			field: 'industry_id'
+		},
 		noOfEmployees: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
@@ -104,6 +109,7 @@ module.exports = (sequelize, DataTypes) => {
 		Company.hasMany(models.faq, { as: 'faqs', foreignKey: 'company_id' });
 		Company.hasMany(models.team, { as: 'teams', foreignKey: 'company_id' });
 		Company.belongsToMany(models.user, { through: 'company_followers', as: 'followers', foreignKey: 'company_id' });
+		Company.belongsTo(models.industry, { as: 'industry', foreignKey: 'industry_id' });
 	};
 	return Company;
 };

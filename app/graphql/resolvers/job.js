@@ -33,28 +33,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
     let result = false;
     await models.sequelize.transaction(async t => {
-        let activityFieldText = await models.activityFieldText.findOne({
-            where: {
-                title: jobDetails.activityField,
-            },
-            attributes: [ 'activityFieldId' ],
-            transaction: t
-        });
-        if (!activityFieldText) {
-            const activityField = await models.activityField.create({
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, { transaction: t });
-            activityFieldText = await models.activityFieldText.create({
-                activityFieldId: activityField.id,
-                languageId,
-                title: jobDetails.activityField,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, { transaction: t });
-        }
-
-        jobDetails.activityFieldId = activityFieldText.activityFieldId;
+        jobDetails.activityFieldId = await storeActivityField(jobDetails.activityField, languageId, models, t);
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
         jobDetails.jobId = jobDetails.id;
@@ -119,6 +98,32 @@ const handleJob = async (language, jobDetails, { user, models }) => {
     });
 
     return { status: result };
+}
+
+const storeActivityField = async (title, languageId, models, transaction) => {
+    let activityFieldText = await models.activityFieldText.findOne({
+        where: {
+            title,
+            languageId
+        },
+        attributes: [ 'activityFieldId' ],
+        transaction
+    });
+    if (!activityFieldText) {
+        const activityField = await models.activityField.create({
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }, { transaction });
+        activityFieldText = await models.activityFieldText.create({
+            activityFieldId: activityField.id,
+            languageId,
+            title,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }, { transaction });
+    }
+
+    return activityFieldText.activityFieldId;
 }
 
 const job = async (id, language, { models }) => {

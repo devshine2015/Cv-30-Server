@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-	const ActivityField = sequelize.define('activityField', {
+	const Industry = sequelize.define('industry', {
 		id: {
 			allowNull: false,
 			autoIncrement: true,
@@ -22,11 +22,11 @@ module.exports = (sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		freezeTableName: true,
-		tableName: 'activity_fields'
+		tableName: 'industries'
 	});
-	ActivityField.associate = models => {
-		ActivityField.hasMany(models.activityFieldText, { as: 'i18n', foreignKey: 'activity_field_id' });
-		ActivityField.hasMany(models.job, { as: 'jobs', foreignKey: 'activity_field_id' });
+	Industry.associate = models => {
+		Industry.hasMany(models.industryText, { as: 'i18n', foreignKey: 'industry_id' });
+		Industry.hasMany(models.company, { as: 'jobs', foreignKey: 'industry_id' });
 	};
-	return ActivityField;
+	return Industry;
 };

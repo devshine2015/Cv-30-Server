@@ -11,20 +11,48 @@ const handleCompany = async (language, details, { user, models }) => {
         const companyOk = await validateCompany(details.id, user, models);
         if (companyOk !== true) return companyOk;
     }
-    await models.sequelize.transaction(async t => {
+    const languageId = await getLanguageIdByCode(models, language);
+
+    await models.sequelize.transaction(async transaction => {
+        if (details.industry) {
+            details.industryId = await storeIndustry(details.industry, languageId, models, transaction);
+        }
         details.id = details.id || uuid();
         details.user_id = user.id;
-        await models.company.upsert(details, { transaction: t });
+        await models.company.upsert(details, { transaction });
         details.companyId = details.id;
-        details.languageId = await getLanguageIdByCode(models, language);
-        await models.companyText.upsert(details, { transaction: t });
-        if (details.place) {
-            details.place.companyId = details.id;
-            await models.place.upsert(details.place, { transaction: t });
-        }
+        details.languageId = languageId;
+        await models.companyText.upsert(details, { transaction });
     });
 
     return { status: true };
+}
+
+const storeIndustry = async (title, languageId, models, transaction) => {
+    let industryText = await models.industryText.findOne({
+        where: {
+            title,
+            languageId: languageId
+        },
+        attributes: [ 'industryId' ],
+        transaction
+    });
+
+    if (!industryText) {
+        const industry = await models.industry.create({
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }, { transaction });
+        industryText = await models.industryText.create({
+            industryId: industry.id,
+            languageId,
+            title,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }, { transaction });
+    }
+
+    return industryText.industryId;
 }
 
 const company = async (id, language, { models }) => {
@@ -43,8 +71,6 @@ const all = async (language, { models }) => {
         ...includeForFind(await getLanguageIdByCode(models, language))
     })
 };
-
-
 
 const handleFAQ = async (language, details, { user, models }) => {
     checkUserAuth(user);

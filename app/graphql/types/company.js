@@ -9,6 +9,7 @@ module.exports = `
         featuredArticles: [Article]
         officeArticles: [Article]
         storiesArticles: [Article]
+        industry: Industry
         activityField: String
         noOfEmployees: String
         location: String
@@ -29,10 +30,10 @@ module.exports = `
         name: String
         headline: String
         description: String
+        industry: String
         activityField: String
         noOfEmployees: String
         location: String
-        place: PlaceInput
         hasLogo: Boolean
         logoContentType: ImageType
         logoPath: String
@@ -40,22 +41,6 @@ module.exports = `
         coverContentType: ImageType
         coverPath: String
         coverBackground: String
-    }
-    input PlaceInput {
-        addressComponents: String
-        formattedAddress: String
-        latitude: Float
-        longitude: Float
-        internationalPhoneNumber: String
-        name: String
-        placeId: String
-        compoundCode: String
-        globalCode: String
-        rating: Float
-        reviews: String
-        types: String
-        googleUrl: String
-        website: String
     }
     type CompanyText {
         headline: String

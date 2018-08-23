@@ -18,29 +18,14 @@ module.exports = {
             activityField: yup.string().trim().max(255),
             noOfEmployees: yup.string().trim().max(255),
             location: yup.string().trim().max(255),
-            place: yup.object().shape({
-                addressComponents: yup.string().trim().nullable(),
-                formattedAddress: yup.string().trim().nullable(),
-                latitude: yup.number().nullable(),
-                longitude: yup.number().nullable(),
-                international_phone_number: yup.string().trim().nullable(),
-                name: yup.string().trim().nullable(),
-                placeId: yup.string().trim().nullable(),
-                compoundCode: yup.string().trim().nullable(),
-                globalCode: yup.string().trim().nullable(),
-                rating: yup.number().nullable().min(0).max(5),
-                reviews: yup.string().trim().nullable(),
-                types: yup.string().trim().nullable(),
-                googleUrl: yup.string().trim().nullable(),
-                website: yup.string().trim().nullable()
-            }),
             hasCover: yup.boolean(),
             coverContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
             coverPath: yup.string().max(2048).nullable(),
             coverBackground: yup.string().trim().max(4096).nullable(),
             hasLogo: yup.boolean(),
             logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
-            logoPath: yup.string().max(2048).nullable()
+            logoPath: yup.string().max(2048).nullable(),
+            industry: yup.string().trim().min(2).max(255),
         })
     }),
     faqInput: yup.object().shape({

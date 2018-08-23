@@ -1,4 +1,5 @@
 'use strict';
+// TODO: obsolete? Delete? Was used with gmaps
 module.exports = (sequelize, DataTypes) => {
 	var place = sequelize.define('place', {
 		companyId: {
