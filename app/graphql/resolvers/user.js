@@ -570,7 +570,7 @@ const createProfileResponse = async (user, models, languageId) => {
     });
 
     const promises = [userQuery, userProfile];
-    promises.push.apply(includeForFind(languageId).map(item => models.user.findOne({
+    promises.push.apply(promises, includeForFind(languageId).map(item => models.user.findOne({
         where: {
             id: user.id
         },
