@@ -582,13 +582,10 @@ const createProfileResponse = async (user, models, languageId) => {
 
     const newUserResults = await Promise.all(promises);
 
-    let final = {};
-    newUserResults.forEach(item => final = {
-        ...final,
-        ...item.get(),
-    });
-
-    return final;
+    return newUserResults.reduce((acc, item) => ({
+        ...acc,
+        ...item.get()
+    }), {});
 }
 
 const includeForFind = (languageId) => [
