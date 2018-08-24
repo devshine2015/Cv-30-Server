@@ -79,7 +79,7 @@ module.exports = `
 		company(
 			id: String!
 			language: LanguageCodeType!
-		): Company
+        ): Company
     }
 
     extend type Mutation {

@@ -72,6 +72,17 @@ const all = async (language, { models }) => {
     })
 };
 
+const industries = async (language, { models }) => {
+    yupValidation(schema.company.all, { language });
+
+    const languageId = await getLanguageIdByCode(models, language);
+    return models.industry.findAll({
+        include: [
+            { association: 'i18n', where: { languageId } }
+        ]
+    })
+}
+
 const handleFAQ = async (language, details, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.company.faqInput, { language, details });
@@ -179,7 +190,8 @@ const removeTag = async (id, companyId, { user, models }) => {
 module.exports = {
     Query: {
         companies: (_, { language }, context) => all(language, context),
-        company: (_, { id, language }, context) => company(id, language, context)
+        company: (_, { id, language }, context) => company(id, language, context),
+        industries: (_, { language }, context) => industries(language, context)
     },
     Mutation: {
         handleCompany: (_, { language, details }, context) => handleCompany(language, details, context),
