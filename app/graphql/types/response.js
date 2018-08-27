@@ -8,6 +8,7 @@ module.exports = `
         lastName: String
         hasAvatar: Boolean
         avatarContentType: ImageType
+        avatarPath: String
         error: String
         god: Boolean
     }
