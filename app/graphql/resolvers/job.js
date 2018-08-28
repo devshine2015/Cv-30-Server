@@ -166,15 +166,17 @@ const includeForFind = (languageId) => {
                 include: [
                     {
                         association: 'i18n', where: { languageId }
-                    }, {
-                        association: 'officeArticles',
-                        include: [
-                            { association: 'featuredImage', include: [{ association: 'i18n', where: { languageId } }] },
-                            { association: 'i18n', where: { languageId } },
-                            { association: 'images', include: [{ association: 'i18n', where: { languageId } }] },
-                            { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
-                        ]
-                    }, {
+                    }, 
+                    // {
+                    //     association: 'officeArticles',
+                    //     include: [
+                    //         { association: 'featuredImage', include: [{ association: 'i18n', where: { languageId } }] },
+                    //         { association: 'i18n', where: { languageId } },
+                    //         { association: 'images', include: [{ association: 'i18n', where: { languageId } }] },
+                    //         { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
+                    //     ]
+                    // },
+                    {
                         association: 'faqs',
                         include: [
                             { association: 'i18n', where: { languageId } }
@@ -184,16 +186,16 @@ const includeForFind = (languageId) => {
                 ]
             }, {
                 association: 'applicants',
-                include: [
-                    { association: 'skills', include: [{ association: 'i18n', where: { languageId } }] },
-                    { association: 'values', include: [{ association: 'i18n', where: { languageId } }] },
-                    { association: 'profile', include: [{ association: 'salary' }] },
-                    { association: 'articles' },
-                    { association: 'experience', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
-                    { association: 'projects', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
-                    { association: 'story', include: [{ association: 'i18n', where: { languageId } }] },
-                    { association: 'contact' }
-                ]
+                // include: [
+                //     { association: 'skills', include: [{ association: 'i18n', where: { languageId } }] },
+                //     { association: 'values', include: [{ association: 'i18n', where: { languageId } }] },
+                //     { association: 'profile', include: [{ association: 'salary' }] },
+                //     { association: 'articles' },
+                //     { association: 'experience', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
+                //     { association: 'projects', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
+                //     { association: 'story', include: [{ association: 'i18n', where: { languageId } }] },
+                //     { association: 'contact' }
+                // ]
             }, {
                 association: 'jobTypes',
                 include: [
