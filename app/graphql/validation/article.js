@@ -33,7 +33,7 @@ module.exports = {
             id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             isFeatured: yup.boolean(),
             isPost: yup.boolean(),
-            postAs: yup.string().matches(/(profile|company|team)/, { excludeEmptyString: true }),
+            postAs: yup.string().matches(/(profile|company|team|landingPage)/, { excludeEmptyString: true }),
             postingCompanyId: yup.string().when('postAs', {
                 is: (postAs) => postAs === "company",
                 then: yup.string()

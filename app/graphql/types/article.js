@@ -3,6 +3,7 @@ module.exports = `
         profile
         company
         team
+        landingPage
     }
     type Article {
         id: String!

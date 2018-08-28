@@ -11,6 +11,7 @@ module.exports = `
         i18n: [LandingPageText]
         created_at: Date
         updated_at: Date
+        articles: [Article]
     }
     type LandingPageText {
         headline: String

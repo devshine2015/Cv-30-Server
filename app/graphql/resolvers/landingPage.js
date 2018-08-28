@@ -31,10 +31,26 @@ const handleLandingPage = async (language, details, { user, models }) => {
 const landingPage = async (language, { models }) => {
     yupValidation(schema.landingPage.one, { language });
 
-    return models.landingPage.findOne({
+    const landingPage = await models.landingPage.findOne({
         where: { id: 1 },
         ...includeForFind(await getLanguageIdByCode(models, language))
     });
+
+    const articles = await models.article.findAll({
+        where: {
+            postAs: 'landingPage'
+        },
+        include: [
+            { association: 'i18n' },
+            { association: 'images' },
+            { association: 'videos' },
+            { association: 'featuredImage' }
+        ]
+    });
+    return {
+        ...landingPage,
+        articles
+    };
 }
 
 const includeForFind = (languageId) => {

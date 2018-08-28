@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle, throwForbiddenError } = require('./common');
 
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
@@ -25,6 +25,8 @@ const handleArticle = async (language, article, options, { user, models }) => {
             const postingTeamOk = await validateTeam(article.postingTeamId, user, models);
             if (postingTeamOk !== true) return postingTeamOk;
         }
+
+        if (article.postAs === 'landingPage' && (!user.god || options)) throwForbiddenError();
     }
 
     if (options) {
