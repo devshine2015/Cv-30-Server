@@ -352,29 +352,24 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
     const languageId = await getLanguageIdByCode(models, language);
     const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
 
-    if (user) {
-        const userFollowees = await models.user.find({
-            where: {
-                id: user.id
-            },
-            include: [
-                {
-                    association: 'followees',
-                    attributes: ['id']
-                }
-            ]
-        }).then(u => u ? u.get().followees.map(i => i.id) : []);
-    
+    if (user && (!peopleOrCompany && !(tags && tags.length))) {   
         // Following articles
-        let where = {
+        const where = {
             [models.Sequelize.Op.and]: [{
                 [models.Sequelize.Op.or]: [
-                    { ownerId: { [models.Sequelize.Op.eq]: user.id } },
-                    { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                    { postAs: {[models.Sequelize.Op.in]: ['company', 'team'] } },
+                    { [models.Sequelize.Op.and]: [
+                        { postAs: 'profile'},
+                        { [models.Sequelize.Op.or]: [
+                            { ownerId: { [models.Sequelize.Op.eq]: user.id } },
+                            { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                        ]}   
+                    ]}
                 ]
             }]
         };
-        let include = [
+        
+        const include = [
             {
                 association: 'author',
                 attributes: ['id'],
@@ -387,8 +382,6 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
                 required: false
             }
         ];
-        if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
-        if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
 
         const followingArticlesIds = await models.article.findAll({
             where,
@@ -396,30 +389,9 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
             include
         });
 
-        const followingArticles = getArticlesByIds(followingArticlesIds, languageId, models);
-    
-        // Not following articles - search first for ids
-        where = {
-            ownerId: { [models.Sequelize.Op.notIn]: [...userFollowees, user.id] },
-        };
-        include = [];
-        if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
-        if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
-
-        const notFollowingArticlesIds = await models.article.findAll({
-            where,
-            attributes: ['id'],
-            include
-        });
-
-        const notFollowingArticles = getArticlesByIds(notFollowingArticlesIds, languageId, models);
-        
-        return {
-            following: followingArticles,
-            others: notFollowingArticles
-        }
+        return getArticlesByIds(followingArticlesIds, languageId, models);
     } else {
-        const where = {};
+        const where = { postAs: { [models.Sequelize.Op.ne]: 'landingPage' } };
         const include = [];
         if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
         if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
@@ -430,9 +402,7 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
             include
         });
 
-        return {
-            following: getArticlesByIds(followingArticlesIds, languageId, models)
-        }
+        return getArticlesByIds(followingArticlesIds, languageId, models);
     }
 }
 

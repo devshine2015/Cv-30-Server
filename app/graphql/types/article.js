@@ -32,10 +32,6 @@ module.exports = `
     type ArticleTagText {
         title: String
     }
-    type NewsFeedArticles {
-        following: [Article]
-        others: [Article]
-    }
 
     extend type Query {
         articles(
@@ -49,7 +45,7 @@ module.exports = `
             language: LanguageCodeType!
             peopleOrCompany: String
             tags: [String]
-        ): NewsFeedArticles
+        ): [Article]
         feedArticles(
             language: LanguageCodeType!
             userId: String
