@@ -11,6 +11,7 @@ module.exports = `
         coverContentType: ImageType
         coverPath: String
         coverBackground: String
+        location: String
     }
     input TeamInput {
         id: String
@@ -20,6 +21,7 @@ module.exports = `
         coverContentType: ImageType
         coverPath: String
         coverBackground: String
+        location: String
     }
 
     extend type Query {
