@@ -157,6 +157,22 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: result };
 }
 
+const removeArticle = async(id, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.removeArticle, {
+        id
+    });
+
+    const articleOk = await validateArticle(id, user, models);
+    if (articleOk !== true) return articleOk;
+
+    if (await models.article.destroy({ where: { id } })) {
+        return { status: true };
+    }
+
+    return { status: false };
+}
+
 const storeArticleTags = async (titles, articleId, languageId, isSet, user, models, transaction) => {
     const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
 
@@ -573,6 +589,7 @@ module.exports = {
     Mutation: {
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
         handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
+        removeArticle: (_, { id }, context) => removeArticle(id, context)
     }
 };
 

@@ -104,9 +104,8 @@ module.exports = `
 			language: LanguageCodeType!
 			details: ArticleTagsInput!
         ): StandardResponse
-        endorseArticle (
-            articleId: String!
-            isEndorsing: Boolean
+        removeArticle (
+            id: String!
         ): StandardResponse
     }
 `;
