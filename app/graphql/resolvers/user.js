@@ -50,6 +50,24 @@ const all = async (language, { models }) => {
         }))
 };
 
+const deleteProfile = async ({ user, models }) => {
+    checkUserAuth(user);
+
+    const foundUser = await models.user.findOne({
+        where: { id: user.id },
+        attributes: ['id', 'status']
+    });
+
+    if (!foundUser) return { status: false, error: 'User not found'}
+    foundUser.status = 'deleted';
+    const result = await foundUser.save();
+    if (result !== foundUser) {
+        throw new Error(JSON.stringify(result.errors));
+    }
+
+    return { status: true };
+}
+
 const setAvatar = async (status, contentType, path, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.setAvatar, { status, contentType, path });
@@ -674,5 +692,6 @@ module.exports = {
         handleFollow: (_, { details }, context) => handleFollow(details, context),
 
         setPosition: (_, { position }, context) => setPosition(position, context),
+        deleteProfile: (_, { }, context) => deleteProfile(context)
     }
 };

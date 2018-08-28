@@ -71,5 +71,6 @@ module.exports = `
 		setPosition(
 			position: String
 		): StandardResponse
+		deleteProfile: StandardResponse
 	}
 `;
