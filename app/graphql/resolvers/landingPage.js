@@ -48,7 +48,7 @@ const landingPage = async (language, { models }) => {
         ]
     });
     return {
-        ...landingPage,
+        ...landingPage.get(),
         articles
     };
 }
