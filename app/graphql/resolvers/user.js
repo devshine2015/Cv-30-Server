@@ -576,89 +576,135 @@ const setPosition = async (position, { user, models }) => {
 }
 
 const createProfileResponse = async (user, models, languageId) => {
-    const userQuery = models.user.findOne({ where: { id: user.id }});
-
-    const userProfile = models.profile.findOne({
-        where: {
-            userId: user.id
-        },
-        include: [
-            { association: 'salary' }
-        ]
+    const promises = profileSubQueriesParams(languageId).map(item => {
+        let query = models.user.findOne({
+            where: {
+                id: user.id
+            },
+            include: [
+                item.include
+            ],
+            attributes: item.allAttributes ? undefined : ['id']
+        });
+        if (item.then) {
+            query = query.then(item.then);
+        } else {
+            query = query.then(user => (user.get({plain: true})));
+        }
+        return query;
     });
-
-    const promises = [userQuery, userProfile];
-    promises.push.apply(promises, includeForFind(languageId).map(item => models.user.findOne({
-        where: {
-            id: user.id
-        },
-        include: [
-            item
-        ],
-        attributes: ['id']
-    })));
 
     const newUserResults = await Promise.all(promises);
 
     return newUserResults.reduce((acc, item) => ({
         ...acc,
-        ...item.get()
+        ...item
     }), {});
 }
 
-const includeForFind = (languageId) => [
-    { association: 'skills', include: [{ association: 'i18n' }] },
-    { association: 'values', include: [{ association: 'i18n' }] },
+const profileSubQueriesParams = (languageId) => [
     {
-        association: 'ownedCompanies',
-        ...companyAssociationForUserProfile(languageId)
-    },
-    //{ association: 'profile', include: [{ association: 'salary' }] },
-    { association: 'articles' },
-    { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
-    { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] },
-    { association: 'story', include: [{ association: 'i18n' }] },
-    { association: 'contact' },
-    {
-        association: 'featuredArticles', include: [
-            { association: 'author' },
-            { association: 'i18n', where: { languageId } },
-            { association: 'images' },
-            { association: 'videos' },
-            { association: 'featuredImage' }
-        ]
+        include: { association: 'profile', include: [{ association: 'salary' }]},
+        then: user => ({
+            ...user.get({ plain: true }),
+            ...user.profile ? user.profile.get({plain: true}) : {}
+        }),
+        allAttributes: true
     },
     {
-        association: 'aboutMeArticles', include: [
-            { association: 'author' },
-            { association: 'i18n', where: { languageId } },
-            { association: 'images' },
-            { association: 'videos' },
-            { association: 'featuredImage' }
-        ]
-    },
-    { association: 'followers' },
-    { association: 'followees' },
-    {
-        association: 'followingCompanies',
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
-    }, 
-    {
-        association: 'followingJobs',
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        include: { association: 'skills', include: [{ association: 'i18n' }] }
     },
     {
-        association: 'followingTeams'
+        include: { association: 'values', include: [{ association: 'i18n' }] }
     },
     {
-        association: 'appliedJobs',
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        include: {
+            association: 'ownedCompanies',
+            ...companyAssociationForUserProfile(languageId)
+        }
+    },
+    {
+        include: { association: 'articles' }
+    },
+    {
+        include: { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] }
+    },
+    {
+        include: { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] }
+    },
+    {
+        include: { association: 'story', include: [{ association: 'i18n' }] }
+    },
+    {
+        include: { association: 'contact' }
+    },
+    {
+        include: {
+            association: 'featuredArticles', include: [
+                { association: 'author' },
+                { association: 'i18n', where: { languageId } },
+                { association: 'images' },
+                { association: 'videos' },
+                { association: 'featuredImage' }
+            ]
+        }
+    },
+    {
+        include: {
+            association: 'aboutMeArticles', include: [
+                { association: 'author' },
+                { association: 'i18n', where: { languageId } },
+                { association: 'images' },
+                { association: 'videos' },
+                { association: 'featuredImage' }
+            ]
+        }
+    },
+    {
+        include: { association: 'followers' }
+    },
+    {
+        include: { 
+            association: 'followees',
+            include: [
+                { association: 'profile' }
+            ]
+        },
+        then: (profile) => ({
+            followees: profile.followees.map(item => ({
+                ...item.get(),
+                ...item.profile ? item.profile.get() : {}
+            }))
+        })
+    },
+    {
+        include: {
+            association: 'followingCompanies',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
+    },
+    {
+        include: {
+            association: 'followingJobs',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
+    },
+    {
+        include: {
+            association: 'followingTeams'
+        }
+    },
+    {
+        include: {
+            association: 'appliedJobs',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
     }
 ];
 

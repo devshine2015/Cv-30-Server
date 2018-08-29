@@ -23,8 +23,8 @@ module.exports = `
         story: Story
         salary: Salary
         errors: [Error]
-        followers: [User]
-        followees: [User]
+        followers: [Profile]
+        followees: [Profile]
         followingCompanies: [Company]
         followingTeams: [Team]
         followingJobs: [Job]
