@@ -45,7 +45,8 @@ const landingPage = async (language, { models }) => {
             { association: 'images' },
             { association: 'videos' },
             { association: 'featuredImage' }
-        ]
+        ],
+        order: [ [ 'createdAt', 'desc' ] ]
     });
     return {
         ...landingPage.get(),
