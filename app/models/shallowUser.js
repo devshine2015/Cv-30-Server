@@ -32,6 +32,16 @@ module.exports = (Sequelize, DataTypes) => {
             allowNull: false,
             fieldName: 'position'
         },
+        avatarPath: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            fieldName: 'avatar_path'
+        },
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            fieldName: 'description'
+        },
         createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

@@ -6,6 +6,8 @@ module.exports = `
         firstName: String
         lastName: String
         position: String!
+        avatarPath: String
+        description: String
         updatedAt: Date!
         createdAt: Date!
     }
@@ -15,6 +17,8 @@ module.exports = `
         firstName: String!
         lastName: String!
         position: String!
+        avatarPath: String
+        description: String
     }
     input ShallowUserOptions {
         shallowUserId: String!

@@ -1,9 +1,8 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, throwForbiddenError, validateCompany } = require('./common');
+const { checkUserAuth, yupValidation } = require('./common');
 
 const handleShallowUser = async (shallowUser, options, { user, models }) => {
-    console.log("Am intrat");
     checkUserAuth(user);
     yupValidation(schema.shallowUser.handleShallowUser, {
         shallowUser,
@@ -11,19 +10,19 @@ const handleShallowUser = async (shallowUser, options, { user, models }) => {
     });
 
     let result = false;
-    await models.sequelize.transaction(async t => {
+    await models.sequelize.transaction(async transaction => {
         if (shallowUser) {
             shallowUser.id = shallowUser.id || uuid();
-            await models.shallowUser.upsert(shallowUser, { transaction: t });
+            await models.shallowUser.upsert(shallowUser, { transaction });
         }
 
         if (options) {
-            shallowUser = await models.shallowUser.findOne({ attributes: ["id"], where: { id: options.shallowUserId }, transaction: t });
-            const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId }, transaction: t });
+            shallowUser = await models.shallowUser.findOne({ attributes: ["id"], where: { id: options.shallowUserId }, transaction });
+            const team = await models.team.findOne({ attributes: ["id"], where: { id: options.teamId }, transaction });
             if (options.isMember) {
-                await team.addShallowMember(shallowUser, { transaction: t });
+                await team.addShallowMember(shallowUser, { transaction });
             } else {
-                await team.removeShallowMember(shallowUser, { transaction: t });
+                await team.removeShallowMember(shallowUser, { transaction });
             }
         }
 
