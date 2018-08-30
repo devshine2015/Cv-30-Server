@@ -15,9 +15,9 @@ const handleTeam = async (teamDetails, { user, models }) => {
     return { status: true };
 }
 
-const addMemberToTeam = async (teamId, memberId, { user, models }) => {
+const handleTeamMember = async (teamId, memberId, add, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
+    yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId, add });
 
     const team = await models.team.findOne({ attributes: ["id", "companyId"], where: { id: teamId } });
     if (!team)
@@ -30,27 +30,11 @@ const addMemberToTeam = async (teamId, memberId, { user, models }) => {
     if (!member)
         return { status: false, error: 'Member not found' };
 
-    await team.addMember(member);
-
-    return { status: true };
-}
-
-const removeMemberFromTeam = async (teamId, memberId, { user, models }) => {
-    checkUserAuth(user);
-    yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId });
-
-    const team = await models.team.findOne({ attributes: ["id", "companyId"], where: { id: teamId } });
-    if (!team)
-        return { status: false, error: 'Team not found' };
-
-    const companyOk = await validateCompany(team.companyId, user, models);
-    if (companyOk !== true) return companyOk;
-
-    const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
-    if (!member)
-        return { status: false, error: 'Member not found' };
-
-    team.removeMember(member);
+    if (add) {
+        await team.addMember(member);
+    } else {
+        await team.removeMember(member);
+    }
 
     return { status: true };
 }
@@ -90,7 +74,7 @@ const all = async (language, { models }) => {
     const languageId = await getLanguageIdByCode(models, language);
     const teamsQuery = models.team.findAll();
     const promises = [teamsQuery];
-    promises.push.apply(promises, includeAssosiactions(languageId).map(include => models.team.findAll({
+    promises.push.apply(promises, includeAssociations(languageId).map(include => models.team.findAll({
         include,
         attributes: ['id']
     })));
@@ -103,7 +87,7 @@ const all = async (language, { models }) => {
     })), []);
 }
 
-const includeAssosiactions = (languageId) => [
+const includeAssociations = (languageId) => [
     {
         association: 'officeArticles',
         include: [
@@ -145,7 +129,7 @@ const includeAssosiactions = (languageId) => [
 
 const includeForFind = (languageId) => {
     return {
-        include: includeAssosiactions(languageId)
+        include: includeAssociations(languageId)
     };
 }
 
@@ -156,7 +140,6 @@ module.exports = {
     },
     Mutation: {
         handleTeam: (_, { teamDetails }, context) => handleTeam(teamDetails, context),
-        addMemberToTeam: (_, { teamId, memberId }, context) => addMemberToTeam(teamId, memberId, context),
-        removeMemberFromTeam: (_, { teamId, memberId }, context) => removeMemberFromTeam(teamId, memberId, context),
+        handleTeamMember: (_, { teamId, memberId, add }, context) => handleTeamMember(teamId, memberId, add, context),
     }
 }

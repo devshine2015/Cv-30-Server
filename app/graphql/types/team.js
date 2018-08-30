@@ -38,13 +38,10 @@ module.exports = `
         handleTeam (
 			teamDetails: TeamInput!
 		): StandardResponse
-		addMemberToTeam (
-			teamId: String!,
-			memberId: String!
-		): StandardResponse
-		removeMemberFromTeam (
-			teamId: String!,
-			memberId: String!
+		handleTeamMember (
+			teamId: String!
+            memberId: String!
+            add: Boolean
 		): StandardResponse
     }
 `;
