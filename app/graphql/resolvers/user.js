@@ -681,7 +681,13 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'followingCompanies',
             include: [
-                { association: 'i18n', where: { languageId } }
+                { association: 'i18n', where: { languageId } },
+                {
+                    association: 'industry',
+                    include: [
+                        { association: 'i18n' }
+                    ]
+                }
             ]
         }
     },
