@@ -17,7 +17,7 @@ const handleTeam = async (teamDetails, { user, models }) => {
 
 const handleTeamMember = async (teamId, memberId, add, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.team.addRemoveMemberInput, { teamId, memberId, add });
+    yupValidation(schema.team.handleTeamMember, { teamId, memberId, add });
 
     const team = await models.team.findOne({ attributes: ["id", "companyId"], where: { id: teamId } });
     if (!team)
