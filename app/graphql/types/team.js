@@ -3,7 +3,7 @@ module.exports = `
         id: String!
         name: String
         company: Company
-        members: [User]
+        members: [Profile]
         shallowMembers: [ShallowUser]
         officeArticles: [Article]
         jobs: [Job]

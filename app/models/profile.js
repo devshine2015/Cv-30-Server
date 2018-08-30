@@ -51,7 +51,7 @@ module.exports = (Sequelize, DataTypes) => {
 		position: {
             type: DataTypes.STRING(255),
             allowNull: true,
-            fieldName: 'position'
+            field: 'position'
         },
 		createdAt: {
 			allowNull: false,

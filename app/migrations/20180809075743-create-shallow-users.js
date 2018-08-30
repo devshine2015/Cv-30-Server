@@ -41,7 +41,7 @@ module.exports = {
 			position: {
 				type: Sequelize.STRING(255),
 				allowNull: false,
-				fieldName: 'position'
+				field: 'position'
 			},
 			createdAt: {
 				allowNull: false,

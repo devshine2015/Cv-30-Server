@@ -596,9 +596,9 @@ const createProfileResponse = async (user, models, languageId) => {
 
     const newUserResults = await Promise.all(promises);
 
-    return newUserResults.reduce((acc, item) => ({
+    return newUserResults.reduce((acc, profilePart) => ({
         ...acc,
-        ...item
+        ...profilePart
     }), {});
 }
 

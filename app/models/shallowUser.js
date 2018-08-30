@@ -30,17 +30,17 @@ module.exports = (Sequelize, DataTypes) => {
         position: {
             type: DataTypes.STRING(255),
             allowNull: false,
-            fieldName: 'position'
+            field: 'position'
         },
         avatarPath: {
             type: DataTypes.TEXT,
             allowNull: true,
-            fieldName: 'avatar_path'
+            field: 'avatar_path'
         },
         description: {
             type: DataTypes.TEXT,
             allowNull: true,
-            fieldName: 'description'
+            field: 'description'
         },
         createdAt: {
 			allowNull: false,

@@ -41,97 +41,114 @@ const handleTeamMember = async (teamId, memberId, add, { user, models }) => {
 
 const team = async (id, language, { models }) => {
     yupValidation(schema.team.one, { id, language });
-    return models.team.findOne({
-        where: { id },
-        ...includeForFind(await getLanguageIdByCode(models, language))
+
+    const languageId = await getLanguageIdByCode(models, language);
+    const promises = profileSubQueriesParams(languageId).map(item => {
+        let query = models.team.findOne({
+            where: { id },
+            include: [
+                item.include
+            ],
+            attributes: item.allAttributes ? undefined : ['id']
+        });
+        if (item.then) {
+            query = query.then(item.then);
+        } else {
+            query = query.then(team => team.get({plain: true}));
+        }
+        return query;
     });
+
+    const teamResults = await Promise.all(promises);
+
+    return teamResults.reduce((acc, teamPart) => ({
+        ...acc,
+        ...teamPart
+    }), {});
 }
-
-// TRY THIS IF THE STANDARD ONE TAKES TOO LONG
-// const team = async (id, language, { models }) => {
-//     yupValidation(schema.team.one, { id, language });
-
-//     const languageId = await getLanguageIdByCode(models, language);
-//     const teamQuery = models.team.findOne({where: { id }});
-//     const promises = [teamQuery];
-//     promises.push.apply(promises, includeAssosiactions(languageId).map(include => models.team.findOne({
-//         where: { id },
-//         include,
-//         attributes: ['id']
-//     })));
-
-//     const teamResults = await Promise.all(promises);
-
-//     return teamResults.reduce((acc, team) => ({
-//         ...acc,
-//         ...team.get()
-//     }), {});
-// }
 
 const all = async (language, { models }) => {
     yupValidation(schema.team.all, { language });
 
     const languageId = await getLanguageIdByCode(models, language);
-    const teamsQuery = models.team.findAll();
-    const promises = [teamsQuery];
-    promises.push.apply(promises, includeAssociations(languageId).map(include => models.team.findAll({
-        include,
-        attributes: ['id']
-    })));
+    const promises = profileSubQueriesParams(languageId).map(item => {
+        let query = models.team.findAll({
+            include: [
+                item.include
+            ],
+            attributes: item.allAttributes ? undefined : ['id']
+        });
+        if (item.then) {
+            query = query.then(teams => teams.map(item.then));
+        } else {
+            query = query.then(teams => teams.map(team => team.get({plain: true})));
+        }
+        return query;
+    });
 
     const teamsResults = await Promise.all(promises);
 
-    return teamsResults.reduce((acc, teamsResult) => teamsResult.map((k,i) => ({
+    return teamsResults.reduce((acc, teamsResult) => teamsResult.map((teamPart, i) => ({
         ...acc[i],
-        ...k.get()
+        ...teamPart
     })), []);
 }
 
-const includeAssociations = (languageId) => [
+const profileSubQueriesParams = (languageId) => [
     {
-        association: 'officeArticles',
-        include: [
-            { association: 'featuredImage', include: [{ association: 'i18n' }] },
-            { association: 'images', include: [{ association: 'i18n' }] },
-            { association: 'i18n', where: { languageId } }
-        ]
+        include: {
+            association: 'officeArticles',
+            include: [
+                { association: 'featuredImage', include: [{ association: 'i18n' }] },
+                { association: 'images', include: [{ association: 'i18n' }] },
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
     },
     {
-        association: 'company',
-        include: [
-            { association: 'i18n', where: { languageId } },
-            { association: 'owner' }
-        ]
+        include: {
+            association: 'company',
+            include: [
+                { association: 'i18n', where: { languageId } },
+                { association: 'owner' }
+            ]
+        },
+        allAttributes: true
     },
     {
-        association: 'members',
-        include: [
-            // { association: 'skills', include: [{ association: 'i18n' }] },
-            // { association: 'values', include: [{ association: 'i18n' }] },
-            { association: 'profile', include: [{ association: 'salary' }] },
-            // { association: 'articles' },
-            // { association: 'experience', include: [{ association: 'i18n' }] },
-            // { association: 'projects', include: [{ association: 'i18n' }] },
-            // { association: 'contact' },
-            // { association: 'featuredArticles' }
-        ]
+        include: {
+            association: 'members',
+            include: [
+                // { association: 'skills', include: [{ association: 'i18n' }] },
+                // { association: 'values', include: [{ association: 'i18n' }] },
+                { association: 'profile', include: [{ association: 'salary' }] },
+                // { association: 'articles' },
+                // { association: 'experience', include: [{ association: 'i18n' }] },
+                // { association: 'projects', include: [{ association: 'i18n' }] },
+                // { association: 'contact' },
+                // { association: 'featuredArticles' }
+            ]
+        },
+        then: team => ({
+            ...team.get({ plain: true }),
+            members: team.members ? team.members.map(member => ({ 
+                ...member.get({plain: true}),
+                ...member.profile ? member.profile.get({plain: true}) : {}
+            })) : []
+        })
     },
     {
-        association: 'shallowMembers'
+        include: { association: 'shallowMembers' }
     },
     {
-        association: 'jobs',
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        include: {
+            association: 'jobs',
+            include: [
+                { association: 'i18n', where: { languageId } }
+            ]
+        }
     }
 ];
-
-const includeForFind = (languageId) => {
-    return {
-        include: includeAssociations(languageId)
-    };
-}
 
 module.exports = {
     Query: {
