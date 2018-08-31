@@ -95,12 +95,17 @@ const handleFAQ = async (language, details, { user, models }) => {
     if (details.id && !await models.faq.findOne({ where: { id: details.id } }))
         return { status: false, error: 'FAQ not found' }
 
-    await models.sequelize.transaction(async t => {
-        details.id = details.id || uuid();
-        await models.faq.upsert(details, { transaction: t });
-        details.faqId = details.id;
-        details.languageId = languageId;
-        await models.faqText.upsert(details, { transaction: t });
+    await models.sequelize.transaction(async transaction => {
+        if (details.remove) {
+            await models.faq.destroy({where: { id: details.id }});
+            await models.faqText.destroy({where: { faqId: details.id }});
+        } else {
+            details.id = details.id || uuid();
+            await models.faq.upsert(details, { transaction });
+            details.faqId = details.id;
+            details.languageId = languageId;
+            await models.faqText.upsert(details, { transaction });
+        }
     });
 
     return { status: true };

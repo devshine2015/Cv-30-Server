@@ -35,6 +35,7 @@ module.exports = {
             companyId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
             question: yup.string().trim(),
             answer: yup.string().trim(),
+            remove: yup.boolean()
         }).required()
     }),
     tags: yup.object().shape({

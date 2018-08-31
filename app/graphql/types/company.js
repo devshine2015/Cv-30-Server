@@ -70,6 +70,7 @@ module.exports = `
         companyId: String
         question: String
         answer: String
+        remove: Boolean
     }
     
     extend type Query {
@@ -97,7 +98,7 @@ module.exports = `
         ): StandardResponse
         handleFAQ (
 			language: LanguageCodeType!
-			faq: FaqInput!
+            faq: FaqInput!
 		): StandardResponse
     }
 `;
