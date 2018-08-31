@@ -35,8 +35,8 @@ module.exports = {
                 isPublic: yup.boolean().required()
             }),
             activityField: yup.string().trim().max(255),
-            imagePath: yup.string().trim(),
-            videoUrl: yup.string().trim(),
+            imagePath: yup.string().trim().max(1024).nullable(),
+            videoUrl: yup.string().trim().max(1024).nullable(),
             skills: yup.array().of(
                 yup.string().trim()
                     .required('Skill needs a title')
