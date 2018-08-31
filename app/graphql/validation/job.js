@@ -41,7 +41,8 @@ module.exports = {
                 yup.string().trim()
                     .required('Skill needs a title')
                     .max(100, 'Skill title cannot be longer than 100 chars')
-            )
+            ),
+            status: yup.string().matches(/(draft|active|archived)/, { excludeEmptyString: true })
         })
     }),
     handleApplyToJob: yup.object().shape({

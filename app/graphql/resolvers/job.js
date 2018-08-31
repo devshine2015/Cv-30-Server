@@ -138,8 +138,12 @@ const job = async (id, language, { models }) => {
 const all = async (language, companyId, { models }) => {
     yupValidation(schema.job.all, { language, companyId });
 
+    let where = {
+        status: 'active'
+    };
+    if (companyId) where = { ...where, companyId };
     return models.job.findAll({
-        where: companyId ? { companyId } : {},
+        where,
         ...includeForFind(await getLanguageIdByCode(models, language))
     });
 }

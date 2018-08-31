@@ -70,6 +70,12 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.TEXT,
 			field: 'video_url'
 		},
+		status: {
+			allowNull: false,
+			defaultValue: 'draft',
+			type: DataTypes.ENUM('draft', 'active', 'archived'),
+			field: 'status'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,

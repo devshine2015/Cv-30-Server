@@ -20,6 +20,7 @@ module.exports = `
         skills: [Skill]
         imagePath: String
         videoUrl: String
+        status: String
     }
     type JobText {
         title: String
@@ -59,6 +60,7 @@ module.exports = `
         skills: [String]
         imagePath: String
         videoUrl: String
+        status: String
     }
     input JobSalaryInput {
         amountMin: Float!
