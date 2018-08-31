@@ -60,6 +60,16 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.INTEGER,
 			field: 'activity_field_id'
 		},
+		imagePath: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'image_path'
+		},
+		videoUrl: {
+			allowNull: true,
+			type: DataTypes.TEXT,
+			field: 'video_url'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
