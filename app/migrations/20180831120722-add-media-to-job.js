@@ -5,22 +5,20 @@ module.exports = {
 		return [
 			queryInterface.addColumn(
 				'jobs',
-				'imagePath',
+				'image_path',
 				{
 					type: Sequelize.TEXT,
 					allowNull: true,
-					after: 'activity_field_id',
-					field: 'image_path'
+					after: 'activity_field_id'
 				}
 			),
 			queryInterface.addColumn(
 				'jobs',
-				'videoUrl',
+				'video_url',
 				{
 					type: Sequelize.TEXT,
 					allowNull: true,
-					after: 'imagePath',
-					field: 'video_url'
+					after: 'image_path'
 				}
 			)
 		]
