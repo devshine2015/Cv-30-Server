@@ -708,7 +708,8 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'appliedJobs',
             include: [
-                { association: 'i18n', where: { languageId } }
+                { association: 'i18n', where: { languageId } },
+                { association: 'company', attributes: ['id', 'name', 'logoPath']}
             ]
         }
     }
