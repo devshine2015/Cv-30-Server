@@ -126,12 +126,12 @@ const storeActivityField = async (title, languageId, models, transaction) => {
     return activityFieldText.activityFieldId;
 }
 
-const job = async (id, language, { models }) => {
+const job = async (id, language, { user, models }) => {
     yupValidation(schema.job.one, { id, language });
 
     return models.job.findOne({
         where: { id },
-        ...includeForFind(await getLanguageIdByCode(models, language))
+        ...includeForFind(await getLanguageIdByCode(models, language), user ? user.id : null, models)
     });
 }
 
@@ -144,7 +144,7 @@ const all = async (language, companyId, { models }) => {
     if (companyId) where = { ...where, companyId };
     return models.job.findAll({
         where,
-        ...includeForFind(await getLanguageIdByCode(models, language))
+        ...includeForFind(await getLanguageIdByCode(models, language), null, models)
     });
 }
 
@@ -160,7 +160,7 @@ const jobTypes = async (language, { models }) => {
     });
 }
 
-const includeForFind = (languageId) => {
+const includeForFind = (languageId, userId, models) => {
     return {
         include: [
             { association: 'i18n', where: { languageId } },
@@ -206,7 +206,15 @@ const includeForFind = (languageId) => {
                     { association: 'i18n', where: { languageId } }
                 ]
             }, { 
-                association: 'salary'
+                association: 'salary',
+                attributes: ['isPublic', 'amountMin', 'amountMax', 'currency'],
+                required: false,
+                where: { 
+                    [models.Sequelize.Op.or]: [
+                        { isPublic: { [models.Sequelize.Op.eq]: true } },
+                        { '$company.owner.id$': { [models.Sequelize.Op.eq]: userId } }
+                    ]
+                }
             }, {
                 association: 'activityField',
                 include: [
