@@ -33,7 +33,9 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
     let result = false;
     await models.sequelize.transaction(async t => {
-        jobDetails.activityFieldId = await storeActivityField(jobDetails.activityField, languageId, models, t);
+        if (jobDetails.activityField) {
+            jobDetails.activityFieldId = await storeActivityField(jobDetails.activityField, languageId, models, t);
+        }
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
         jobDetails.jobId = jobDetails.id;
@@ -58,6 +60,9 @@ const handleJob = async (language, jobDetails, { user, models }) => {
                 ]
             }, {
                 association: 'jobTypes',
+                attributes: ['id'],
+            }, {
+                association: 'jobBenefits',
                 attributes: ['id'],
             }],
             attributes: ['id'],
@@ -92,6 +97,23 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
 
             await job.removeSkills(associatedSkillsToRemove, { transaction: t});
+        }
+        // Benefits
+        if (jobDetails.jobBenefits) {
+            const jobBenefits = await models.jobBenefit.findAll({
+                where: {
+                    id: {
+                        [models.Sequelize.Op.in]: jobDetails.jobBenefits
+                    }
+                },
+                attributes: ['id'],
+                transaction: t
+            });
+
+            if (jobBenefits.length !== jobDetails.jobBenefits.length) throw new Error("Invalid job benefits input");
+            const jobBenefitsToRemove = job.jobBenefits.filter(item => jobDetails.jobBenefits.findIndex(el => el.id === item.id) === -1);
+            await job.addJobBenefits(jobBenefits, { transaction: t });
+            await job.removeJobBenefits(jobBenefitsToRemove, { transaction: t })
         }
 
         result = true;
@@ -160,6 +182,10 @@ const jobTypes = async (language, { models }) => {
     });
 }
 
+const jobBenefits = async ({ models }) => {
+    return models.jobBenefit.findAll({ });
+}
+
 const includeForFind = (languageId, userId, models) => {
     return {
         include: [
@@ -225,6 +251,8 @@ const includeForFind = (languageId, userId, models) => {
                 include: [
                     { association: 'i18n', where: { languageId } }
                 ]
+            }, {
+                association: 'jobBenefits'
             }
         ]
     }
@@ -248,7 +276,8 @@ module.exports = {
     Query: {
         jobs: (_, { language, companyId }, context) => all(language, companyId, context),
         job: (_, { id, language }, context) => job(id, language, context),
-        jobTypes: (_, { language }, context) => jobTypes(language, context)
+        jobTypes: (_, { language }, context) => jobTypes(language, context),
+        jobBenefits: (_, { }, context) => jobBenefits(context)
     },
     Mutation: {
         handleJob: (_, { language, jobDetails }, context) => handleJob(language, jobDetails, context),

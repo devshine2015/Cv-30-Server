@@ -103,6 +103,7 @@ module.exports = (sequelize, DataTypes) => {
 		Job.belongsToMany(models.user, { through: 'job_followers', as: 'followers', foreignKey: 'job_id' });
 		Job.belongsToMany(models.user, { through: 'job_applicants', as: 'applicants', foreignKey: 'job_id' });
 		Job.belongsToMany(models.jobType, { through: 'job_job_types', as: 'jobTypes', foreignKey: 'job_id' });
+		Job.belongsToMany(models.jobBenefit, { through: 'job_job_benefits', as: 'jobBenefits', foreignKey: 'job_id' });
 		Job.hasOne(models.jobSalary, { as: 'salary', foreignKey: 'job_id' });
 		Job.belongsTo(models.activityField, { as: "activityField", foreignKey: 'activity_field_id' });
 		Job.belongsToMany(models.skill, { as: 'skills', through: 'job_skills', foreignKey: 'job_id' });

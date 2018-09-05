@@ -33,7 +33,7 @@ module.exports = {
                 amountMax: yup.number().positive().required(),
                 currency: yup.string().required().matches(/(ron|eur)/, { excludeEmptyString: true }),
                 isPublic: yup.boolean().required()
-            }),
+            }).default(undefined),
             activityField: yup.string().trim().max(255),
             imagePath: yup.string().trim().max(1024).nullable(),
             videoUrl: yup.string().trim().max(1024).nullable(),
@@ -42,7 +42,8 @@ module.exports = {
                     .required('Skill needs a title')
                     .max(100, 'Skill title cannot be longer than 100 chars')
             ),
-            status: yup.string().matches(/(draft|active|archived)/, { excludeEmptyString: true })
+            status: yup.string().matches(/(draft|active|archived)/, { excludeEmptyString: true }),
+            jobBenefits: yup.array().of(yup.number().positive().integer()),
         })
     }),
     handleApplyToJob: yup.object().shape({

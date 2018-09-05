@@ -21,6 +21,7 @@ module.exports = `
         imagePath: String
         videoUrl: String
         status: String
+        jobBenefits: [JobBenefit]
     }
     type JobText {
         title: String
@@ -39,6 +40,11 @@ module.exports = `
         amountMax: Float
         currency: Currency
         isPublic: Boolean
+    }
+    type JobBenefit {
+        id: Int
+        key: String!
+        icon: String!
     }
 
     input JobInput {
@@ -61,6 +67,7 @@ module.exports = `
         imagePath: String
         videoUrl: String
         status: String
+        jobBenefits: [Int]
     }
     input JobSalaryInput {
         amountMin: Float!
@@ -81,6 +88,7 @@ module.exports = `
         jobTypes(
             language: LanguageCodeType!
         ): [JobType]
+        jobBenefits: [JobBenefit]
     }
 
     extend type Mutation {
