@@ -107,7 +107,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     let newSlug = slugify(article.title);
                     let newSlugBad = true;
                     while (newSlugBad) {
-                        const existingArticleText = await models.articleText.findOne({ attributes: ["articleId", "slug"], where: { slug: newSlug }}, { transaction: t });
+                        const existingArticleText = await models.articleText.findOne({ attributes: ["articleId", "slug"], where: { slug: newSlug } }, { transaction: t });
                         if (!existingArticleText || existingArticleText.articleId === article.articleId) {
                             newSlugBad = false;
                         } else {
@@ -157,7 +157,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
     return { status: result };
 }
 
-const removeArticle = async(id, { user, models }) => {
+const removeArticle = async (id, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.removeArticle, {
         id
@@ -182,7 +182,7 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
         where: {
             id: user.id
         }
-    }, { transaction});
+    }, { transaction });
 
     const articleArticleTags = await models.articleArticleTag.findAll({
         attributes: ['id', 'tagId'],
@@ -190,12 +190,12 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
             articleId
         },
         include: [
-            { association: 'users', attributes: ['id']},
+            { association: 'users', attributes: ['id'] },
             {
                 association: 'tag',
                 attributes: ['id'],
                 include: [
-                    { association: 'i18n', attributes: ['title'], where: { languageId }}
+                    { association: 'i18n', attributes: ['title'], where: { languageId } }
                 ]
             }
         ]
@@ -204,7 +204,7 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
     // Start the changes. Find what's new, first.
     const existingTags = await models.articleTag.findAll({
         include: [
-            { 
+            {
                 association: 'i18n',
                 where: {
                     languageId,
@@ -212,7 +212,7 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
                         [models.Sequelize.Op.in]: cleanedInputTags
                     }
                 }
-             }
+            }
         ]
     }, { transaction });
 
@@ -289,9 +289,9 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
             }
         }, { transaction });
     }
-    
+
     const mergedArticleArticleTags = newArticleArticleTags.concat(existingArticleArticleTag);
-    
+
     if (isSet !== undefined) {
         if (isSet) {
             if (mergedArticleArticleTags.length) {
@@ -305,7 +305,7 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
     }
 }
 
-const handleArticleTags = async(language, { titles, articleId, isSet }, { user, models }) => {
+const handleArticleTags = async (language, { titles, articleId, isSet }, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.handleArticleTags, {
         language,
@@ -313,7 +313,7 @@ const handleArticleTags = async(language, { titles, articleId, isSet }, { user, 
         articleId,
         isSet
     });
-    
+
     const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
@@ -334,10 +334,12 @@ const article = async (id, language, { models }) => {
     }).then(mapArticle);
 }
 
-const all = async (language, { models }) => {
+const all = async (language, { models, user }) => {
     yupValidation(schema.article.all, { language });
     return models.article.findAll({
-        where: {},
+        where: {
+            ownerId: user.id
+        },
         ...includeForFind(await getLanguageIdByCode(models, language))
     }).then(mapArticles);
 }
@@ -352,29 +354,33 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
     const languageId = await getLanguageIdByCode(models, language);
     const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
 
-    if (user && (!peopleOrCompany && !(tags && tags.length))) {   
+    if (user && (!peopleOrCompany && !(tags && tags.length))) {
         // Following articles
         const where = {
             [models.Sequelize.Op.and]: [{
                 [models.Sequelize.Op.or]: [
-                    { postAs: {[models.Sequelize.Op.in]: ['company', 'team'] } },
-                    { [models.Sequelize.Op.and]: [
-                        { postAs: 'profile'},
-                        { [models.Sequelize.Op.or]: [
-                            { ownerId: { [models.Sequelize.Op.eq]: user.id } },
-                            { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
-                        ]}   
-                    ]}
+                    { postAs: { [models.Sequelize.Op.in]: ['company', 'team'] } },
+                    {
+                        [models.Sequelize.Op.and]: [
+                            { postAs: 'profile' },
+                            {
+                                [models.Sequelize.Op.or]: [
+                                    { ownerId: { [models.Sequelize.Op.eq]: user.id } },
+                                    { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
+                                ]
+                            }
+                        ]
+                    }
                 ]
             }]
         };
-        
+
         const include = [
             {
                 association: 'author',
                 attributes: ['id'],
                 include: [
-                    { 
+                    {
                         association: 'followers',
                         attributes: ['id']
                     }
@@ -410,7 +416,7 @@ const addPeopleOrCompanyToQueryParams = (where, include, peopleOrCompany, models
     where[models.Sequelize.Op.or] = [
         { '$author.first_name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` } },
         { '$author.last_name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` } },
-        { '$postingCompany.name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` }}
+        { '$postingCompany.name$': { [models.Sequelize.Op.like]: `%${peopleOrCompany}%` } }
     ];
     const authorAss = include.find(ass => ass.association === 'author');
     if (authorAss) {
@@ -418,7 +424,7 @@ const addPeopleOrCompanyToQueryParams = (where, include, peopleOrCompany, models
     } else {
         include.push({
             association: 'author',
-            attributes: [ 'id', 'lastName', 'firstName'],
+            attributes: ['id', 'lastName', 'firstName'],
             required: false
         });
     }
@@ -455,7 +461,7 @@ const getArticlesByIds = async (articleIds, languageId, models) => {
                 id: { [models.Sequelize.Op.in]: articleIds.map(it => it.id) }
             },
             ...includeForFind(languageId),
-            order: [ [ 'createdAt', 'desc' ] ]
+            order: [['createdAt', 'desc']]
         }).then(mapArticles);
     }
 
@@ -469,12 +475,12 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
 
     if (userId) {
         return models.article.findAll({
-            where: { 
+            where: {
                 ownerId: userId,
                 postAs: 'profile'
             },
             ...includeForFind(languageId),
-            order: [ [ 'createdAt', 'desc' ] ]
+            order: [['createdAt', 'desc']]
         }).then(mapArticles);
     }
 
@@ -485,18 +491,18 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
                 postingCompanyId: companyId
             },
             ...includeForFind(languageId),
-            order: [ [ 'createdAt', 'desc' ] ]
+            order: [['createdAt', 'desc']]
         }).then(mapArticles);
     }
 
     if (teamId) {
         return models.article.findAll({
             where: {
-                    postAs: 'team',
-                    postingTeamId: teamId
+                postAs: 'team',
+                postingTeamId: teamId
             },
             ...includeForFind(languageId),
-            order: [ [ 'createdAt', 'desc' ] ]
+            order: [['createdAt', 'desc']]
         }).then(mapArticles);
     }
 
@@ -531,7 +537,7 @@ const includeForFind = (languageId) => {
             { association: 'images' },
             { association: 'videos' },
             { association: 'featuredImage' },
-            { 
+            {
                 association: 'tags',
                 include: [
                     {
