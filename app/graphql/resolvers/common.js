@@ -130,6 +130,59 @@ const storeSkills = async (skills, associatedSkills, languageId, models, transac
     return { createdSkills, existingSkills, associatedSkillsToRemove };
 }
 
+const findOneFromSubQueries = async (subQueries, sequelizeModel, where) => {
+    const promises = subQueries.map(item => {
+        let query = sequelizeModel.findOne({
+            where: where ? where : {},
+            include: [
+                item.include
+            ],
+            attributes: item.allAttributes ? undefined : ['id']
+        });
+        if (item.then) {
+            query = query.then(item.then);
+        } else {
+            query = query.then(queryResult => queryResult.get({plain: true}));
+        }
+        return query;
+    });
+
+    const results = await Promise.all(promises);
+
+    return results.reduce((acc, resultsPart) => {
+        console.log(resultsPart);
+        return  ({
+            ...acc,
+            ...resultsPart
+        })
+    }, {}) ; 
+}
+
+const findAllFromSubQueries = async (subQueries, sequelizeModel, where) => {
+    const promises = subQueries.map(item => {
+        let query = sequelizeModel.findAll({
+            where: where ? where : {},
+            include: [
+                item.include
+            ],
+            attributes: item.allAttributes ? undefined : ['id']
+        });
+        if (item.then) {
+            query = query.then(queryResult => queryResult.map(item.then));
+        } else {
+            query = query.then(queryResult => queryResult.map(mi => mi.get({plain: true})));
+        }
+        return query;
+    });
+
+    const results = await Promise.all(promises);
+
+    return results.reduce((acc, result) => result.map((resultPart, i) => ({
+        ...acc[i],
+        ...resultPart
+    })), []);
+}
+
 module.exports = {
     checkUserAuth,
     yupValidation,
@@ -140,5 +193,7 @@ module.exports = {
     validateCompany,
     validateTeam,
     validateArticle,
-    storeSkills
+    storeSkills,
+    findOneFromSubQueries,
+    findAllFromSubQueries
 }

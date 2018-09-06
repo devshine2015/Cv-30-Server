@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany } = require('./common');
-const { includeForFind } = require('../../sequelize/queries/company');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, findOneFromSubQueries, findAllFromSubQueries } = require('./common');
+const { companySubQueriesParams, companiesSubQueriesParams } = require('../../sequelize/queries/company');
 
 const handleCompany = async (language, details, { user, models }) => {
     checkUserAuth(user);
@@ -58,18 +58,20 @@ const storeIndustry = async (title, languageId, models, transaction) => {
 const company = async (id, language, { models }) => {
     yupValidation(schema.company.one, { id, language });
 
-    return models.company.findOne({
-        where: { id: id },
-        ...includeForFind(await getLanguageIdByCode(models, language))
-    });
+    return await findOneFromSubQueries(
+        companySubQueriesParams(await getLanguageIdByCode(models, language)),
+        models.company,
+        { id }
+    );
 }
 
 const all = async (language, { models }) => {
     yupValidation(schema.company.all, { language });
 
-    return models.company.findAll({
-        ...includeForFind(await getLanguageIdByCode(models, language))
-    })
+    return await findAllFromSubQueries(
+        companiesSubQueriesParams(await getLanguageIdByCode(models, language)),
+        models.company
+    );
 };
 
 const industries = async (language, { models }) => {
