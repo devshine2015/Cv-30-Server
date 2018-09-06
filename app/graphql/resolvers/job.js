@@ -46,7 +46,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             await models.jobSalary.upsert(jobDetails.salary, { transaction: t });
         }
 
-        job = await models.job.findOne({ 
+        job = await models.job.findOne({
             where: { id: jobDetails.id },
             include: [{
                 association: 'skills',
@@ -66,7 +66,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
                 attributes: ['id'],
             }],
             attributes: ['id'],
-            transaction: t 
+            transaction: t
         });
 
         if (jobDetails.jobTypes) {
@@ -82,7 +82,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
             if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
 
-            const jobTypesToRemove = job.jobTypes.filter(item => jobDetails.jobTypes.findIndex(el => el.id === item.id) === -1);
+            const jobTypesToRemove = job.jobTypes.filter(item => jobDetails.jobTypes.findIndex(el => el === item.id) === -1);
             await job.addJobTypes(jobTypes, { transaction: t });
             await job.removeJobTypes(jobTypesToRemove, { transaction: t })
         }
@@ -96,7 +96,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             // Add existing values to job
             if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
 
-            await job.removeSkills(associatedSkillsToRemove, { transaction: t});
+            await job.removeSkills(associatedSkillsToRemove, { transaction: t });
         }
         // Benefits
         if (jobDetails.jobBenefits) {
@@ -111,7 +111,7 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             });
 
             if (jobBenefits.length !== jobDetails.jobBenefits.length) throw new Error("Invalid job benefits input");
-            const jobBenefitsToRemove = job.jobBenefits.filter(item => jobDetails.jobBenefits.findIndex(el => el.id === item.id) === -1);
+            const jobBenefitsToRemove = job.jobBenefits.filter(item => jobDetails.jobBenefits.findIndex(el => el === item.id) === -1);
             await job.addJobBenefits(jobBenefits, { transaction: t });
             await job.removeJobBenefits(jobBenefitsToRemove, { transaction: t })
         }
@@ -128,7 +128,7 @@ const storeActivityField = async (title, languageId, models, transaction) => {
             title,
             languageId
         },
-        attributes: [ 'activityFieldId' ],
+        attributes: ['activityFieldId'],
         transaction
     });
     if (!activityFieldText) {
@@ -183,7 +183,7 @@ const jobTypes = async (language, { models }) => {
 }
 
 const jobBenefits = async ({ models }) => {
-    return models.jobBenefit.findAll({ });
+    return models.jobBenefit.findAll({});
 }
 
 const includeForFind = (languageId, userId, models) => {
@@ -196,7 +196,7 @@ const includeForFind = (languageId, userId, models) => {
                 include: [
                     {
                         association: 'i18n', where: { languageId }
-                    }, 
+                    },
                     // {
                     //     association: 'officeArticles',
                     //     include: [
@@ -231,11 +231,11 @@ const includeForFind = (languageId, userId, models) => {
                 include: [
                     { association: 'i18n', where: { languageId } }
                 ]
-            }, { 
+            }, {
                 association: 'salary',
                 attributes: ['isPublic', 'amountMin', 'amountMax', 'currency'],
                 required: false,
-                where: { 
+                where: {
                     [models.Sequelize.Op.or]: [
                         { isPublic: { [models.Sequelize.Op.eq]: true } },
                         { '$company.owner.id$': { [models.Sequelize.Op.eq]: userId } }
