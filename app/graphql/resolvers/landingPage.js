@@ -7,7 +7,7 @@ const handleLandingPage = async (language, details, { user, models }) => {
         where: { id: user.id, god: true },
         attributes: ["id"]
     });
-    
+
     if (!foundUser) throwForbiddenError();
 
     yupValidation(schema.landingPage.input, {
@@ -31,10 +31,12 @@ const handleLandingPage = async (language, details, { user, models }) => {
 const landingPage = async (language, { models }) => {
     yupValidation(schema.landingPage.one, { language });
 
-    const landingPage = await models.landingPage.findOne({
+    const landingPageData = await models.landingPage.findOne({
         where: { id: 1 },
         ...includeForFind(await getLanguageIdByCode(models, language))
     });
+
+    const landingPage = landingPageData ? { ...landingPageData.get() } : {};
 
     const articles = await models.article.findAll({
         where: {
@@ -46,10 +48,11 @@ const landingPage = async (language, { models }) => {
             { association: 'videos' },
             { association: 'featuredImage' }
         ],
-        order: [ [ 'createdAt', 'desc' ] ]
+        order: [['createdAt', 'desc']]
     });
+
     return {
-        ...landingPage.get(),
+        ...landingPage,
         articles
     };
 }

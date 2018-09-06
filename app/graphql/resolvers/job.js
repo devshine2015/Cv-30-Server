@@ -69,23 +69,10 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             transaction: t
         });
 
-        if (jobDetails.jobTypes) {
-            const jobTypes = await models.jobType.findAll({
-                where: {
-                    id: {
-                        [models.Sequelize.Op.in]: jobDetails.jobTypes
-                    }
-                },
-                attributes: ['id'],
-                transaction: t
-            });
+        if (jobDetails.jobTypes)
+            await job.setJobTypes(jobDetails.jobTypes, { transaction: t });
 
-            if (jobTypes.length !== jobDetails.jobTypes.length) throw new Error("Invalid job types input");
 
-            const jobTypesToRemove = job.jobTypes.filter(item => jobDetails.jobTypes.findIndex(el => el === item.id) === -1);
-            await job.addJobTypes(jobTypes, { transaction: t });
-            await job.removeJobTypes(jobTypesToRemove, { transaction: t })
-        }
         // If no skills => leave as before
         if (jobDetails.skills) {
             const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
@@ -98,23 +85,10 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
             await job.removeSkills(associatedSkillsToRemove, { transaction: t });
         }
-        // Benefits
-        if (jobDetails.jobBenefits) {
-            const jobBenefits = await models.jobBenefit.findAll({
-                where: {
-                    id: {
-                        [models.Sequelize.Op.in]: jobDetails.jobBenefits
-                    }
-                },
-                attributes: ['id'],
-                transaction: t
-            });
 
-            if (jobBenefits.length !== jobDetails.jobBenefits.length) throw new Error("Invalid job benefits input");
-            const jobBenefitsToRemove = job.jobBenefits.filter(item => jobDetails.jobBenefits.findIndex(el => el === item.id) === -1);
-            await job.addJobBenefits(jobBenefits, { transaction: t });
-            await job.removeJobBenefits(jobBenefitsToRemove, { transaction: t })
-        }
+        // Benefits
+        if (jobDetails.jobBenefits)
+            await job.setJobBenefits(jobDetails.jobBenefits, { transaction: t });
 
         result = true;
     });
