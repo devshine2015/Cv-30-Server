@@ -5,7 +5,8 @@ module.exports = `
         name: String
         createdAt: Date
         updatedAt: Date
-        i18n: [CompanyText]
+        headline: String
+        description: String
         featuredArticles: [Article]
         officeArticles: [Article]
         storiesArticles: [Article]
@@ -42,15 +43,8 @@ module.exports = `
         coverPath: String
         coverBackground: String
     }
-    type CompanyText {
-        headline: String
-        description: String
-    }
     type Tag {
         id: Int
-        i18n: [TagText]
-    }
-    type TagText {
         title: String
     }
     input TagsInput {
@@ -59,11 +53,8 @@ module.exports = `
     }
     type Faq {
         id: String
-        i18n: [FaqText]
-    }
-    type FaqText {
-        question: String,
-		answer: String
+        question: String
+        answer: String
     }
     input FaqInput {
         id: String
@@ -102,3 +93,15 @@ module.exports = `
 		): StandardResponse
     }
 `;
+
+`type CompanyText {
+    headline: String
+    description: String
+}
+type FaqText {
+    question: String,
+    answer: String
+}
+type TagText {
+    title: String
+}`;

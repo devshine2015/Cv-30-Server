@@ -7,6 +7,10 @@ module.exports = (Sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(100),
+			allowNull: false
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -26,7 +30,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Tag.belongsToMany(models.company, {
 			through: 'company_tags'
 		});
-		Tag.hasMany(models.tagText, { as: 'i18n', foreignKey: 'tag_id' } );
+		// Tag.hasMany(models.tagText, { as: 'i18n', foreignKey: 'tag_id' } );
 	};
 	return Tag;
 };

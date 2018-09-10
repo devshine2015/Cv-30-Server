@@ -23,6 +23,15 @@ module.exports = (sequelize, DataTypes) => {
 			allowNull: true,
 			field: 'name'
 		},
+		headline: {
+			type: DataTypes.STRING(255),
+			allowNull: true,
+			field: 'headline'
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		activityField: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
@@ -99,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
 	Company.associate = models => {
 		Company.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		Company.hasOne(models.place, { as: 'place', foreignKey: 'company_id' });
-		Company.hasMany(models.companyText, { as: 'i18n', foreignKey: 'company_id' });
+		// Company.hasMany(models.companyText, { as: 'i18n', foreignKey: 'company_id' });
 		Company.hasMany(models.job, { as: 'jobs', foreignKey: 'company_id' });
 		Company.hasMany(models.article, { as: 'articles', foreignKey: 'posting_company_id' });
 		Company.belongsToMany(models.article, { as: 'featuredArticles', through: 'company_featured_articles', foreignKey: 'company_id' });

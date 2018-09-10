@@ -20,39 +20,39 @@ const handleCompany = async (language, details, { user, models }) => {
         details.id = details.id || uuid();
         details.user_id = user.id;
         await models.company.upsert(details, { transaction });
-        details.companyId = details.id;
-        details.languageId = languageId;
-        await models.companyText.upsert(details, { transaction });
+        // details.companyId = details.id;
+        // details.languageId = languageId;
+        // await models.companyText.upsert(details, { transaction });
     });
 
     return { status: true };
 }
 
 const storeIndustry = async (title, languageId, models, transaction) => {
-    let industryText = await models.industryText.findOne({
+    let industryText = await models.industry.findOne({
         where: {
-            title,
-            languageId: languageId
+            title
         },
-        attributes: [ 'industryId' ],
+        attributes: [ 'id' ],
         transaction
     });
 
-    if (!industryText) {
+    if (!industry) {
         const industry = await models.industry.create({
-            createdAt: new Date(),
-            updatedAt: new Date()
-        }, { transaction });
-        industryText = await models.industryText.create({
-            industryId: industry.id,
-            languageId,
             title,
             createdAt: new Date(),
             updatedAt: new Date()
         }, { transaction });
+        // industryText = await models.industryText.create({
+        //     industryId: industry.id,
+        //     languageId,
+        //     title,
+        //     createdAt: new Date(),
+        //     updatedAt: new Date()
+        // }, { transaction });
     }
 
-    return industryText.industryId;
+    return industry.id;
 }
 
 const company = async (id, language, { models }) => {
@@ -79,9 +79,9 @@ const industries = async (language, { models }) => {
 
     const languageId = await getLanguageIdByCode(models, language);
     return models.industry.findAll({
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        // include: [
+        //     { association: 'i18n', where: { languageId } }
+        // ]
     })
 }
 
@@ -100,13 +100,13 @@ const handleFAQ = async (language, details, { user, models }) => {
     await models.sequelize.transaction(async transaction => {
         if (details.remove) {
             await models.faq.destroy({where: { id: details.id }});
-            await models.faqText.destroy({where: { faqId: details.id }});
+            // await models.faqText.destroy({where: { faqId: details.id }});
         } else {
             details.id = details.id || uuid();
             await models.faq.upsert(details, { transaction });
-            details.faqId = details.id;
-            details.languageId = languageId;
-            await models.faqText.upsert(details, { transaction });
+            // details.faqId = details.id;
+            // details.languageId = languageId;
+            // await models.faqText.upsert(details, { transaction });
         }
     });
 
@@ -126,7 +126,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
     const cleanInputTags = tagsInput.tags.map(item => item.trim().toLowerCase());
 
     const existingTags = await models.tag.findAll({
-        include: [{
+        /*include: [{
             association: 'i18n',
             where: {
                 languageId,
@@ -134,7 +134,7 @@ const setTags = async (language, tagsInput, { user, models }) => {
                     [models.Sequelize.Op.in]: cleanInputTags
                 }
             },
-        }]
+        }]*/
     });
 
     let newTags = [];

@@ -2,7 +2,8 @@ module.exports = `
     type Video {
         id: String
         author: User
-        i18n: [VideoText]
+        title: String
+        description: String
         isFeatured: Boolean
         source: String
         sourceType: MediaSourceType
@@ -11,10 +12,6 @@ module.exports = `
         filename: String
         createdAt: Date
         updatedAt: Date
-    }
-    type VideoText {
-        title: String
-        description: String
     }
     input VideoInput {
         id: String!
@@ -26,3 +23,8 @@ module.exports = `
         path: String
     }
 `;
+
+`type VideoText {
+    title: String
+    description: String
+}`;

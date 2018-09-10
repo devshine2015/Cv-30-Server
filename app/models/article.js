@@ -18,6 +18,19 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'user_id'
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: false
+		},
+		slug: {
+			type: DataTypes.STRING(255),
+			allowNull: false,
+			unique: true
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		isFeatured: {
 			allowNull: true,
 			defaultValue: false,
@@ -80,7 +93,7 @@ module.exports = (Sequelize, DataTypes) => {
 		});
 	Article.associate = models => {
 		Article.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
-		Article.hasMany(models.articleText, { as: 'i18n' });
+		// Article.hasMany(models.articleText, { as: 'i18n' });
 		Article.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 		Article.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
 		Article.hasOne(models.image, { as: 'featuredImage', foreignKey: 'source_id', scope: { is_featured: true } })

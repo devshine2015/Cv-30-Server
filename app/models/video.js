@@ -41,6 +41,14 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: false,
 			field: 'path'
 		},
+		title: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -68,7 +76,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Video.belongsTo(models.article, { as: 'article', foreignKey: 'source_id' });
 		Video.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
 		Video.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
-		Video.hasMany(models.videoText, { as: 'i18n', foreignKey: 'video_id' });
+		// Video.hasMany(models.videoText, { as: 'i18n', foreignKey: 'video_id' });
 	};
 	return Video;
 };

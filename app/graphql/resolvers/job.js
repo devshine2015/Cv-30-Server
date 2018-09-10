@@ -38,9 +38,9 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         }
         jobDetails.id = jobDetails.id || uuid();
         await models.job.upsert(jobDetails, { transaction: t });
-        jobDetails.jobId = jobDetails.id;
-        jobDetails.languageId = languageId;
-        await models.jobText.upsert(jobDetails, { transaction: t });
+        // jobDetails.jobId = jobDetails.id;
+        // jobDetails.languageId = languageId;
+        // await models.jobText.upsert(jobDetails, { transaction: t });
         if (jobDetails.salary) {
             jobDetails.salary.jobId = jobDetails.id;
             await models.jobSalary.upsert(jobDetails.salary, { transaction: t });
@@ -50,14 +50,14 @@ const handleJob = async (language, jobDetails, { user, models }) => {
             where: { id: jobDetails.id },
             include: [{
                 association: 'skills',
-                attributes: ['id'],
-                include: [
-                    {
-                        association: 'i18n',
-                        where: { languageId },
-                        attributes: ['title']
-                    }
-                ]
+                attributes: ['id', 'title'],
+                // include: [
+                //     {
+                //         association: 'i18n',
+                //         where: { languageId },
+                //         attributes: ['title']
+                //     }
+                // ]
             }, {
                 association: 'jobTypes',
                 attributes: ['id'],
@@ -97,29 +97,21 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 }
 
 const storeActivityField = async (title, languageId, models, transaction) => {
-    let activityFieldText = await models.activityFieldText.findOne({
+    let activityField = await models.activityField.findOne({
         where: {
-            title,
-            languageId
+            title
         },
-        attributes: ['activityFieldId'],
         transaction
     });
-    if (!activityFieldText) {
-        const activityField = await models.activityField.create({
-            createdAt: new Date(),
-            updatedAt: new Date()
-        }, { transaction });
-        activityFieldText = await models.activityFieldText.create({
-            activityFieldId: activityField.id,
-            languageId,
+    if (!activityField) {
+        activityField = await models.activityField.create({
             title,
             createdAt: new Date(),
             updatedAt: new Date()
         }, { transaction });
     }
 
-    return activityFieldText.activityFieldId;
+    return activityField.id;
 }
 
 const job = async (id, language, { user, models }) => {
@@ -150,9 +142,9 @@ const jobTypes = async (language, { models }) => {
     const languageId = await getLanguageIdByCode(models, language);
 
     return models.jobType.findAll({
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        // include: [
+        //     { association: 'i18n', where: { languageId } }
+        // ]
     });
 }
 
@@ -163,14 +155,14 @@ const jobBenefits = async ({ models }) => {
 const includeForFind = (languageId, userId, models) => {
     return {
         include: [
-            { association: 'i18n', where: { languageId } },
+            // { association: 'i18n', where: { languageId } },
             { association: 'team' },
             {
                 association: 'company',
                 include: [
-                    {
-                        association: 'i18n', where: { languageId }
-                    },
+                    // {
+                    //     association: 'i18n', where: { languageId }
+                    // },
                     // {
                     //     association: 'officeArticles',
                     //     include: [
@@ -182,9 +174,9 @@ const includeForFind = (languageId, userId, models) => {
                     // },
                     {
                         association: 'faqs',
-                        include: [
-                            { association: 'i18n', where: { languageId } }
-                        ]
+                        // include: [
+                        //     { association: 'i18n', where: { languageId } }
+                        // ]
                     },
                     { association: 'owner' }
                 ]
@@ -202,9 +194,9 @@ const includeForFind = (languageId, userId, models) => {
                 // ]
             }, {
                 association: 'jobTypes',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
+                // include: [
+                //     { association: 'i18n', where: { languageId } }
+                // ]
             }, {
                 association: 'salary',
                 attributes: ['isPublic', 'amountMin', 'amountMax', 'currency'],
@@ -217,14 +209,14 @@ const includeForFind = (languageId, userId, models) => {
                 }
             }, {
                 association: 'activityField',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
+                // include: [
+                //     { association: 'i18n', where: { languageId } }
+                // ]
             }, {
                 association: 'skills',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
+                // include: [
+                //     { association: 'i18n', where: { languageId } }
+                // ]
             }, {
                 association: 'jobBenefits'
             }

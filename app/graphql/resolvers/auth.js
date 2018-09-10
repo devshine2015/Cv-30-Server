@@ -142,8 +142,8 @@ const activateAccount = async (token, { models }) => {
 };
 
 const attemptLogout = async ({ res }) => {
-    res.clearCookie(process.env.TOKEN_NAME);
-    res.clearCookie(process.env.REFRESH_TOKEN_NAME);
+    res.clearCookie(process.env.TOKEN_HEADER);
+    res.clearCookie(process.env.REFRESH_TOKEN_HEADER);
     return {
         status: true,
         error: null
@@ -193,13 +193,13 @@ const attemptLogin = async (email, password, { models, res }) => {
         return response;
     }
     let tokens = _createTokens(user);
-    res.cookie(process.env.TOKEN_NAME, tokens.token, {
+    res.cookie(process.env.TOKEN_HEADER, tokens.token, {
         path: '/',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true
     });
-    res.cookie(process.env.REFRESH_TOKEN_NAME, tokens.refreshToken, {
+    res.cookie(process.env.REFRESH_TOKEN_HEADER, tokens.refreshToken, {
         path: '/',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         secure: process.env.NODE_ENV === 'production',
@@ -400,13 +400,13 @@ const updateUserSettings = async ({ firstName, lastName, oldPassword, newPasswor
         );
     }
     let tokens = _createTokens(user);
-    res.cookie(process.env.TOKEN_NAME, tokens.token, {
+    res.cookie(process.env.TOKEN_HEADER, tokens.token, {
         path: '/',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true
     });
-    res.cookie(process.env.REFRESH_TOKEN_NAME, tokens.refreshToken, {
+    res.cookie(process.env.REFRESH_TOKEN_HEADER, tokens.refreshToken, {
         path: '/',
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         secure: process.env.NODE_ENV === 'production',

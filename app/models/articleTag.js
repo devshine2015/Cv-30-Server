@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: true
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -24,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
 		tableName: 'article_tags'
 	});
 	ArticleTag.associate = models => {
-		ArticleTag.hasMany(models.articleTagText, { as: 'i18n', foreignKey: 'article_tag_id' } );
+		// ArticleTag.hasMany(models.articleTagText, { as: 'i18n', foreignKey: 'article_tag_id' } );
 		ArticleTag.hasMany(models.articleArticleTag, { as: 'tags', foreignKey: 'tag_id'});
 	};
 	return ArticleTag;

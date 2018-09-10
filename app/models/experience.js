@@ -17,6 +17,14 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'user_id'
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: true
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		location: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
@@ -70,7 +78,7 @@ module.exports = (Sequelize, DataTypes) => {
 		});
 	Experience.associate = models => {
 		Experience.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
-		Experience.hasMany(models.experienceText, { as: 'i18n', foreignKey: 'experience_id' });
+		// Experience.hasMany(models.experienceText, { as: 'i18n', foreignKey: 'experience_id' });
 		// Experience.belongsTo(models.location, { as: 'location' });
 		Experience.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
 		Experience.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });

@@ -3,18 +3,14 @@ module.exports = `
         id: String
         position: String
         company: String
-        description: String
         startDate: Date
         location: String
         endDate: Date
         isCurrent: Boolean,
-        i18n: [ExperienceText]
-        videos: [Video]
-        images: [Image]
-    }
-    type ExperienceText {
         title: String
         description: String
+        videos: [Video]
+        images: [Image]
     }
 
     input ExperienceInput {
@@ -31,3 +27,8 @@ module.exports = `
         images: [ImageInput]
     }
 `;
+
+`type ExperienceText {
+    title: String
+    description: String
+}`;

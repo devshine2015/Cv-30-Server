@@ -35,8 +35,8 @@ services:
       DB_HOST: db
       APP_HOST: "${APP_HOST}"
       COOKIE_SECRET: "${COOKIE_SECRET}"
-      TOKEN_NAME: "${TOKEN_NAME}"
-      REFRESH_TOKEN_NAME: "${REFRESH_TOKEN_NAME}"
+      TOKEN_HEADER: "${TOKEN_HEADER}"
+      REFRESH_TOKEN_HEADER: "${REFRESH_TOKEN_HEADER}"
       NODE_ENV: development
     restart: always
     networks:

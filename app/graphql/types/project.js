@@ -4,17 +4,13 @@ module.exports = `
         position: String
         company: String
         location: String
-        description: String
         startDate: Date
         endDate: Date
         isCurrent: Boolean,
-        i18n: [ProjectText]
-        videos: [Video]
-        images: [Image]
-    }
-    type ProjectText {
         title: String
         description: String
+        videos: [Video]
+        images: [Image]
     }
 
     input ProjectInput {
@@ -31,3 +27,8 @@ module.exports = `
         images: [ImageInput]
     }
 `;
+
+`type ProjectText {
+    title: String
+    description: String
+}`;

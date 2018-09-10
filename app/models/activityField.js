@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: false
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 		tableName: 'activity_fields'
 	});
 	ActivityField.associate = models => {
-		ActivityField.hasMany(models.activityFieldText, { as: 'i18n', foreignKey: 'activity_field_id' });
+		// ActivityField.hasMany(models.activityFieldText, { as: 'i18n', foreignKey: 'activity_field_id' });
 		ActivityField.hasMany(models.job, { as: 'jobs', foreignKey: 'activity_field_id' });
 	};
 	return ActivityField;

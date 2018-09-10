@@ -42,6 +42,14 @@ module.exports = (Sequelize, DataTypes) => {
 			allowNull: false,
 			field: 'path'
 		},
+		title: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		originalFilename: {
 			type: DataTypes.STRING(255),
 			allowNull: false,
@@ -83,7 +91,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Image.belongsTo(models.user, { as: 'user', foreignKey: 'source_id' });
 		Image.belongsTo(models.user, { as: 'author', foreignKey: 'user_id' });
 		Image.belongsTo(models.ad, {as: 'ad', foreignKey: 'source_id' });
-		Image.hasMany(models.imageText, { as: 'i18n', foreignKey: 'image_id' });
+		// Image.hasMany(models.imageText, { as: 'i18n', foreignKey: 'image_id' });
   	};
 	return Image;
 };

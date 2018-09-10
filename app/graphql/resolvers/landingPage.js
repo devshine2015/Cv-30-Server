@@ -43,7 +43,7 @@ const landingPage = async (language, { models }) => {
             postAs: 'landingPage'
         },
         include: [
-            { association: 'i18n' },
+            // { association: 'i18n' },
             { association: 'images' },
             { association: 'videos' },
             { association: 'featuredImage' }
@@ -59,9 +59,9 @@ const landingPage = async (language, { models }) => {
 
 const includeForFind = (languageId) => {
     return {
-        include: [
-            { association: 'i18n', where: { languageId } }
-        ]
+        // include: [
+        //     { association: 'i18n', where: { languageId } }
+        // ]
     };
 }
 

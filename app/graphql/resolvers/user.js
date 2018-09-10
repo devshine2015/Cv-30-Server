@@ -23,17 +23,17 @@ const all = async (language, { models }) => {
     return models.user.findAll({
         where: {},
         include: [
-            { association: 'skills', include: [{ association: 'i18n' }] },
-            { association: 'values', include: [{ association: 'i18n' }] },
+            { association: 'skills'/*, include: [{ association: 'i18n' }] */},
+            { association: 'values'/*, include: [{ association: 'i18n' }] */},
             {
                 association: 'ownedCompanies',
                 ...companyAssociationForUserProfile(languageId)
             },
             { association: 'profile', include: [{ association: 'salary' }] },
-            { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }, { association: 'i18n' }] },
+            { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }/*, { association: 'i18n' }*/] },
             { association: 'contact' },
             { association: 'currentExperience' },
-            { association: 'currentProject', include: [{ association: 'i18n', where: { languageId } }] }
+            { association: 'currentProject'/*, include: [{ association: 'i18n', where: { languageId } }]*/ }
         ]
     })
         .then(users => users.map(item => {
@@ -174,18 +174,20 @@ const setStory = async (language, { title, description }, { user, models }) => {
     try {
         await models.sequelize.transaction(async t => {
             await models.story.upsert({
-                userId: user.id
-            }, {
-                    transaction: t
-                });
-            await models.storyText.upsert({
                 userId: user.id,
-                languageId,
                 title,
                 description
             }, {
-                    transaction: t
-                });
+                transaction: t
+            });
+            // await models.storyText.upsert({
+            //     userId: user.id,
+            //     languageId,
+            //     title,
+            //     description
+            // }, {
+            //         transaction: t
+            //     });
             response.status = true;
         })
     } catch (error) {
@@ -210,15 +212,15 @@ const setValues = async (addValues, removeValues, language, { user, models }) =>
     const cleanedInputValues = addValues.map(item => item.trim().toLowerCase());
 
     const existingValues = await models.value.findAll({
-        include: [{
-            association: 'i18n',
-            where: {
-                languageId,
-                title: {
-                    [models.Sequelize.Op.in]: cleanedInputValues
-                }
-            },
-        }]
+        // include: [{
+        //     association: 'i18n',
+        //     where: {
+        //         languageId,
+        //         title: {
+        //             [models.Sequelize.Op.in]: cleanedInputValues
+        //         }
+        //     },
+        // }]
     });
 
     let newValues = [];
@@ -251,15 +253,15 @@ const setValues = async (addValues, removeValues, language, { user, models }) =>
             // Remove values
             if (removeValues.length) {
                 const valuesToRemove = await models.value.findAll({
-                    include: [{
-                        association: 'i18n',
-                        where: {
-                            languageId,
-                            title: {
-                                [models.Sequelize.Op.in]: removeValues.map(item => item.trim().toLowerCase())
-                            }
-                        },
-                    }],
+                    // include: [{
+                    //     association: 'i18n',
+                    //     where: {
+                    //         languageId,
+                    //         title: {
+                    //             [models.Sequelize.Op.in]: removeValues.map(item => item.trim().toLowerCase())
+                    //         }
+                    //     },
+                    // }],
                     transaction
                 });
 
@@ -295,15 +297,15 @@ const setSkills = async (addSkills, removeSkills, language, { user, models }) =>
         // Remove skills
         if (removeSkills.length) {
             const skillsToRemove = await models.skill.findAll({
-                include: [{
-                    association: 'i18n',
-                    where: {
-                        languageId,
-                        title: {
-                            [models.Sequelize.Op.in]: removeSkills.map(item => item.trim().toLowerCase())
-                        }
-                    },
-                }],
+                // include: [{
+                //     association: 'i18n',
+                //     where: {
+                //         languageId,
+                //         title: {
+                //             [models.Sequelize.Op.in]: removeSkills.map(item => item.trim().toLowerCase())
+                //         }
+                //     },
+                // }],
                 transaction
             });
 
@@ -361,6 +363,8 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
         await models.project.upsert({
             id: projectId,
             userId: user.id,
+            title,
+            description,
             location,
             isCurrent,
             position,
@@ -368,12 +372,12 @@ const setProject = async ({ id, location, isCurrent, position, company, startDat
             startDate: new Date(startDate),
             endDate: endDate ? new Date(endDate) : null,
         }, { transaction: t });
-        await models.projectText.upsert({
-            projectId,
-            languageId,
-            title,
-            description
-        }, { transaction: t });
+        // await models.projectText.upsert({
+        //     projectId,
+        //     languageId,
+        //     title,
+        //     description
+        // }, { transaction: t });
         await upsertImages(images, languageId, projectId, user.id, models, t);
         await upsertVideos(videos, languageId, projectId, user.id, models, t);
         result = true;
@@ -415,6 +419,8 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
         await models.experience.upsert({
             id: experienceId,
             userId: user.id,
+            title,
+            description,
             location,
             isCurrent,
             position,
@@ -422,12 +428,12 @@ const setExperience = async ({ id, location, isCurrent, position, company, start
             startDate: new Date(startDate),
             endDate: endDate ? new Date(endDate) : null,
         }, { transaction: t });
-        await models.experienceText.upsert({
-            experienceId: experienceId,
-            languageId,
-            title,
-            description
-        }, { transaction: t });
+        // await models.experienceText.upsert({
+        //     experienceId: experienceId,
+        //     languageId,
+        //     title,
+        //     description
+        // }, { transaction: t });
         await upsertImages(images, languageId, experienceId, user.id, models, t);
         await upsertVideos(videos, languageId, experienceId, user.id, models, t);
         result = true;
@@ -453,12 +459,14 @@ const upsertImages = async (images, languageId, sourceId, userId, models, transa
             isFeatured: item.isFeatured,
             sourceId: item.source ? item.source : sourceId,
             sourceType: item.sourceType,
+            title: item.title,
+            description: item.description,
             path: item.path
         }, {
                 updateOnDuplicate: ["isFeatured", "path"],
                 transaction
             })));
-        await Promise.all(images.map(item => models.imageText.upsert({
+        /*await Promise.all(images.map(item => models.imageText.upsert({
             imageId: item.id,
             title: item.title,
             description: item.description,
@@ -466,7 +474,7 @@ const upsertImages = async (images, languageId, sourceId, userId, models, transa
         }, {
                 updateOnDuplicate: ["title", "description"],
                 transaction
-            })));
+            })));*/
     }
 }
 
@@ -612,10 +620,10 @@ const profileSubQueriesParams = (languageId) => [
         allAttributes: true
     },
     {
-        include: { association: 'skills', include: [{ association: 'i18n' }] }
+        include: { association: 'skills'/*, include: [{ association: 'i18n' }] */}
     },
     {
-        include: { association: 'values', include: [{ association: 'i18n' }] }
+        include: { association: 'values'/*, include: [{ association: 'i18n' }] */}
     },
     {
         include: {
@@ -627,13 +635,13 @@ const profileSubQueriesParams = (languageId) => [
         include: { association: 'articles' }
     },
     {
-        include: { association: 'experience', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] }
+        include: { association: 'experience', include: [/*{ association: 'i18n' }, */{ association: 'videos' }, { association: 'images' }] }
     },
     {
-        include: { association: 'projects', include: [{ association: 'i18n' }, { association: 'videos' }, { association: 'images' }] }
+        include: { association: 'projects', include: [/*{ association: 'i18n' }, */{ association: 'videos' }, { association: 'images' }] }
     },
     {
-        include: { association: 'story', include: [{ association: 'i18n' }] }
+        include: { association: 'story'/*, include: [{ association: 'i18n' }] */}
     },
     {
         include: { association: 'contact' }
@@ -642,7 +650,7 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'featuredArticles', include: [
                 { association: 'author' },
-                { association: 'i18n', where: { languageId } },
+                // { association: 'i18n', where: { languageId } },
                 { association: 'images' },
                 { association: 'videos' },
                 { association: 'featuredImage' }
@@ -653,7 +661,7 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'aboutMeArticles', include: [
                 { association: 'author' },
-                { association: 'i18n', where: { languageId } },
+                // { association: 'i18n', where: { languageId } },
                 { association: 'images' },
                 { association: 'videos' },
                 { association: 'featuredImage' }
@@ -681,12 +689,12 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'followingCompanies',
             include: [
-                { association: 'i18n', where: { languageId } },
+                // { association: 'i18n', where: { languageId } },
                 {
                     association: 'industry',
-                    include: [
-                        { association: 'i18n' }
-                    ]
+                    // include: [
+                    //     { association: 'i18n' }
+                    // ]
                 }
             ]
         }
@@ -694,9 +702,9 @@ const profileSubQueriesParams = (languageId) => [
     {
         include: {
             association: 'followingJobs',
-            include: [
-                { association: 'i18n', where: { languageId } }
-            ]
+            // include: [
+            //     { association: 'i18n', where: { languageId } }
+            // ]
         }
     },
     {
@@ -708,7 +716,7 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'appliedJobs',
             include: [
-                { association: 'i18n', where: { languageId } },
+                // { association: 'i18n', where: { languageId } },
                 { association: 'company', attributes: ['id', 'name', 'logoPath']}
             ]
         }

@@ -85,13 +85,14 @@ const validateArticle = async (id, user, models, options = {
 }
 
 const storeSkills = async (skills, associatedSkills, languageId, models, transaction) => {
+    return;
     const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
     let existingSkills = [];
     let createdSkills = [];
 
     if (cleanedInputSkills.length) {
         existingSkills = await models.skill.findAll({
-            include: [{
+            /*include: [{
                 association: 'i18n',
                 where: {
                     languageId,
@@ -99,7 +100,7 @@ const storeSkills = async (skills, associatedSkills, languageId, models, transac
                         [models.Sequelize.Op.in]: cleanedInputSkills
                     }
                 },
-            }],
+            }],*/
             transaction
         });
 

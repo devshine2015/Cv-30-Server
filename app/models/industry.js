@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: false
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 		tableName: 'industries'
 	});
 	Industry.associate = models => {
-		Industry.hasMany(models.industryText, { as: 'i18n', foreignKey: 'industry_id' });
+		// Industry.hasMany(models.industryText, { as: 'i18n', foreignKey: 'industry_id' });
 		Industry.hasMany(models.company, { as: 'jobs', foreignKey: 'industry_id' });
 	};
 	return Industry;

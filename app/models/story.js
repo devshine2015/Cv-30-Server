@@ -10,6 +10,16 @@ module.exports = (Sequelize, DataTypes) => {
 				},
 			field: 'user_id'
 		},
+		title: {
+			allowNull: false,
+			type: DataTypes.TEXT,
+			field: 'title'
+		},
+		description: {
+			allowNull: false,
+			type: DataTypes.TEXT,
+			field: 'description'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -28,7 +38,7 @@ module.exports = (Sequelize, DataTypes) => {
 	});
 	Story.associate = models => {
 		Story.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
-		Story.hasMany(models.storyText, { as: 'i18n', foreignKey: 'user_id' });
+		// Story.hasMany(models.storyText, { as: 'i18n', foreignKey: 'user_id' });
 		// Story.belongsTo(models.language, { as: 'language' });
 	};
 	return Story;

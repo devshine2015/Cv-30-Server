@@ -8,13 +8,10 @@ module.exports = `
         path: String
         originalFilename: String
         filename: String
-        i18n: [ImageText]
-        createdAt: Date
-        updatedAt: Date
-    }
-    type ImageText {
         title: String
         description: String
+        createdAt: Date
+        updatedAt: Date
     }
     input ImageInput {
         id: String!
@@ -30,3 +27,8 @@ module.exports = `
         images: [Image]
     }
 `;
+
+`type ImageText {
+    title: String
+    description: String
+}`;

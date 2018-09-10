@@ -8,6 +8,9 @@ module.exports = `
     type Article {
         id: String!
         author: Profile
+        title: String
+        slug: String
+        description: String
         isPost: Boolean
         postAs: PostAs!
         postingCompany: Company
@@ -15,22 +18,14 @@ module.exports = `
         featuredImage: Image
         images: [Image]
         videos: [Video]
-        i18n: [ArticleText]
         tags: [ArticleTag]
         createdAt: Date
         updatedAt: Date
     }
-    type ArticleText {
-        title: String
-        description: String
-    }
     type ArticleTag {
         id: String!
-        i18n: [ArticleTagText]
-        users: [Profile]
-    }
-    type ArticleTagText {
         title: String
+        users: [Profile]
     }
 
     extend type Query {
@@ -105,3 +100,11 @@ module.exports = `
         ): StandardResponse
     }
 `;
+
+`type ArticleText {
+    title: String
+    description: String
+}
+type ArticleTagText {
+    title: String
+}`;

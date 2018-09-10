@@ -17,6 +17,15 @@ module.exports = (Sequelize, DataTypes) => {
 			},
 			field: 'user_id'
 		},
+		title: {
+			allowNull: true,
+			type: DataTypes.STRING(255),
+			field: 'title'
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
 		location: {
 			allowNull: true,
 			type: DataTypes.STRING(255),
@@ -64,7 +73,7 @@ module.exports = (Sequelize, DataTypes) => {
 		});
 	Project.associate = function (models) {
 		Project.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
-		Project.hasMany(models.projectText, { as: 'i18n', foreignKey: 'project_id' });
+		// Project.hasMany(models.projectText, { as: 'i18n', foreignKey: 'project_id' });
 		// Project.belongsTo(models.location, { as: 'location' });
 		Project.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
 		Project.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });

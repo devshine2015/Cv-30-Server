@@ -9,9 +9,11 @@ module.exports = `
         linkedin: String
         createdAt: Date
         updatedAt: Date
-        i18n: [JobText]
         company: Company
         team: Team
+        title: String
+        description: String
+        idealCandidate: String
         applicants: [Profile]
         location: String
         jobTypes: [JobType]
@@ -23,16 +25,8 @@ module.exports = `
         status: String
         jobBenefits: [JobBenefit]
     }
-    type JobText {
-        title: String
-        description: String
-        idealCandidate: String
-    }
     type JobType {
         id: Int
-        i18n: [JobTypeText]
-    }
-    type JobTypeText {
         title: String
     }
     type JobSalary {
@@ -102,3 +96,12 @@ module.exports = `
 		): StandardResponse
     }
 `;
+
+`type JobText {
+    title: String
+    description: String
+    idealCandidate: String
+}
+type JobTypeText {
+    title: String
+}`;

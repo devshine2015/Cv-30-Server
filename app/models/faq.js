@@ -17,6 +17,16 @@ module.exports = (Sequelize, DataTypes) => {
             },
 			field: 'company_id',
 		},
+		question: {
+			allowNull: false,
+			type: DataTypes.TEXT,
+			field: 'question'
+		},
+		answer: {
+			allowNull: false,
+			type: DataTypes.TEXT,
+			field: 'answer'
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -34,7 +44,7 @@ module.exports = (Sequelize, DataTypes) => {
 	});
 	Faq.associate = models => {
 		Faq.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
-		Faq.hasMany(models.faqText, { as: 'i18n', foreignKey: 'faq_id' });
+		// Faq.hasMany(models.faqText, { as: 'i18n', foreignKey: 'faq_id' });
 	};
 	return Faq;
 };

@@ -99,9 +99,9 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'officeArticles',
             include: [
-                { association: 'featuredImage', include: [{ association: 'i18n' }] },
-                { association: 'images', include: [{ association: 'i18n' }] },
-                { association: 'i18n', where: { languageId } }
+                { association: 'featuredImage'/*, include: [{ association: 'i18n' }] */},
+                { association: 'images'/*, include: [{ association: 'i18n' }] */},
+                // { association: 'i18n', where: { languageId } }
             ]
         }
     },
@@ -109,7 +109,7 @@ const profileSubQueriesParams = (languageId) => [
         include: {
             association: 'company',
             include: [
-                { association: 'i18n', where: { languageId } },
+                // { association: 'i18n', where: { languageId } },
                 { association: 'owner' }
             ]
         },
@@ -143,9 +143,9 @@ const profileSubQueriesParams = (languageId) => [
     {
         include: {
             association: 'jobs',
-            include: [
-                { association: 'i18n', where: { languageId } }
-            ]
+            // include: [
+            //     { association: 'i18n', where: { languageId } }
+            // ]
         }
     }
 ];

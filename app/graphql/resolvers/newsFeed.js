@@ -24,15 +24,17 @@ const handleAd = async (language, details, { user, models }) => {
         await models.image.upsert( {
             ...details.image,
             userId: user.id,
+            title: details.image.title,
+            description: details.image.description,
             sourceId: details.id
         }, { transaction });
 
-        await models.imageText.upsert({
+        /*await models.imageText.upsert({
             imageId: details.image.id,
             title: details.image.title,
             description: details.image.description,
             languageId
-        }, { transaction });
+        }, { transaction });*/
 
         result = true;
     });
@@ -53,9 +55,9 @@ const includeForFind = (languageId) => {
         include: [
             {
                 association: 'image',
-                include: [
-                    { association: 'i18n', where: { languageId } }
-                ]
+                // include: [
+                //     { association: 'i18n', where: { languageId } }
+                // ]
             }
         ]
     };

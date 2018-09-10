@@ -1,9 +1,6 @@
 module.exports = `
     type Industry {
         id: Int
-        i18n: [IndustryText]
-    }
-    type IndustryText {
         title: String
     }
 
@@ -13,3 +10,7 @@ module.exports = `
         ): [Industry]
     }
 `;
+
+`type IndustryText {
+    title: String
+}`;

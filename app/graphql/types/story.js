@@ -1,8 +1,5 @@
 module.exports = `
     type Story {
-        i18n: [StoryText]
-    }
-    type StoryText {
         title: String
         description: String
     }
@@ -12,3 +9,8 @@ module.exports = `
         description: String
     }
 `;
+
+`type StoryText {
+    title: String
+    description: String
+}`;

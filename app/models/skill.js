@@ -7,6 +7,10 @@ module.exports = (Sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(100),
+			allowNull: false
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -25,7 +29,7 @@ module.exports = (Sequelize, DataTypes) => {
     Skill.associate = models => {
 		Skill.belongsToMany(models.user, { through: Sequelize.define('UserSkills', {})});
 		Skill.belongsToMany(models.job, { as: 'jobs', through: 'job_skills', foreignKey: 'skill_id' });
-		Skill.hasMany(models.skillText, { as: 'i18n', foreignKey: 'skill_id' } );
+		// Skill.hasMany(models.skillText, { as: 'i18n', foreignKey: 'skill_id' } );
     };
     return Skill;
 };

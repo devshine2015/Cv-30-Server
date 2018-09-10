@@ -26,6 +26,19 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			field: 'team_id'
 		},
+		title: {
+			type: DataTypes.STRING(255),
+			allowNull: true,
+		},
+		description: {
+			type: DataTypes.TEXT,
+			allowNull: true
+		},
+		idealCandidate: {
+			type: DataTypes.TEXT,
+			allowNull: true,
+			field: 'ideal_candidate'
+		},
 		expireDate: {
 			allowNull: true,
 			type: DataTypes.DATE,
@@ -97,7 +110,7 @@ module.exports = (sequelize, DataTypes) => {
 		]
 	});
 	Job.associate = function(models) {
-		Job.hasMany(models.jobText, { as: 'i18n', foreignKey: 'job_id' });
+		// Job.hasMany(models.jobText, { as: 'i18n', foreignKey: 'job_id' });
 		Job.belongsTo(models.company, { as: 'company', foreignKey: 'company_id' });
 		Job.belongsTo(models.team, { as: 'team', foreignKey: 'team_id' });
 		Job.belongsToMany(models.user, { through: 'job_followers', as: 'followers', foreignKey: 'job_id' });

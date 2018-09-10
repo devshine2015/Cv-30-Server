@@ -53,6 +53,19 @@ const handleArticle = async (language, article, options, { user, models }) => {
         if (article) {
             article.id = article.id || uuid();
             article.ownerId = user.id;
+            if (article.title) {
+                let newSlug = slugify(article.title);
+                let newSlugBad = true;
+                while (newSlugBad) {
+                    const existingArticleSlug = await models.article.findOne({ attributes: ["slug"], where: { slug: newSlug } }, { transaction: t });
+                    if (!existingArticleSlug || existingArticleSlug.articleId === article.id) {
+                        newSlugBad = false;
+                    } else {
+                        newSlug = slugify(`${article.title} ${new Date().getTime()}`);
+                    }
+                }
+                article.slug = newSlug;
+            }
             await models.article.upsert(article, { transaction: t });
             article.articleId = article.id;
             article.languageId = languageId;
@@ -64,20 +77,22 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     sourceId: article.id,
                     sourceType: item.sourceType,
                     target: item.target,
+                    title: item.title,
+                    description: item.description,
                     path: item.path
                 })), {
                         updateOnDuplicate: ["isFeatured", "path"],
                         transaction: t
                     });
-                await models.imageText.bulkCreate(article.images.map(item => ({
+                /*await models.imageText.bulkCreate(article.images.map(item => ({
                     imageId: item.id,
                     title: item.title,
                     description: item.description,
                     languageId
                 })), {
-                        updateOnDuplicate: ["title", "description"],
-                        transaction: t
-                    });
+                    updateOnDuplicate: ["title", "description"],
+                    transaction: t
+                });*/
             }
 
             if (article.videos && article.videos.length > 0) {
@@ -87,22 +102,24 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     isFeatured: item.isFeatured,
                     sourceId: article.id,
                     sourceType: item.sourceType,
-                    path: item.path
-                })), {
-                        updateOnDuplicate: ["isFeatured", "path"],
-                        transaction: t
-                    });
-                await models.videoText.bulkCreate(article.videos.map(item => ({
-                    videoId: item.id,
                     title: item.title,
                     description: item.description,
-                    languageId
+                    path: item.path
                 })), {
-                        updateOnDuplicate: ["title", "description"],
-                        transaction: t
-                    });
+                    updateOnDuplicate: ["isFeatured", "path"],
+                    transaction: t
+                });
+                // await models.videoText.bulkCreate(article.videos.map(item => ({
+                //     videoId: item.id,
+                //     title: item.title,
+                //     description: item.description,
+                //     languageId
+                // })), {
+                //         updateOnDuplicate: ["title", "description"],
+                //         transaction: t
+                //     });
             }
-            if (!!article.title || !!article.description) {
+            /*if (!!article.title || !!article.description) {
                 if (article.title) {
                     let newSlug = slugify(article.title);
                     let newSlugBad = true;
@@ -117,7 +134,7 @@ const handleArticle = async (language, article, options, { user, models }) => {
                     article.slug = newSlug;
                 }
                 await models.articleText.upsert(article, { transaction: t });
-            }
+            }*/
 
             if (article.tags) {
                 await storeArticleTags(article.tags, article.id, languageId, undefined, user, models, t);
@@ -174,6 +191,7 @@ const removeArticle = async (id, { user, models }) => {
 }
 
 const storeArticleTags = async (titles, articleId, languageId, isSet, user, models, transaction) => {
+    return;
     const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
 
     // Get data before changes
@@ -193,17 +211,17 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
             { association: 'users', attributes: ['id'] },
             {
                 association: 'tag',
-                attributes: ['id'],
-                include: [
-                    { association: 'i18n', attributes: ['title'], where: { languageId } }
-                ]
+                attributes: ['id', 'title'],
+                // include: [
+                //     { association: 'i18n', attributes: ['title'], where: { languageId } }
+                // ]
             }
         ]
     }, { transaction });
 
     // Start the changes. Find what's new, first.
     const existingTags = await models.articleTag.findAll({
-        include: [
+        /*include: [
             {
                 association: 'i18n',
                 where: {
@@ -213,7 +231,7 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
                     }
                 }
             }
-        ]
+        ]*/
     }, { transaction });
 
     let newTags = [];
@@ -223,18 +241,20 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
     let newArticleArticleTags = [];
 
     if (newTags.length) {
-        const createdTags = await models.articleTag.bulkCreate(newTags.map(_ => { }), { transaction });
+        const createdTags = await models.articleTag.bulkCreate(newTags.map(title => ({
+            title
+        })), { transaction });
 
         // Create tag texts - need tag_id from tags
-        const mappedTagTexts = newTags.map((title, i) => {
-            return {
-                tagId: createdTags[i].id,
-                languageId,
-                title
-            };
-        });
+        // const mappedTagTexts = newTags.map((title, i) => {
+        //     return {
+        //         tagId: createdTags[i].id,
+        //         languageId,
+        //         title
+        //     };
+        // });
 
-        await models.articleTagText.bulkCreate(mappedTagTexts, { transaction });
+        // await models.articleTagText.bulkCreate(mappedTagTexts, { transaction });
 
         // Link new tags with article
         newArticleArticleTags = articleArticleTag = await models.articleArticleTag.bulkCreate(createdTags.map(newTag => ({
@@ -444,10 +464,10 @@ const addTagsToQueryParams = (where, include, filteredTags, languageId, models) 
         include: [
             {
                 association: 'tag',
-                attributes: ['id'],
-                include: [
-                    { association: 'i18n', where: { languageId }, attributes: ['title'] }
-                ]
+                attributes: ['id', 'title'],
+                // include: [
+                //     { association: 'i18n', where: { languageId }, attributes: ['title'] }
+                // ]
             },
         ]
     });
@@ -533,7 +553,7 @@ const includeForFind = (languageId) => {
                     { association: 'profile' }
                 ]
             },
-            { association: 'i18n', where: { languageId } },
+            // { association: 'i18n', where: { languageId } },
             { association: 'images' },
             { association: 'videos' },
             { association: 'featuredImage' },
@@ -542,9 +562,9 @@ const includeForFind = (languageId) => {
                 include: [
                     {
                         association: 'tag',
-                        include: [
-                            { association: 'i18n', where: { languageId } }
-                        ]
+                        // include: [
+                        //     { association: 'i18n', where: { languageId } }
+                        // ]
                     },
                     { association: 'users', required: false }
                 ]

@@ -7,6 +7,10 @@ module.exports = (Sequelize, DataTypes) => {
 			primaryKey: true,
 			type: DataTypes.INTEGER
 		},
+		title: {
+			type: DataTypes.STRING(100),
+			allowNull: false
+		},
 		createdAt: {
 			allowNull: false,
 			type: DataTypes.DATE,
@@ -26,7 +30,7 @@ module.exports = (Sequelize, DataTypes) => {
 		Value.belongsToMany(models.user, {
 			through: 'user_values'
 		});
-		Value.hasMany(models.valueText, { as: 'i18n', foreignKey: 'value_id' } );
+		// Value.hasMany(models.valueText, { as: 'i18n', foreignKey: 'value_id' } );
 	};
 	return Value;
 };
