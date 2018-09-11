@@ -2,35 +2,40 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
+		return queryInterface.sequelize.transaction((t) =>
 			queryInterface.addColumn(
 				'articles',
 				'title',
 				{
 					allowNull: true,
 					type: Sequelize.STRING(255),
-					after: 'user_id'
+					after: 'user_id',
+					transaction: t
 				}
-			),
-			queryInterface.addColumn(
-				'articles',
-				'slug',
-				{
-					allowNull: true,
-					type: Sequelize.STRING(255),
-					after: 'title'
-				}
-			),
-			queryInterface.addColumn(
-				'articles',
-				'description',
-				{
-					allowNull: true,
-					type: Sequelize.TEXT,
-					after: 'slug'
-				}
+			).then(() =>
+				queryInterface.addColumn(
+					'articles',
+					'slug',
+					{
+						allowNull: true,
+						type: Sequelize.STRING(255),
+						after: 'title',
+						transaction: t
+					}
+				).then(() =>
+					queryInterface.addColumn(
+						'articles',
+						'description',
+						{
+							allowNull: true,
+							type: Sequelize.TEXT,
+							after: 'slug',
+							transaction: t
+						}
+					)
+				)
 			)
-		];
+		);
 	},
 	down: (queryInterface, Sequelize) => {
 		return [

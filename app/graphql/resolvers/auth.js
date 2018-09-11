@@ -205,7 +205,6 @@ const attemptLogin = async (email, password, { models, res }) => {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true
     });
-
     tokens.id = user.id;
     tokens.email = user.email;
     tokens.firstName = user.firstName;

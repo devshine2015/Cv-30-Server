@@ -147,9 +147,8 @@ module.exports = async (req, res) => {
     let refreshToken = null;
     let user = null;
     let bearerLength = 0;
-    const tokenHeader = cleanHeaderName(process.env.TOKEN_HEADER);
-    const refreshTokenHeader = cleanHeaderName(process.env.REFRESH_TOKEN_HEADER);
-    console.log(cookies);
+    const tokenHeader = process.env.TOKEN_HEADER;
+    const refreshTokenHeader = process.env.REFRESH_TOKEN_HEADER;
     if (cookies && cookies[tokenHeader]) authorization = cookies[tokenHeader];
     if (cookies && cookies[refreshTokenHeader]) refreshToken = cookies[refreshTokenHeader];
     if (!authorization && headers[tokenHeader]) {
@@ -167,6 +166,8 @@ module.exports = async (req, res) => {
             });
         }
         if (user) {
+            console.log("=====");
+            console.log(user);
             const { ok, result } = await new Promise(function (resolve) {
                 jwt.verify(token, user.salt + process.env.JWT_SECRET, function (err, result) {
                     if (err) {
