@@ -2,16 +2,16 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
-			queryInterface.addColumn(
-				'shallow_users',
-				'description',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'position'
-				}
-			),
+		return queryInterface.addColumn(
+			'shallow_users',
+			'description',
+			{
+				type: Sequelize.TEXT,
+				allowNull: true,
+				after: 'position'
+			}
+		)
+		.then(() =>
 			queryInterface.addColumn(
 				'shallow_users',
 				'avatar_path',
@@ -21,7 +21,7 @@ module.exports = {
 					after: 'position'
 				}
 			)
-		]
+		);
 	},
 
 	down: (queryInterface, Sequelize) => {

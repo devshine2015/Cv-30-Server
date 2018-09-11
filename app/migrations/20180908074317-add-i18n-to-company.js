@@ -2,16 +2,16 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
-			queryInterface.addColumn(
-				'companies',
-				'headline',
-				{
-					allowNull: true,
-					type: Sequelize.STRING(255),
-					after: 'name'
-				}
-            ),
+		return queryInterface.addColumn(
+			'companies',
+			'headline',
+			{
+				allowNull: true,
+				type: Sequelize.STRING(255),
+				after: 'name'
+			}
+		)
+		.then(() =>
             queryInterface.addColumn(
 				'companies',
 				'description',
@@ -21,7 +21,7 @@ module.exports = {
 					after: 'name'
 				}
 			)
-		];
+		);
 	},
 	down: (queryInterface, Sequelize) => {
 		return [

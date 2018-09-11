@@ -2,16 +2,16 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
-			queryInterface.addColumn(
-				'jobs',
-				'phone',
-				{
-					allowNull: true,
-					type: Sequelize.STRING(255),
-					field: 'phone'
-				}
-			),
+		return queryInterface.addColumn(
+			'jobs',
+			'phone',
+			{
+				allowNull: true,
+				type: Sequelize.STRING(255),
+				field: 'phone'
+			}
+		)
+		.then(() => 
 			queryInterface.addColumn(
 				'jobs',
 				'email',
@@ -20,26 +20,30 @@ module.exports = {
 					type: Sequelize.STRING(255),
 					field: 'email'
 				}
-			),
-			queryInterface.addColumn(
-				'jobs',
-				'facebook',
-				{
-					allowNull: true,
-					type: Sequelize.STRING(255),
-					field: 'facebook'
-				}
-			),
-			queryInterface.addColumn(
-				'jobs',
-				'linkedin',
-				{
-					allowNull: true,
-					type: Sequelize.STRING(255),
-					field: 'linkedin'
-				}
 			)
-		];
+			.then(() => 
+				queryInterface.addColumn(
+					'jobs',
+					'facebook',
+					{
+						allowNull: true,
+						type: Sequelize.STRING(255),
+						field: 'facebook'
+					}
+				)
+				.then(() =>
+					queryInterface.addColumn(
+						'jobs',
+						'linkedin',
+						{
+							allowNull: true,
+							type: Sequelize.STRING(255),
+							field: 'linkedin'
+						}
+					)
+				)
+			)
+		);
 	},
   	down: (queryInterface, Sequelize) => {
 		return [

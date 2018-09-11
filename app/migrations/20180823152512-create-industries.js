@@ -1,26 +1,25 @@
 'use strict';
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return[
-			queryInterface.createTable('industries', {
-				id: {
-					allowNull: false,
-					autoIncrement: true,
-					primaryKey: true,
-					type: Sequelize.INTEGER
-				},
-				createdAt: {
-					allowNull: false,
-					type: Sequelize.DATE,
-					field: 'created_at'
-				},
-				updatedAt: {
-					allowNull: false,
-					type: Sequelize.DATE,
-					field: 'updated_at'
-				}
-			}),
-
+		return queryInterface.createTable('industries', {
+			id: {
+				allowNull: false,
+				autoIncrement: true,
+				primaryKey: true,
+				type: Sequelize.INTEGER
+			},
+			createdAt: {
+				allowNull: false,
+				type: Sequelize.DATE,
+				field: 'created_at'
+			},
+			updatedAt: {
+				allowNull: false,
+				type: Sequelize.DATE,
+				field: 'updated_at'
+			}
+		})
+		.then(() =>
 			queryInterface.createTable('industry_i18n', {
 				industryId: {
 					allowNull: false,
@@ -49,18 +48,19 @@ module.exports = {
 					type: Sequelize.DATE,
 					field: 'updated_at'
 				}
-			}),
-
-			queryInterface.addColumn(
-				'companies',
-				'industry_id',
-				{
-					allowNull: true,
-					type: Sequelize.INTEGER,
-					after: 'activity_field'
-				}
+			})
+			.then(() =>
+				queryInterface.addColumn(
+					'companies',
+					'industry_id',
+					{
+						allowNull: true,
+						type: Sequelize.INTEGER,
+						after: 'activity_field'
+					}
+				)
 			)
-		];
+		);
 	},
 	down: (queryInterface, Sequelize) => {
 		return [

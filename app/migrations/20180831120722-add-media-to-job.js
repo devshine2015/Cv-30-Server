@@ -2,16 +2,16 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
-			queryInterface.addColumn(
-				'jobs',
-				'image_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'activity_field_id'
-				}
-			),
+		return queryInterface.addColumn(
+			'jobs',
+			'image_path',
+			{
+				type: Sequelize.TEXT,
+				allowNull: true,
+				after: 'activity_field_id'
+			}
+		)
+		.then(() =>
 			queryInterface.addColumn(
 				'jobs',
 				'video_url',
@@ -21,7 +21,7 @@ module.exports = {
 					after: 'image_path'
 				}
 			)
-		]
+		);
 	},
 	down: (queryInterface, Sequelize) => {
 		return [

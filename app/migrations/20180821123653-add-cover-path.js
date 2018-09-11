@@ -2,66 +2,18 @@
 
 module.exports = {
 	up: (queryInterface, Sequelize) => {
-		return [
+		return queryInterface.addColumn(
+			'companies',
+			'logo_path',
+			{
+				type: Sequelize.TEXT,
+				allowNull: true,
+				after: 'logo_content_type'
+			}
+		)
+		.then(() =>
 			queryInterface.addColumn(
 				'companies',
-				'logo_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'logo_content_type'
-				}
-			),
-			queryInterface.addColumn(
-				'companies',
-				'cover_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'cover_content_type'
-				}
-			),
-
-			queryInterface.addColumn(
-				'landing_pages',
-				'cover_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'cover_content_type'
-				}
-			),
-			queryInterface.addColumn(
-				'landing_pages',
-				'footer_cover_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'footer_cover_content_type'
-				}
-			),
-
-			queryInterface.addColumn(
-				'profiles',
-				'avatar_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'avatar_content_type'
-				}
-			),
-			queryInterface.addColumn(
-				'profiles',
-				'cover_path',
-				{
-					type: Sequelize.TEXT,
-					allowNull: true,
-					after: 'profile_cover_content_type'
-				}
-			),
-
-			queryInterface.addColumn(
-				'teams',
 				'cover_path',
 				{
 					type: Sequelize.TEXT,
@@ -69,7 +21,62 @@ module.exports = {
 					after: 'cover_content_type'
 				}
 			)
-		];
+			.then(() =>
+				queryInterface.addColumn(
+					'landing_pages',
+					'cover_path',
+					{
+						type: Sequelize.TEXT,
+						allowNull: true,
+						after: 'cover_content_type'
+					}
+				)
+				.then(() =>
+					queryInterface.addColumn(
+						'landing_pages',
+						'footer_cover_path',
+						{
+							type: Sequelize.TEXT,
+							allowNull: true,
+							after: 'footer_cover_content_type'
+						}
+					)
+					.then(() =>
+						queryInterface.addColumn(
+							'profiles',
+							'avatar_path',
+							{
+								type: Sequelize.TEXT,
+								allowNull: true,
+								after: 'avatar_content_type'
+							}
+						)
+						.then(() =>
+							queryInterface.addColumn(
+								'profiles',
+								'cover_path',
+								{
+									type: Sequelize.TEXT,
+									allowNull: true,
+									after: 'profile_cover_content_type'
+								}
+							)
+							.then(() =>
+								queryInterface.addColumn(
+									'teams',
+									'cover_path',
+									{
+										type: Sequelize.TEXT,
+										allowNull: true,
+										after: 'cover_content_type'
+									}
+								)
+							)
+						)
+					)
+				)
+			)
+		);
 	},
 
 	down: (queryInterface, Sequelize) => {
