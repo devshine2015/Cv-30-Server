@@ -29,7 +29,7 @@ const handleCompany = async (language, details, { user, models }) => {
 }
 
 const storeIndustry = async (title, languageId, models, transaction) => {
-    let industryText = await models.industry.findOne({
+    let industry = await models.industry.findOne({
         where: {
             title
         },
@@ -38,7 +38,7 @@ const storeIndustry = async (title, languageId, models, transaction) => {
     });
 
     if (!industry) {
-        const industry = await models.industry.create({
+        industry = await models.industry.create({
             title,
             createdAt: new Date(),
             updatedAt: new Date()
