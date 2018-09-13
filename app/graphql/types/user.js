@@ -8,7 +8,21 @@ module.exports = `
         lastName: String
         updatedAt: Date!
         createdAt: Date!
-    }
+	}
+	type Signature {
+		bucket: String!
+    	region: String!
+		keyStart: String
+		params: SignatureParams!
+	}
+	type SignatureParams {
+		acl: String
+		policy: String
+		x_amz_algorithm: String
+		x_amz_credential: String
+		x_amz_date: String
+		x_amz_signature: String
+	}
     input UserSettingsInput {
         firstName: String!
         lastName: String!
@@ -21,9 +35,10 @@ module.exports = `
         jobId: String
         teamId: String
         isFollowing: Boolean!
-    }
+	}
 
     extend type Query {
+		signature(id: String!): Signature
         profile(
 			id: String
 			language: LanguageCodeType!

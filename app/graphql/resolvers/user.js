@@ -2,6 +2,7 @@ const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, storeSkills } = require('./common');
 const { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
+const FroalaEditor = require('../../../node_modules/wysiwyg-editor-node-sdk/lib/froalaEditor.js');
 
 const profile = async (id, language, { user, models }) => {
     yupValidation(schema.user.one, { id, language });
@@ -723,8 +724,28 @@ const profileSubQueriesParams = (languageId) => [
     }
 ];
 
+// const forbidden = () => { throw new Error("Forbidden") };
+const signature = (id, { user }) => {
+    if (!user) throw new Error("Forbidden");
+    const hash = { params: {} };
+    const froalaHash = FroalaEditor.S3.getHash({
+        bucket: process.env.AWS_BUCKET,
+        region: 'eu-west-1',
+        keyStart: 'articles/' + id,
+        acl: 'public-read',
+        accessKey: process.env.AWS_ACCESS_KEY,
+        secretKey: process.env.AWS_SECRET_KEY
+    });
+    Object.keys(froalaHash).map(key => {
+        if (key == 'params') Object.keys(froalaHash[key]).map(k => hash[key][k.replace(/-/g, '_')] = froalaHash[key][k]);
+        else hash[key] = froalaHash[key];
+    });
+    return hash;
+}
+
 module.exports = {
     Query: {
+        signature: (_, { id }, context) => signature(id, context),
         profile: (_, { id, language }, context) => profile(id, language, context),
         profiles: (_, { language }, context) => all(language, context),
         // profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),

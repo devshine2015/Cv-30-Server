@@ -38,6 +38,14 @@ services:
       TOKEN_HEADER: "${TOKEN_HEADER}"
       REFRESH_TOKEN_HEADER: "${REFRESH_TOKEN_HEADER}"
       NODE_ENV: development
+      SMTP_EMAIL: "${SMTP_EMAIL}"
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_USERNAME: "${SMTP_USERNAME}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      AWS_BUCKET: "${AWS_BUCKET}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
+      AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
     restart: always
     networks:
       - wowzaaa
