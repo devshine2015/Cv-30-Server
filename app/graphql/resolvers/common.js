@@ -84,52 +84,57 @@ const validateArticle = async (id, user, models, options = {
     return true;
 }
 
-const storeSkills = async (skills, associatedSkills, languageId, models, transaction) => {
-    return;
-    const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
-    let existingSkills = [];
-    let createdSkills = [];
+// const storeSkills = async (skills, associatedSkills, languageId, models, transaction) => {
+//     return;
+//     const cleanedInputSkills = skills.map(item => item.trim().toLowerCase());
+//     let existingSkills = [];
+//     let createdSkills = [];
 
-    if (cleanedInputSkills.length) {
-        existingSkills = await models.skill.findAll({
-            /*include: [{
-                association: 'i18n',
-                where: {
-                    languageId,
-                    title: {
-                        [models.Sequelize.Op.in]: cleanedInputSkills
-                    }
-                },
-            }],*/
-            transaction
-        });
+//     if (cleanedInputSkills.length) {
+//         existingSkills = await models.skill.findAll({
+//             where: {
+//                 title: {
+//                     [models.Sequelize.Op.in]: cleanedInputSkills
+//                 }
+//             },
+//             /*include: [{
+//                 association: 'i18n',
+//                 where: {
+//                     languageId,
+//                     title: {
+//                         [models.Sequelize.Op.in]: cleanedInputSkills
+//                     }
+//                 },
+//             }],*/
+//             transaction
+//         });
 
-        let newSkills = [];
-        if (!existingSkills.length) newSkills = cleanedInputSkills
-        else newSkills = cleanedInputSkills.filter(item => !existingSkills.find(el => el.i18n[0].title == item));
+//         let newSkills = [];
+//         if (!existingSkills.length) newSkills = cleanedInputSkills
+//         else newSkills = cleanedInputSkills.filter(item => !existingSkills.find(el => el.i18n[0].title == item));
 
-        if (newSkills.length) {
-            createdSkills = await models.skill.bulkCreate(newSkills.map(_ => { }), { transaction });
+//         if (newSkills.length) {
+//             createdSkills =      models.skill.bulkCreate(newSkills.map(_ => { }), { transaction });
 
-            // Create skill texts - need skill_id from skills
-            const mappedSkillTexts = newSkills.map((title, i) => {
-                return {
-                    skillId: createdSkills[i].dataValues.id,
-                    languageId,
-                    title,
-                };
-            });
+//             // Create skill texts - need skill_id from skills
+//             const mappedSkillTexts = newSkills.map((title, i) => {
+//                 return {
+//                     skillId: createdSkills[i].dataValues.id,
+//                     languageId,
+//                     title,
+//                 };
+//             });
 
-            const createdSkillTexts = await models.skillText.bulkCreate(mappedSkillTexts, { transaction });
-            if (createdSkills.length !== newSkills.length || createdSkillTexts.length !== newSkills.length)
-                throw new Error("Skill storage failed");
-        }
-    }
+//             const createdSkillTexts = await models.skillText.bulkCreate(mappedSkillTexts, { transaction });
+//             if (createdSkills.length !== newSkills.length || createdSkillTexts.length !== newSkills.length)
+//                 throw new Error("Skill storage failed");
+//         }
+//     }
 
-    const associatedSkillsToRemove = associatedSkills.filter(item => cleanedInputSkills.findIndex(el => el === item.i18n[0].title) === -1);
+//     const associatedSkillsToRemove = associatedSkills.filter(item => cleanedInputSkills.findIndex(el => el === item.i18n[0].title) === -1);
 
-    return { createdSkills, existingSkills, associatedSkillsToRemove };
-}
+//     return { createdSkills, existingSkills, associatedSkillsToRemove };
+// }
 
 const findOneFromSubQueries = async (subQueries, sequelizeModel, where) => {
     const promises = subQueries.map(item => {
@@ -194,7 +199,7 @@ module.exports = {
     validateCompany,
     validateTeam,
     validateArticle,
-    storeSkills,
+    // storeSkills,
     findOneFromSubQueries,
     findAllFromSubQueries
 }

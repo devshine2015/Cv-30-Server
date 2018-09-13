@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, storeSkills } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode } = require('./common');
 const { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
 const FroalaEditor = require('../../../node_modules/wysiwyg-editor-node-sdk/lib/froalaEditor.js');
 
@@ -199,20 +199,46 @@ const setStory = async (language, { title, description }, { user, models }) => {
     return response;
 }
 
-const setValues = async (addValues, removeValues, language, { user, models }) => {
+const setValues = async (values, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.values, {
         language,
-        addValues,
-        removeValues
+        values
     });
 
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        let dbValues = await models.value.findAll({
+            where: {
+                title: {
+                    [models.Sequelize.Op.in]: values
+                }
+            },
+            transaction: t
+        });
+        const newValues = values.filter(value => !dbValues.filter(dbValue => dbValue.title == value).length);
+        if (newValues.length) {
+            await models.value.bulkCreate(newValues.map(title => ({ title })), { transaction: t });
+            const newDbValues = await models.value.findAll({
+                where: {
+                    title: {
+                        [models.Sequelize.Op.in]: newValues
+                    }
+                },
+                transaction: t
+            });
+            dbValues = dbValues.concat(newDbValues);
+        }
+        await user.setValues(dbValues, { transaction: t });
+    });
+
+    return { status: result };
     // Get existing values
-    const languageId = await getLanguageIdByCode(models, language);
+    // const languageId = await getLanguageIdByCode(models, language);
 
-    const cleanedInputValues = addValues.map(item => item.trim().toLowerCase());
+    // const cleanedInputValues = addValues.map(item => item.trim().toLowerCase());
 
-    const existingValues = await models.value.findAll({
+    // const existingValues = await models.value.findAll({
         // include: [{
         //     association: 'i18n',
         //     where: {
@@ -222,72 +248,92 @@ const setValues = async (addValues, removeValues, language, { user, models }) =>
         //         }
         //     },
         // }]
-    });
+    // });
 
-    let newValues = [];
-    if (!existingValues.length) newValues = cleanedInputValues
-    else newValues = cleanedInputValues.filter(item => !existingValues.find(el => el.i18n[0].title == item));
+    // let newValues = [];
+    // if (!existingValues.length) newValues = cleanedInputValues
+    // else newValues = cleanedInputValues.filter(item => !existingValues.find(el => el.i18n[0].title == item));
 
-    let result = false;
-    if (newValues.length || existingValues.length) {
-        await models.sequelize.transaction(async transaction => {
-            if (newValues.length) {
-                const createdValues = await models.value.bulkCreate(newValues.map(_ => { }), { transaction });
+    // let result = false;
+    // if (newValues.length || existingValues.length) {
+    //     await models.sequelize.transaction(async transaction => {
+    //         if (newValues.length) {
+    //             const createdValues = await models.value.bulkCreate(newValues.map(_ => { }), { transaction });
 
-                // Create value texts - need value_id from values
-                const mappedValueTexts = newValues.map((title, i) => {
-                    return {
-                        valueId: createdValues[i].dataValues.id,
-                        languageId,
-                        title,
-                    };
-                });
+    //             // Create value texts - need value_id from values
+    //             const mappedValueTexts = newValues.map((title, i) => {
+    //                 return {
+    //                     valueId: createdValues[i].dataValues.id,
+    //                     languageId,
+    //                     title,
+    //                 };
+    //             });
 
-                await models.valueText.bulkCreate(mappedValueTexts, { transaction });
-                // Add new values to user
-                if (createdValues.length) await user.addValues(createdValues, { transaction });
-            }
+    //             await models.valueText.bulkCreate(mappedValueTexts, { transaction });
+    //             // Add new values to user
+    //             if (createdValues.length) await user.addValues(createdValues, { transaction });
+    //         }
 
-            // Add existing values to user
-            if (existingValues.length) await user.addValues(existingValues, { transaction });
+    //         // Add existing values to user
+    //         if (existingValues.length) await user.addValues(existingValues, { transaction });
 
-            // Remove values
-            if (removeValues.length) {
-                const valuesToRemove = await models.value.findAll({
-                    // include: [{
-                    //     association: 'i18n',
-                    //     where: {
-                    //         languageId,
-                    //         title: {
-                    //             [models.Sequelize.Op.in]: removeValues.map(item => item.trim().toLowerCase())
-                    //         }
-                    //     },
-                    // }],
-                    transaction
-                });
+    //         // Remove values
+    //         if (removeValues.length) {
+    //             const valuesToRemove = await models.value.findAll({
+    //                 // include: [{
+    //                 //     association: 'i18n',
+    //                 //     where: {
+    //                 //         languageId,
+    //                 //         title: {
+    //                 //             [models.Sequelize.Op.in]: removeValues.map(item => item.trim().toLowerCase())
+    //                 //         }
+    //                 //     },
+    //                 // }],
+    //                 transaction
+    //             });
 
-                await user.removeValues(valuesToRemove, { transaction });
-            }
-            result = true;
-        });
-    }
-    return { status: result };
+    //             await user.removeValues(valuesToRemove, { transaction });
+    //         }
+    //         result = true;
+    //     });
+    // }
+    // return { status: result };
 }
 
-const setSkills = async (addSkills, removeSkills, language, { user, models }) => {
+const setSkills = async (skills, language, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.user.skills, {
         language,
-        addSkills,
-        removeSkills
+        skills
     });
-
     // Get existing values
-    const languageId = await getLanguageIdByCode(models, language);
+    // const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
-    await models.sequelize.transaction(async transaction => {
-        const { createdSkills, existingSkills } = await storeSkills(addSkills, [], languageId, models, transaction);
+    await models.sequelize.transaction(async t => {
+        let dbSkills = await models.skill.findAll({
+            where: {
+                title: {
+                    [models.Sequelize.Op.in]: skills
+                }
+            },
+            transaction: t
+        });
+        const newSkills = skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
+        if (newSkills.length) {
+            await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
+            const newDbSkills = await models.skill.findAll({
+                where: {
+                    title: {
+                        [models.Sequelize.Op.in]: newSkills
+                    }
+                },
+                transaction: t
+            });
+            dbSkills = dbSkills.concat(newDbSkills);
+        }
+        await user.setSkills(dbSkills, { transaction: t });
+        /*const { createdSkills, existingSkills } = await storeSkills(addSkills, [], languageId, models, transaction);
 
         // Add new skills to user
         if (createdSkills.length) await user.addSkills(createdSkills, { transaction });
@@ -311,7 +357,7 @@ const setSkills = async (addSkills, removeSkills, language, { user, models }) =>
             });
 
             await user.removeSkills(skillsToRemove, { transaction });
-        }
+        }*/
 
         result = true;
     });
@@ -761,8 +807,8 @@ module.exports = {
         setSalary: (_, { salary }, context) => setSalary(salary, context),
         setStory: (_, { language, story }, context) => setStory(language, story, context),
 
-        setValues: (_, { addValues, removeValues, language }, context) => setValues(addValues, removeValues, language, context),
-        setSkills: (_, { addSkills, removeSkills, language }, context) => setSkills(addSkills, removeSkills, language, context),
+        setValues: (_, { values, language }, context) => setValues(values, language, context),
+        setSkills: (_, { skills, language }, context) => setSkills(skills, language, context),
         setContact: (_, { contact }, context) => setContact(contact, context),
 
         setProject: (_, { project, language }, context) => setProject(project, language, context),

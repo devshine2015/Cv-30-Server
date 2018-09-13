@@ -58,13 +58,11 @@ module.exports = `
 		): StandardResponse
 		setSalary( salary: SalaryInput ): StandardResponse
 		setValues (
-			addValues: [String!]!
-			removeValues: [String!]!
+			values: [String!]!
 			language: LanguageCodeType!
 		): StandardResponse
 		setSkills (
-			addSkills: [String!]!
-			removeSkills: [String!]!
+			skills: [String!]!
 			language: LanguageCodeType!
 		): StandardResponse
 		setContact ( contact: ContactInput ): StandardResponse

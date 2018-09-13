@@ -30,12 +30,7 @@ module.exports = {
     }),
     values: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        addValues: yup.array().of(
-            yup.string().trim()
-                .required('Value needs a title')
-                .max(100, 'Value title cannot be longer than 100 chars')
-        ),
-        removeValues: yup.array().of(
+        values: yup.array().of(
             yup.string().trim()
                 .required('Value needs a title')
                 .max(100, 'Value title cannot be longer than 100 chars')
@@ -43,12 +38,7 @@ module.exports = {
     }),
     skills: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
-        addSkills: yup.array().of(
-            yup.string().trim()
-                .required('Skill needs a title')
-                .max(100, 'Skill title cannot be longer than 100 chars')
-        ),
-        removeSkills: yup.array().of(
+        skills: yup.array().of(
             yup.string().trim()
                 .required('Skill needs a title')
                 .max(100, 'Skill title cannot be longer than 100 chars')

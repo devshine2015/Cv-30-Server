@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError, storeSkills } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -75,15 +75,38 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
         // If no skills => leave as before
         if (jobDetails.skills) {
-            const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
+            let dbSkills = await models.skill.findAll({
+                where: {
+                    title: {
+                        [models.Sequelize.Op.in]: jobDetails.skills
+                    }
+                },
+                transaction: t
+            });
+            const newSkills = jobDetails.skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
+            if (newSkills.length) {
+                await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
+                const newDbSkills = await models.skill.findAll({
+                    where: {
+                        title: {
+                            [models.Sequelize.Op.in]: newSkills
+                        }
+                    },
+                    transaction: t
+                });
+                dbSkills = dbSkills.concat(newDbSkills);
+            }
+            await job.setSkills(dbSkills, { transaction: t });
 
-            // Add new skills to job
-            if (createdSkills.length) await job.addSkills(createdSkills, { transaction: t });
+            // const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
 
-            // Add existing values to job
-            if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
+            // // Add new skills to job
+            // if (createdSkills.length) await job.addSkills(createdSkills, { transaction: t });
 
-            await job.removeSkills(associatedSkillsToRemove, { transaction: t });
+            // // Add existing values to job
+            // if (existingSkills.length) await job.addSkills(existingSkills, { transaction: t });
+
+            // await job.removeSkills(associatedSkillsToRemove, { transaction: t });
         }
 
         // Benefits
