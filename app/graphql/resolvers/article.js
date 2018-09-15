@@ -2,6 +2,38 @@ const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle, throwForbiddenError } = require('./common');
 
+const appreciate = async (tagId, articleId, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.article.appreciate, {
+        tagId,
+        articleId
+    });
+    const article = await models.article.findOne({
+        attributes: ['id', 'ownerId'],
+        where: {
+            id: articleId
+        },
+        include: [
+            { association: 'activeTags', where: { tagId } }
+        ]
+    });
+    if (!article) return { status: false };
+    if (article.ownerId == user.id) return { status: false };
+    try {
+        let voters = article.activeTags && article.activeTags.length == 1 && article.activeTags[0].voters || '';
+        if (voters) voters = JSON.parse(voters);
+        else voters = [];
+        if (voters.indexOf(user.id) == -1) {
+            voters.push(user.id);
+            article.activeTags[0].voters = JSON.stringify(voters);
+            article.activeTags[0].votes++;
+            await article.activeTags[0].save();
+            return { status: true };
+        }
+        return { status: false };
+    } catch(error) { return { status: false }; }
+}
+
 const handleArticle = async (language, article, options, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.handleArticle, {
@@ -135,10 +167,6 @@ const handleArticle = async (language, article, options, { user, models }) => {
                 }
                 await models.articleText.upsert(article, { transaction: t });
             }*/
-
-            if (article.tags) {
-                await storeArticleTags(article.tags, article.id, languageId, undefined, user, models, t);
-            }
         }
         if (options && options.articleId && options.companyId) {
             article = await models.article.findOne({ attributes: ["id"], where: { id: options.articleId }, transaction: t });
@@ -169,6 +197,11 @@ const handleArticle = async (language, article, options, { user, models }) => {
             }
         }
         result = true;
+    })
+    .then(async () => {
+        if (article.tags) {
+            await storeArticleTags(article.tags, article.id, languageId, user, models, null);
+        }
     });
 
     return { status: result };
@@ -190,37 +223,63 @@ const removeArticle = async (id, { user, models }) => {
     return { status: false };
 }
 
-const storeArticleTags = async (titles, articleId, languageId, isSet, user, models, transaction) => {
-    return;
-    const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
+const storeArticleTags = async (tags, articleId, languageId, user, models, t) => {
+    await models.sequelize.transaction(async transaction => {
+        const article = await models.article.findOne({ where: { id: articleId } }, { transaction });
+        console.log(article);
+        let dbArticleTags = await models.articleTag.findAll({
+            where: {
+                title: {
+                    [models.Sequelize.Op.in]: tags
+                }
+            },
+            transaction
+        });
+        const newTags = tags.filter(tag => !dbArticleTags.filter(dbTag => dbTag.title == tag).length);
+        if (newTags.length) {
+            await models.articleTag.bulkCreate(newTags.map(title => ({ title })), { transaction });
+            const newDbTags = await models.articleTag.findAll({
+                where: {
+                    title: {
+                        [models.Sequelize.Op.in]: newTags
+                    }
+                },
+                transaction
+            });
+            dbArticleTags = dbArticleTags.concat(newDbTags);
+        }
+        await article.setTags(dbArticleTags, { transaction });
+    });
+    // return;
+    // const cleanedInputTags = titles.map(title => title.trim().toLowerCase());
 
     // Get data before changes
-    const foundUser = await models.user.findOne({
-        attributes: ['id'],
-        where: {
-            id: user.id
-        }
-    }, { transaction });
+    // const foundUser = await models.user.findOne({
+    //     attributes: ['id'],
+    //     where: {
+    //         id: user.id
+    //     }
+    // }, { transaction });
 
-    const articleArticleTags = await models.articleArticleTag.findAll({
-        attributes: ['id', 'tagId'],
-        where: {
-            articleId
-        },
-        include: [
-            { association: 'users', attributes: ['id'] },
-            {
-                association: 'tag',
-                attributes: ['id', 'title'],
-                // include: [
-                //     { association: 'i18n', attributes: ['title'], where: { languageId } }
-                // ]
-            }
-        ]
-    }, { transaction });
+    // const articleArticleTags = await models.articleArticleTag.findAll({
+    //     attributes: ['id', 'tagId'],
+    //     where: {
+    //         articleId
+    //     },
+    //     include: [
+    //         { association: 'users', attributes: ['id'] },
+    //         {
+    //             association: 'tag',
+    //             attributes: ['id', 'title'],
+    //             // include: [
+    //             //     { association: 'i18n', attributes: ['title'], where: { languageId } }
+    //             // ]
+    //         }
+    //     ]
+    // }, { transaction });
 
     // Start the changes. Find what's new, first.
-    const existingTags = await models.articleTag.findAll({
+    // const existingTags = await models.articleTag.findAll({
         /*include: [
             {
                 association: 'i18n',
@@ -232,18 +291,18 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
                 }
             }
         ]*/
-    }, { transaction });
+    // }, { transaction });
 
-    let newTags = [];
-    if (existingTags.length === 0) newTags = cleanedInputTags;
-    else newTags = cleanedInputTags.filter(item => !existingTags.find(el => el.i18n[0].title === item));
+    // let newTags = [];
+    // if (existingTags.length === 0) newTags = cleanedInputTags;
+    // else newTags = cleanedInputTags.filter(item => !existingTags.find(el => el.i18n[0].title === item));
 
-    let newArticleArticleTags = [];
+    // let newArticleArticleTags = [];
 
-    if (newTags.length) {
-        const createdTags = await models.articleTag.bulkCreate(newTags.map(title => ({
-            title
-        })), { transaction });
+    // if (newTags.length) {
+    //     const createdTags = await models.articleTag.bulkCreate(newTags.map(title => ({
+    //         title
+    //     })), { transaction });
 
         // Create tag texts - need tag_id from tags
         // const mappedTagTexts = newTags.map((title, i) => {
@@ -257,101 +316,100 @@ const storeArticleTags = async (titles, articleId, languageId, isSet, user, mode
         // await models.articleTagText.bulkCreate(mappedTagTexts, { transaction });
 
         // Link new tags with article
-        newArticleArticleTags = articleArticleTag = await models.articleArticleTag.bulkCreate(createdTags.map(newTag => ({
-            id: uuid(),
-            tagId: newTag.id,
-            articleId
-        })), { transaction });
-    }
+    //     newArticleArticleTags = articleArticleTag = await models.articleArticleTag.bulkCreate(createdTags.map(newTag => ({
+    //         id: uuid(),
+    //         tagId: newTag.id,
+    //         articleId
+    //     })), { transaction });
+    // }
 
-    let existingArticleArticleTag = [];
-    if (existingTags.length) {
-        existingArticleArticleTag = await models.articleArticleTag.findAll({
-            attributes: ['id', 'tagId'],
-            where: {
-                tagId: {
-                    [models.Sequelize.Op.in]: existingTags.map(tag => tag.id)
-                },
-                articleId
-            }
-        }, { transaction });
+    // let existingArticleArticleTag = [];
+    // if (existingTags.length) {
+    //     existingArticleArticleTag = await models.articleArticleTag.findAll({
+    //         attributes: ['id', 'tagId'],
+    //         where: {
+    //             tagId: {
+    //                 [models.Sequelize.Op.in]: existingTags.map(tag => tag.id)
+    //             },
+    //             articleId
+    //         }
+    //     }, { transaction });
 
-        if (existingArticleArticleTag.length !== existingTags.length) {
-            const missingArticleArticleTags = existingTags.filter(item => !existingArticleArticleTag.find(el => el.tagId === item.id));
-            if (missingArticleArticleTags.length) {
-                const newMissingArticleArticleTags = await models.articleArticleTag.bulkCreate(missingArticleArticleTags.map(newTag => ({
-                    id: uuid(),
-                    tagId: newTag.id,
-                    articleId
-                })), { transaction });
+    //     if (existingArticleArticleTag.length !== existingTags.length) {
+    //         const missingArticleArticleTags = existingTags.filter(item => !existingArticleArticleTag.find(el => el.tagId === item.id));
+    //         if (missingArticleArticleTags.length) {
+    //             const newMissingArticleArticleTags = await models.articleArticleTag.bulkCreate(missingArticleArticleTags.map(newTag => ({
+    //                 id: uuid(),
+    //                 tagId: newTag.id,
+    //                 articleId
+    //             })), { transaction });
 
-                existingArticleArticleTag = existingArticleArticleTag.concat(newMissingArticleArticleTags);
-            }
-        }
-    }
+    //             existingArticleArticleTag = existingArticleArticleTag.concat(newMissingArticleArticleTags);
+    //         }
+    //     }
+    // }
 
-    // Remove article tags
-    const articleArticleTagsToRemove = articleArticleTags.filter(aat => cleanedInputTags.findIndex(title => title === aat.tag.i18n[0].title) === -1);
-    if (articleArticleTagsToRemove.length) {
-        // Remove the associated users first
-        articleArticleTagsToRemove.forEach(aat => {
-            if (aat.users.length) {
-                aat.removeUsers(aat.users, { transaction })
-            }
-        });
+    // // Remove article tags
+    // const articleArticleTagsToRemove = articleArticleTags.filter(aat => cleanedInputTags.findIndex(title => title === aat.tag.i18n[0].title) === -1);
+    // if (articleArticleTagsToRemove.length) {
+    //     // Remove the associated users first
+    //     articleArticleTagsToRemove.forEach(aat => {
+    //         if (aat.users.length) {
+    //             aat.removeUsers(aat.users, { transaction })
+    //         }
+    //     });
 
-        // Remove the article article tags
-        await models.articleArticleTag.destroy({
-            where: {
-                id: {
-                    [models.Sequelize.Op.in]: articleArticleTagsToRemove.map(k => k.id)
-                }
-            }
-        }, { transaction });
-    }
+    //     // Remove the article article tags
+    //     await models.articleArticleTag.destroy({
+    //         where: {
+    //             id: {
+    //                 [models.Sequelize.Op.in]: articleArticleTagsToRemove.map(k => k.id)
+    //             }
+    //         }
+    //     }, { transaction });
+    // }
 
-    const mergedArticleArticleTags = newArticleArticleTags.concat(existingArticleArticleTag);
+    // const mergedArticleArticleTags = newArticleArticleTags.concat(existingArticleArticleTag);
 
-    if (isSet !== undefined) {
-        if (isSet) {
-            if (mergedArticleArticleTags.length) {
-                await foundUser.addArticleTags(mergedArticleArticleTags, { transaction });
-            }
-        } else {
-            if (existingArticleArticleTag.length) {
-                await foundUser.removeArticleTags(existingArticleArticleTag, { transaction });
-            }
-        }
-    }
+    // if (isSet !== undefined) {
+    //     if (isSet) {
+    //         if (mergedArticleArticleTags.length) {
+    //             await foundUser.addArticleTags(mergedArticleArticleTags, { transaction });
+    //         }
+    //     } else {
+    //         if (existingArticleArticleTag.length) {
+    //             await foundUser.removeArticleTags(existingArticleArticleTag, { transaction });
+    //         }
+    //     }
+    // }
 }
 
-const handleArticleTags = async (language, { titles, articleId, isSet }, { user, models }) => {
+const handleArticleTags = async (language, { titles, articleId}, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.article.handleArticleTags, {
         language,
         titles,
-        articleId,
-        isSet
+        articleId
     });
 
     const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
     await models.sequelize.transaction(async t => {
-        await storeArticleTags(titles, articleId, languageId, isSet, user, models, t);
+        await storeArticleTags(titles, articleId, languageId, user, models, t);
         result = true;
     });
 
     return { status: result };
 }
 
-const article = async (id, language, { models }) => {
+const article = async (id, language, { user, models }) => {
     yupValidation(schema.article.one, { id, language });
 
     return models.article.findOne({
         where: { id },
         ...includeForFind(await getLanguageIdByCode(models, language))
-    }).then(mapArticle);
+    }).then(article => mapArticle(article, user));
 }
 
 const all = async (language, { models, user }) => {
@@ -361,7 +419,7 @@ const all = async (language, { models, user }) => {
             ownerId: user.id
         },
         ...includeForFind(await getLanguageIdByCode(models, language))
-    }).then(mapArticles);
+    }).then(articles => mapArticles(articles, user));
 }
 
 const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models }) => {
@@ -415,7 +473,7 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
             include
         });
 
-        return getArticlesByIds(followingArticlesIds, languageId, models);
+        return getArticlesByIds(followingArticlesIds, languageId, models, user);
     } else {
         const where = { postAs: { [models.Sequelize.Op.ne]: 'landingPage' } };
         const include = [];
@@ -428,7 +486,7 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
             include
         });
 
-        return getArticlesByIds(followingArticlesIds, languageId, models);
+        return getArticlesByIds(followingArticlesIds, languageId, models, user);
     }
 }
 
@@ -473,7 +531,7 @@ const addTagsToQueryParams = (where, include, filteredTags, languageId, models) 
     });
 }
 
-const getArticlesByIds = async (articleIds, languageId, models) => {
+const getArticlesByIds = async (articleIds, languageId, models, user) => {
     let articles = [];
     if (articleIds.length) {
         articles = await models.article.findAll({
@@ -482,13 +540,13 @@ const getArticlesByIds = async (articleIds, languageId, models) => {
             },
             ...includeForFind(languageId),
             order: [['createdAt', 'desc']]
-        }).then(mapArticles);
+        }).then(articles => mapArticles(articles, user));
     }
 
     return articles;
 }
 
-const feedArticles = async (language, userId, companyId, teamId, { models }) => {
+const feedArticles = async (language, userId, companyId, teamId, { user, models }) => {
     yupValidation(schema.article.feed, { language, userId, companyId, teamId });
 
     const languageId = await getLanguageIdByCode(models, language);
@@ -501,7 +559,7 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
             },
             ...includeForFind(languageId),
             order: [['createdAt', 'desc']]
-        }).then(mapArticles);
+        }).then(articles => mapArticles(articles, user));
     }
 
     if (companyId) {
@@ -512,7 +570,7 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
             },
             ...includeForFind(languageId),
             order: [['createdAt', 'desc']]
-        }).then(mapArticles);
+        }).then(articles => mapArticles(articles, user));
     }
 
     if (teamId) {
@@ -523,26 +581,39 @@ const feedArticles = async (language, userId, companyId, teamId, { models }) => 
             },
             ...includeForFind(languageId),
             order: [['createdAt', 'desc']]
-        }).then(mapArticles);
+        }).then(articles => mapArticles(articles, user));
     }
 
     return [];
 }
 
-const mapArticles = articles => articles.map(mapArticle);
+const mapArticles = (articles, user) => articles.map(article => mapArticle(article, user));
 
-const mapArticle = article => ({
-    ...article.get(),
-    author: {
-        ...article.author.get(),
-        ...article.author.profile.get()
-    },
-    tags: article.tags.map(tag => ({
-        ...tag.tag.get(),
-        id: tag.tag.i18n[0].title,
-        users: tag.users
-    }))
-});
+const mapArticle = (article, user) => {
+    let canVote = {};
+    article.activeTags && article.activeTags.length && article.activeTags.map(tag => {
+        var voters = tag.voters && JSON.parse(tag.voters) || [];
+        if (voters.indexOf(user.id) == -1) canVote[tag.tagId] = true;
+        else canVote[tag.tagId] = false;
+    })
+    console.log(article.ownerId);
+    console.log(user.id);
+    console.log(article.activeTags.length);
+    console.log(canVote)
+    return {
+        ...article.get(),
+        author: {
+            ...article.author.get(),
+            ...article.author.profile.get()
+        },
+        tags: article.activeTags.map(({ tag: { id, title }, votes }) => ({
+            id,
+            title,
+            votes,
+            canVote: article.ownerId != user.id && canVote[id]
+        }))
+    };
+};
 
 const includeForFind = (languageId) => {
     return {
@@ -558,15 +629,15 @@ const includeForFind = (languageId) => {
             { association: 'videos' },
             { association: 'featuredImage' },
             {
-                association: 'tags',
+                association: 'activeTags',
                 include: [
                     {
                         association: 'tag',
                         // include: [
                         //     { association: 'i18n', where: { languageId } }
                         // ]
-                    },
-                    { association: 'users', required: false }
+                    }
+                    // { association: 'users', required: false }
                 ]
             },
             { association: 'postingCompany' },
@@ -583,6 +654,7 @@ module.exports = {
         feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
+        appreciate: (_, { tagId, articleId }, context) => appreciate(tagId, articleId, context),
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
         handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
         removeArticle: (_, { id }, context) => removeArticle(id, context)

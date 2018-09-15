@@ -23,9 +23,10 @@ module.exports = `
         updatedAt: Date
     }
     type ArticleTag {
-        id: String!
+        id: Int
         title: String
-        users: [Profile]
+        votes: Int
+        canVote: Boolean
     }
 
     extend type Query {
@@ -77,12 +78,10 @@ module.exports = `
     input ArticleTagInput {
         title: String!
         articleId: String!
-        isSet: Boolean
     }
     input ArticleTagsInput {
         titles: [String!]!
         articleId: String!
-        isSet: Boolean
     }
     
     extend type Mutation {
@@ -94,6 +93,10 @@ module.exports = `
         handleArticleTags (
 			language: LanguageCodeType!
 			details: ArticleTagsInput!
+        ): StandardResponse
+        appreciate(
+            tagId: Int!
+            articleId: String!
         ): StandardResponse
         removeArticle (
             id: String!

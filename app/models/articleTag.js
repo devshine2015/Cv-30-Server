@@ -11,16 +11,16 @@ module.exports = (sequelize, DataTypes) => {
 			type: DataTypes.STRING(255),
 			allowNull: true
 		},
-		createdAt: {
-			allowNull: false,
-			type: DataTypes.DATE,
-			field: 'created_at'
-		},
-		updatedAt: {
-			allowNull: false,
-			type: DataTypes.DATE,
-			field: 'updated_at'
-		}
+		// createdAt: {
+		// 	allowNull: false,
+		// 	type: DataTypes.DATE,
+		// 	field: 'created_at'
+		// },
+		// updatedAt: {
+		// 	allowNull: false,
+		// 	type: DataTypes.DATE,
+		// 	field: 'updated_at'
+		// }
 	}, {
 		timestamps: true,
 		updatedAt: 'updated_at',
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 	});
 	ArticleTag.associate = models => {
 		// ArticleTag.hasMany(models.articleTagText, { as: 'i18n', foreignKey: 'article_tag_id' } );
-		ArticleTag.hasMany(models.articleArticleTag, { as: 'tags', foreignKey: 'tag_id'});
+		ArticleTag.belongsToMany(models.article, { as: 'articles', foreignKey: 'tag_id', through: 'article_article_tags'});
 	};
 	return ArticleTag;
 };
