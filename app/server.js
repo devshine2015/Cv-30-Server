@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = [
 ];
 const corsOptions = {
     origin: function (origin, callback) {
-        if (ALLOWED_ORIGINS.indexOf(origin) !== -1 || origin && origin.indexOf('cv30.co') !== -1 || process.env.NODE_ENV === "development") callback(null, true);
+	if (ALLOWED_ORIGINS.indexOf(origin) !== -1 || origin && origin.indexOf('cv30.co') !== -1 || process.env.NODE_ENV === "development") callback(null, true);
         else callback(new Error('Not allowed by CORS'));
     },
     credentials: true
@@ -25,6 +25,7 @@ app.use(
     bodyParser.json(),
     cookieParser(process.env.COOKIE_SECRET, {})
 );
+app.use('/health-check', function(req, res) { res.status(200).json('success'); } );
 
 const server = new ApolloServer({
     ...schema,
