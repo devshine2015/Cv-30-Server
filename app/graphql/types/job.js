@@ -38,7 +38,6 @@ module.exports = `
     type JobBenefit {
         id: Int
         key: String!
-        icon: String!
     }
 
     input JobInput {
