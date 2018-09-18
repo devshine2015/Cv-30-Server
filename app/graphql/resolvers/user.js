@@ -51,20 +51,22 @@ const all = async (language, { models }) => {
         }))
 };
 
-const deleteProfile = async ({ user, models }) => {
+const deleteProfile = async ({ user, res }) => {
     checkUserAuth(user);
 
-    const foundUser = await models.user.findOne({
-        where: { id: user.id },
-        attributes: ['id', 'status']
-    });
+    // const foundUser = await models.user.findOne({
+    //     where: { id: user.id },
+    //     attributes: ['id', 'status']
+    // });
 
-    if (!foundUser) return { status: false, error: 'User not found'}
-    foundUser.status = 'deleted';
-    const result = await foundUser.save();
-    if (result !== foundUser) {
+    // if (!foundUser) return { status: false, error: 'User not found'}
+    user.status = 'deleted';
+    const result = await user.save();
+    if (result !== user) {
         throw new Error(JSON.stringify(result.errors));
     }
+    res.clearCookie(process.env.TOKEN_HEADER);
+    res.clearCookie(process.env.REFRESH_TOKEN_HEADER);
 
     return { status: true };
 }

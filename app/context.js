@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
         if (decodedToken) {
             decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
             user = await models.user.findOne({
-                where: { id: decodedToken.data.id }
+                where: { id: decodedToken.data.id, status: 'active' }
             });
         }
         if (user) {
