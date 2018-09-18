@@ -37,7 +37,8 @@ const createAccount = async (nickname, email, password, { models }) => {
 
     let user = await models.user.findOne({
         where: {
-            email: email
+            email: email,
+            status: 'active'
         }
     });
 
@@ -119,7 +120,8 @@ const activateAccount = async (token, { models }) => {
 
     const user = await models.user.findOne({
         where: {
-            activationToken: token
+            activationToken: token,
+            status: 'pending'
         }
     });
 
@@ -233,7 +235,8 @@ const checkTokens = async (token, refreshToken, { models }) => {
         decodedRefreshToken.data = JSON.parse(_decrypt(decodedRefreshToken.data));
         user = await models.user.findOne({
             where: {
-                id: decodedToken.data.id
+                id: decodedToken.data.id,
+                status: 'active'
             }
         });
         decodedToken = await jwt.verify(token, user.salt + process.env.JWT_SECRET);
@@ -274,7 +277,8 @@ const forgotPasswordSendCode = async (email, { models }) => {
     try {
         user = await models.user.findOne({
             where: {
-                email: email
+                email: email,
+                status: 'active'
             }
         });
     } catch (err) {
@@ -327,7 +331,8 @@ const forgotPasswordUpdate = async (token, password, { models }) => {
     try {
         user = await models.user.findOne({
             where: {
-                passwordResetToken: token
+                passwordResetToken: token,
+                status: 'active'
             }
         });
     } catch (err) {
@@ -426,7 +431,8 @@ const forgotPasswordCheckToken = async (token, { models }) => {
     try {
         user = await models.user.findOne({
             where: {
-                passwordResetToken: token
+                passwordResetToken: token,
+                status: 'active'
             }
         });
     } catch (err) {

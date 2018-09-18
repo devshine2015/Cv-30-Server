@@ -26,7 +26,7 @@ const handleTeamMember = async (teamId, memberId, add, { user, models }) => {
     const companyOk = await validateCompany(team.companyId, user, models);
     if (companyOk !== true) return companyOk;
 
-    const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId } });
+    const member = await models.user.findOne({ attributes: ["id"], where: { id: memberId, status: 'active' } });
     if (!member)
         return { status: false, error: 'Member not found' };
 

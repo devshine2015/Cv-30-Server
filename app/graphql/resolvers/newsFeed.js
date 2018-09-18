@@ -4,7 +4,7 @@ const { yupValidation, getLanguageIdByCode, checkUserAuth, throwForbiddenError }
 const handleAd = async (language, details, { user, models }) => {
     checkUserAuth(user);
     const foundUser = await models.user.findOne({
-        where: { id: user.id, god: true },
+        where: { id: user.id, god: true, status: 'active' },
         attributes: ["id"]
     });
     

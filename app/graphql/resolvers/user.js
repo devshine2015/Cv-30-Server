@@ -9,7 +9,7 @@ const profile = async (id, language, { user, models }) => {
     const languageId = await getLanguageIdByCode(models, language);
 
     if (id) {
-        user = await models.user.findOne({ where: { id: id }, attributes: ['id'] });
+        user = await models.user.findOne({ where: { id: id, status: 'active' }, attributes: ['id'] });
         if (!user) return { status: false, error: 'User not found' };
         return await createProfileResponse(user, models, languageId);
     } else {
@@ -22,7 +22,7 @@ const all = async (language, { models }) => {
     const languageId = await getLanguageIdByCode(models, language);
 
     return models.user.findAll({
-        where: {},
+        where: { status: 'active' },
         include: [
             { association: 'skills'/*, include: [{ association: 'i18n' }] */},
             { association: 'values'/*, include: [{ association: 'i18n' }] */},
@@ -568,7 +568,7 @@ const handleFollow = async ({ userToFollowId, companyId, jobId, teamId, isFollow
     let team = undefined;
 
     if (userToFollowId) {
-        userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: userToFollowId } });
+        userToFollow = await models.user.findOne({ attributes: ["id"], where: { id: userToFollowId, status: 'active' } });
         if (!userToFollow)
             return { status: false, error: 'Following user not found' };
     }
@@ -636,7 +636,8 @@ const createProfileResponse = async (user, models, languageId) => {
     const promises = profileSubQueriesParams(languageId).map(item => {
         let query = models.user.findOne({
             where: {
-                id: user.id
+                id: user.id,
+                status: 'active'
             },
             include: [
                 item.include
