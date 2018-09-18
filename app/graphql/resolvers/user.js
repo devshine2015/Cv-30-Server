@@ -625,7 +625,6 @@ const setPosition = async (position, { user, models }) => {
 
     const result = await profile.save();
     if (result !== profile) {
-        console.log(result);
         throw new Error(JSON.stringify(result.errors));
     }
 
