@@ -23,9 +23,11 @@ module.exports = async (req, res) => {
         const decodedToken = await jwt.decode(token);
         if (decodedToken) {
             decodedToken.data = JSON.parse(_decrypt(decodedToken.data));
-            user = await models.user.findOne({
-                where: { id: decodedToken.data.id, status: 'active' }
-            });
+            if (decodedToken.data && decodedToken.data.id) {
+                user = await models.user.findOne({
+                    where: { id: decodedToken.data.id, status: 'active' }
+                });
+            }
         }
         if (user) {
             const { ok, result } = await new Promise(function (resolve) {

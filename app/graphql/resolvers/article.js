@@ -431,7 +431,6 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
 
     const languageId = await getLanguageIdByCode(models, language);
     const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
-
     if (user && (!peopleOrCompany && !(tags && tags.length))) {
         // Following articles
         const where = {
@@ -533,11 +532,13 @@ const addTagsToQueryParams = (where, include, filteredTags, languageId, models) 
 
 const getArticlesByIds = async (articleIds, languageId, models, user) => {
     let articles = [];
+    let where = {};
     if (articleIds.length) {
+        where = {
+            id: { [models.Sequelize.Op.in]: articleIds.map(article => article.id) }
+        };
         articles = await models.article.findAll({
-            where: {
-                id: { [models.Sequelize.Op.in]: articleIds.map(it => it.id) }
-            },
+            where,
             ...includeForFind(languageId),
             order: [['createdAt', 'desc']]
         }).then(articles => mapArticles(articles, user));
@@ -593,13 +594,9 @@ const mapArticle = (article, user) => {
     let canVote = {};
     article.activeTags && article.activeTags.length && article.activeTags.map(tag => {
         var voters = tag.voters && JSON.parse(tag.voters) || [];
-        if (voters.indexOf(user.id) == -1) canVote[tag.tagId] = true;
+        if (user && voters.indexOf(user.id) == -1) canVote[tag.tagId] = true;
         else canVote[tag.tagId] = false;
-    })
-    console.log(article.ownerId);
-    console.log(user.id);
-    console.log(article.activeTags.length);
-    console.log(canVote)
+    });
     return {
         ...article.get(),
         author: {
@@ -610,7 +607,7 @@ const mapArticle = (article, user) => {
             id,
             title,
             votes,
-            canVote: article.ownerId != user.id && canVote[id]
+            canVote: user && article.ownerId != user.id && canVote[id]
         }))
     };
 };

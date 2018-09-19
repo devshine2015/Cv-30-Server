@@ -12,8 +12,10 @@ const profile = async (id, language, { user, models }) => {
         user = await models.user.findOne({ where: { id: id, status: 'active' }, attributes: ['id'] });
         if (!user) return { status: false, error: 'User not found' };
         return await createProfileResponse(user, models, languageId);
-    } else {
+    } else if (user) {
         return await createProfileResponse(user, models, languageId);
+    } else {
+        return { status: false };
     }
 }
 const all = async (language, { models }) => {
