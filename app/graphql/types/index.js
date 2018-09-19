@@ -1,15 +1,6 @@
 const glob = require('glob');
 const path = require('path');
 
-const Query = `
-	type Query {
-		_empty: String
-	}
-	type Mutation {
-		_empty: String
-	}
-`;
-
 const SchemaDefinition = `
 	schema {
 		query: Query
@@ -24,6 +15,5 @@ const allTypes = () => {
 
 module.exports = [
 	SchemaDefinition,
-	Query,
 	...allTypes()
 ];

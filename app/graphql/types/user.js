@@ -37,7 +37,7 @@ module.exports = `
         isFollowing: Boolean!
 	}
 
-    extend type Query {
+    type Query {
 		signature(id: String!): Signature
         profile(
 			id: String
@@ -48,7 +48,7 @@ module.exports = `
 		): [Profile]
     }
 
-    extend type Mutation {
+    type Mutation {
 		avatar ( status: Boolean, contentType: ImageType, path: String ): StandardResponse
 		profileCover ( status: Boolean, contentType: ImageType, path: String ): StandardResponse
 		setCoverBackground ( color: String ): StandardResponse
