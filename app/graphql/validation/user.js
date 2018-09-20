@@ -39,9 +39,7 @@ module.exports = {
     skills: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         skills: yup.array().of(
-            yup.string().trim()
-                .required('Skill needs a title')
-                .max(100, 'Skill title cannot be longer than 100 chars')
+            yup.number().positive().integer()
         )
     }),
     contact: yup.object().shape({

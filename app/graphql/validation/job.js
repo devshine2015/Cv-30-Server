@@ -38,9 +38,7 @@ module.exports = {
             imagePath: yup.string().trim().max(1024).nullable(),
             videoUrl: yup.string().trim().max(1024).nullable(),
             skills: yup.array().of(
-                yup.string().trim()
-                    .required('Skill needs a title')
-                    .max(100, 'Skill title cannot be longer than 100 chars')
+                yup.number().positive().integer()
             ),
             status: yup.string().matches(/(draft|active|archived)/, { excludeEmptyString: true }),
             jobBenefits: yup.array().of(yup.number().positive().integer()),

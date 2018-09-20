@@ -314,29 +314,40 @@ const setSkills = async (skills, language, { user, models }) => {
     // const languageId = await getLanguageIdByCode(models, language);
 
     let result = false;
-    await models.sequelize.transaction(async t => {
+    await models.sequelize.transaction(async transaction => {
         let dbSkills = await models.skill.findAll({
             where: {
-                title: {
+                id: {
                     [models.Sequelize.Op.in]: skills
                 }
             },
-            transaction: t
+            transaction
         });
-        const newSkills = skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
-        if (newSkills.length) {
-            await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
-            const newDbSkills = await models.skill.findAll({
-                where: {
-                    title: {
-                        [models.Sequelize.Op.in]: newSkills
-                    }
-                },
-                transaction: t
-            });
-            dbSkills = dbSkills.concat(newDbSkills);
-        }
-        await user.setSkills(dbSkills, { transaction: t });
+
+        await user.setSkills(dbSkills, { transaction });
+
+        // let dbSkills = await models.skill.findAll({
+        //     where: {
+        //         title: {
+        //             [models.Sequelize.Op.in]: skills
+        //         }
+        //     },
+        //     transaction: t
+        // });
+        // const newSkills = skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
+        // if (newSkills.length) {
+        //     await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
+        //     const newDbSkills = await models.skill.findAll({
+        //         where: {
+        //             title: {
+        //                 [models.Sequelize.Op.in]: newSkills
+        //             }
+        //         },
+        //         transaction: t
+        //     });
+        //     dbSkills = dbSkills.concat(newDbSkills);
+        // }
+        // await user.setSkills(dbSkills, { transaction: t });
         /*const { createdSkills, existingSkills } = await storeSkills(addSkills, [], languageId, models, transaction);
 
         // Add new skills to user

@@ -62,7 +62,7 @@ module.exports = `
 			language: LanguageCodeType!
 		): StandardResponse
 		setSkills (
-			skills: [String!]!
+			skills: [Int]!
 			language: LanguageCodeType!
 		): StandardResponse
 		setContact ( contact: ContactInput ): StandardResponse

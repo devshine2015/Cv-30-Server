@@ -56,7 +56,7 @@ module.exports = `
         jobTypes: [Int]
         salary: JobSalaryInput
         activityField: String
-        skills: [String]
+        skills: [Int]
         imagePath: String
         videoUrl: String
         status: String

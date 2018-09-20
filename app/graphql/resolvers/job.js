@@ -48,23 +48,6 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
         job = await models.job.findOne({
             where: { id: jobDetails.id },
-            include: [{
-                association: 'skills',
-                attributes: ['id', 'title'],
-                // include: [
-                //     {
-                //         association: 'i18n',
-                //         where: { languageId },
-                //         attributes: ['title']
-                //     }
-                // ]
-            }, {
-                association: 'jobTypes',
-                attributes: ['id'],
-            }, {
-                association: 'jobBenefits',
-                attributes: ['id'],
-            }],
             attributes: ['id'],
             transaction: t
         });
@@ -77,26 +60,37 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         if (jobDetails.skills) {
             let dbSkills = await models.skill.findAll({
                 where: {
-                    title: {
+                    id: {
                         [models.Sequelize.Op.in]: jobDetails.skills
                     }
                 },
                 transaction: t
             });
-            const newSkills = jobDetails.skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
-            if (newSkills.length) {
-                await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
-                const newDbSkills = await models.skill.findAll({
-                    where: {
-                        title: {
-                            [models.Sequelize.Op.in]: newSkills
-                        }
-                    },
-                    transaction: t
-                });
-                dbSkills = dbSkills.concat(newDbSkills);
-            }
+    
             await job.setSkills(dbSkills, { transaction: t });
+
+            // let dbSkills = await models.skill.findAll({
+            //     where: {
+            //         title: {
+            //             [models.Sequelize.Op.in]: jobDetails.skills
+            //         }
+            //     },
+            //     transaction: t
+            // });
+            // const newSkills = jobDetails.skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
+            // if (newSkills.length) {
+            //     await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
+            //     const newDbSkills = await models.skill.findAll({
+            //         where: {
+            //             title: {
+            //                 [models.Sequelize.Op.in]: newSkills
+            //             }
+            //         },
+            //         transaction: t
+            //     });
+            //     dbSkills = dbSkills.concat(newDbSkills);
+            // }
+            // await job.setSkills(dbSkills, { transaction: t });
 
             // const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
 
