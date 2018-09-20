@@ -25,7 +25,7 @@ module.exports = {
             hasLogo: yup.boolean(),
             logoContentType: yup.string().matches(/(jpeg|png|gif)/, { excludeEmptyString: true }).nullable(),
             logoPath: yup.string().max(2048).nullable(),
-            industry: yup.string().trim().min(2).max(255),
+            industryId: yup.number().integer().positive(),
         })
     }),
     faqInput: yup.object().shape({

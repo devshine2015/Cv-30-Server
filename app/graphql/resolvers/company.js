@@ -11,12 +11,19 @@ const handleCompany = async (language, details, { user, models }) => {
         const companyOk = await validateCompany(details.id, user, models);
         if (companyOk !== true) return companyOk;
     }
-    const languageId = await getLanguageIdByCode(models, language);
+    //const languageId = await getLanguageIdByCode(models, language);
+
+    if (details.industryId) {
+        const foundIndustry = await models.industry.findOne({ 
+            where: { 
+                id: details.industryId
+            }}
+        );
+        if (!foundIndustry)
+            return { status: false, error: 'Industry not found!' };
+    }
 
     await models.sequelize.transaction(async transaction => {
-        if (details.industry) {
-            details.industryId = await storeIndustry(details.industry, languageId, models, transaction);
-        }
         details.id = details.id || uuid();
         details.user_id = user.id;
         await models.company.upsert(details, { transaction });

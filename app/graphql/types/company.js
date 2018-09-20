@@ -31,7 +31,7 @@ module.exports = `
         name: String
         headline: String
         description: String
-        industry: String
+        industryId: Int
         activityField: String
         noOfEmployees: String
         location: String

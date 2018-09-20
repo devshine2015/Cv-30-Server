@@ -1,7 +1,7 @@
 module.exports = `
     type Industry {
         id: Int
-        title: String
+        key: String!
     }
 
     extend type Query {
@@ -10,7 +10,3 @@ module.exports = `
         ): [Industry]
     }
 `;
-
-`type IndustryText {
-    title: String
-}`;
