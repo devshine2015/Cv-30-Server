@@ -275,20 +275,21 @@ module.exports = {
 			'tactics'
 		];
 
-		return queryInterface.bulkDelete('skills', {})
-		.then(() => queryInterface.bulkDelete('job_skills', {}))
-		.then(() => queryInterface.bulkDelete('user_skills', {}))
-		.then(() => queryInterface.removeColumn('skills', 'title'))
-		.then(() =>	queryInterface.addColumn('skills', 'key', {
-			type: Sequelize.TEXT,
-			allowNull: false,
-			after: 'id'
-		}))
-		.then(() => queryInterface.bulkInsert('skills', skills.map((key, i) => ({
-			id: i,
-			key,
-			...timestamps
-		}))));
+		return queryInterface.sequelize.transaction(transaction => queryInterface.bulkDelete('skills', {}, { transaction })
+			.then(() => queryInterface.bulkDelete('job_skills', {}, { transaction }))
+			.then(() => queryInterface.bulkDelete('user_skills', {}, { transaction }))
+			.then(() => queryInterface.removeColumn('skills', 'title', { transaction }))
+			.then(() =>	queryInterface.addColumn('skills', 'key', {
+				type: Sequelize.TEXT,
+				allowNull: false,
+				after: 'id',
+			}, { transaction }))
+			.then(() => queryInterface.bulkInsert('skills', skills.map((key, i) => ({
+				id: i + 1,
+				key,
+				...timestamps
+			})), { transaction }))
+		);
 	},
 
 	down: (queryInterface, Sequelize) => {
