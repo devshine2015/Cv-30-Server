@@ -422,18 +422,22 @@ const all = async (language, { models, user }) => {
     }).then(articles => mapArticles(articles, user));
 }
 
-const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models }) => {
+const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, { user, models }) => {
     yupValidation(schema.article.newsFeedArticles, {
         language,
         peopleOrCompany,
-        tags
+        tags,
+        first,
+        after
     });
 
     const languageId = await getLanguageIdByCode(models, language);
     const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
+
+    let where, include;
     if (user && (!peopleOrCompany && !(tags && tags.length))) {
         // Following articles
-        const where = {
+        where = {
             [models.Sequelize.Op.and]: [{
                 [models.Sequelize.Op.or]: [
                     { postAs: { [models.Sequelize.Op.in]: ['company', 'team'] } },
@@ -452,7 +456,7 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
             }]
         };
 
-        const include = [
+        include = [
             {
                 association: 'author',
                 attributes: ['id'],
@@ -465,28 +469,43 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, { user, models 
                 required: false
             }
         ];
-
-        const followingArticlesIds = await models.article.findAll({
-            where,
-            attributes: ['id'],
-            include
-        });
-
-        return getArticlesByIds(followingArticlesIds, languageId, models, user);
     } else {
-        const where = { postAs: { [models.Sequelize.Op.ne]: 'landingPage' } };
-        const include = [];
+        where = { postAs: { [models.Sequelize.Op.ne]: 'landingPage' } };
+        include = [];
         if (peopleOrCompany) addPeopleOrCompanyToQueryParams(where, include, peopleOrCompany, models);
         if (tags && tags.length) addTagsToQueryParams(where, include, filteredTags, languageId, models);
-
-        const followingArticlesIds = await models.article.findAll({
-            where,
-            attributes: ['id'],
-            include
-        });
-
-        return getArticlesByIds(followingArticlesIds, languageId, models, user);
     }
+
+    if (after) {
+        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');;
+        where.createdAt = {
+            [models.Sequelize.Op.lt]: after
+        }
+    }
+
+    const followingArticlesIds = await models.article.findAll({
+        where,
+        attributes: ['id', 'createdAt'],
+        include,
+        order: [['createdAt', 'desc']],
+        limit: first + 1
+    });
+
+    let hasNextPage = false;
+    if (followingArticlesIds.length === first + 1) {
+        hasNextPage = true;
+    }
+
+    return getArticlesByIds(hasNextPage ? followingArticlesIds.slice(0, followingArticlesIds.length -1) : followingArticlesIds, languageId, models, user)
+        .then(articles => ({
+            edges: articles.map(article => ({
+                node: article,
+                cursor: Buffer.from(article.createdAt.toISOString()).toString('base64')
+            })),
+            pageInfo: {
+                hasNextPage
+            }
+        }));
 }
 
 const addPeopleOrCompanyToQueryParams = (where, include, peopleOrCompany, models) => {
@@ -647,7 +666,7 @@ module.exports = {
     Query: {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
-        newsFeedArticles: (_, { language, peopleOrCompany, tags }, context) => newsFeedArticles(language, peopleOrCompany, tags, context),
+        newsFeedArticles: (_, { language, peopleOrCompany, tags, first, after }, context) => newsFeedArticles(language, peopleOrCompany, tags, first, after, context),
         feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
     },
     Mutation: {
