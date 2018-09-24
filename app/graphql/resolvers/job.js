@@ -140,17 +140,59 @@ const job = async (id, language, { user, models }) => {
     });
 }
 
-const all = async (language, companyId, { models }) => {
-    yupValidation(schema.job.all, { language, companyId });
+const all = async (language, companyId, first, after, { models }) => {
+    yupValidation(schema.job.all, { 
+        language,
+        companyId,
+        first,
+        after
+    });
 
     let where = {
         status: 'active'
     };
-    if (companyId) where = { ...where, companyId };
-    return models.job.findAll({
+    if (companyId) where.companyId = companyId;
+
+    if (after) {
+        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');
+        where.createdAt = {
+            [models.Sequelize.Op.lt]: after
+        }
+    }
+
+    let jobsIds = await models.job.findAll({
         where,
-        ...includeForFind(await getLanguageIdByCode(models, language), null, models)
+        attributes: ['id'],
+        order: [['createdAt', 'desc']],
+        limit: first + 1
     });
+    
+    const hasNextPage = jobsIds.length === first + 1;
+    jobsIds = hasNextPage ? jobsIds.slice(0, jobsIds.length -1) : jobsIds;
+
+    if (jobsIds && jobsIds.length) {
+        return models.job.findAll({
+            where: {
+                id: { [models.Sequelize.Op.in]: jobsIds.map(job => job.id) }
+            },
+            ...includeForFind(await getLanguageIdByCode(models, language), null, models),
+            order: [['createdAt', 'desc']],
+        }).then(jobs => ({
+            edges: jobs.map(job => ({
+                node: job,
+                cursor: Buffer.from(job.createdAt.toISOString()).toString('base64')
+            })),
+            pageInfo: {
+                hasNextPage
+            }
+        }));
+    }
+    return {
+        edges: [],
+        pageInfo: {
+            hasNextPage: false
+        }
+    };
 }
 
 const jobTypes = async (language, { models }) => {
@@ -257,7 +299,7 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 
 module.exports = {
     Query: {
-        jobs: (_, { language, companyId }, context) => all(language, companyId, context),
+        jobs: (_, { language, companyId, first, after }, context) => all(language, companyId, first, after, context),
         job: (_, { id, language }, context) => job(id, language, context),
         jobTypes: (_, { language }, context) => jobTypes(language, context),
         jobBenefits: (_, { }, context) => jobBenefits(context)
