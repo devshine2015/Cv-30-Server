@@ -477,7 +477,7 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, {
     }
 
     if (after) {
-        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');;
+        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');
         where.createdAt = {
             [models.Sequelize.Op.lt]: after
         }

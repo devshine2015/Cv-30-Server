@@ -72,19 +72,65 @@ const company = async (id, language, { models }) => {
     );
 }
 
-const all = async (language, { models }) => {
-    yupValidation(schema.company.all, { language });
+const all = async (language, first, after, { models }) => {
+    yupValidation(schema.company.all, {
+        language,
+        first,
+        after
+    });
 
-    return await findAllFromSubQueries(
-        companiesSubQueriesParams(await getLanguageIdByCode(models, language)),
-        models.company
-    );
+    //const languageId = await getLanguageIdByCode(models, language);
+    const languageId = 1;
+
+    let where = {};
+
+    if (after) {
+        after = Buffer.from(after, 'base64').toString('ascii');
+        where.name = {
+            [models.Sequelize.Op.gt]: after
+        }
+    }
+
+    let companiesIds = await models.company.findAll({
+        where,
+        attributes: ['id'],
+        order: [['name', 'asc']],
+        limit: first + 1
+    });
+    
+    const hasNextPage = companiesIds.length === first + 1;
+    companiesIds = hasNextPage ? companiesIds.slice(0, companiesIds.length -1) : companiesIds;
+
+    if (companiesIds && companiesIds.length) {
+        return findAllFromSubQueries(
+            companiesSubQueriesParams(languageId),
+            models.company,
+            {
+                id: { [models.Sequelize.Op.in]: companiesIds.map(company => company.id) }
+            },
+            [['name', 'asc']]
+        ).then(companies => ({
+            edges: companies.map(company => ({
+                node: company,
+                cursor: Buffer.from(company.name).toString('base64')
+            })),
+            pageInfo: {
+                hasNextPage
+            }
+        }));
+    }
+    return {
+        edges: [],
+        pageInfo: {
+            hasNextPage: false
+        }
+    };
 };
 
 const industries = async (language, { models }) => {
     yupValidation(schema.company.all, { language });
 
-    const languageId = await getLanguageIdByCode(models, language);
+    //const languageId = await getLanguageIdByCode(models, language);
     return models.industry.findAll({
         // include: [
         //     { association: 'i18n', where: { languageId } }
@@ -203,7 +249,7 @@ const removeTag = async (id, companyId, { user, models }) => {
 
 module.exports = {
     Query: {
-        companies: (_, { language }, context) => all(language, context),
+        companies: (_, { language, first, after }, context) => all(language, first, after, context),
         company: (_, { id, language }, context) => company(id, language, context),
         industries: (_, { language }, context) => industries(language, context)
     },

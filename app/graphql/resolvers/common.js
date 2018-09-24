@@ -164,14 +164,15 @@ const findOneFromSubQueries = async (subQueries, sequelizeModel, where) => {
     }, {}) ; 
 }
 
-const findAllFromSubQueries = async (subQueries, sequelizeModel, where) => {
+const findAllFromSubQueries = async (subQueries, sequelizeModel, where, order) => {
     const promises = subQueries.map(item => {
         let query = sequelizeModel.findAll({
             where: where ? where : {},
             include: [
                 item.include
             ],
-            attributes: item.allAttributes ? undefined : ['id']
+            attributes: item.allAttributes ? undefined : ['id'],
+            order: order ? order : undefined
         });
         if (item.then) {
             query = query.then(queryResult => queryResult.map(item.then));
