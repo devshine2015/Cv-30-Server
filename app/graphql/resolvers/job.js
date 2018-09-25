@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError, encodeCursor, decodeCursor } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -151,19 +151,42 @@ const all = async (language, companyId, first, after, { models }) => {
     let where = {
         status: 'active'
     };
+    const order = [
+        ['createdAt', 'desc'],
+        ['id', 'asc']
+    ];
     if (companyId) where.companyId = companyId;
 
     if (after) {
-        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');
-        where.createdAt = {
-            [models.Sequelize.Op.lt]: after
+        after = decodeCursor(after);
+        where = {
+            ...where,
+            [models.Sequelize.Op.and]: [
+                ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                {
+                    createdAt: {
+                        [models.Sequelize.Op.lte]: after.date
+                    }
+                },
+                {
+                    [models.Sequelize.Op.or]: [{
+                        createdAt: {
+                            [models.Sequelize.Op.ne]: after.date
+                        }
+                    }, {
+                        id: {
+                            [models.Sequelize.Op.gt]: after.id
+                        }
+                    }]
+                }
+            ]
         }
     }
 
     let jobsIds = await models.job.findAll({
         where,
         attributes: ['id'],
-        order: [['createdAt', 'desc']],
+        order,
         limit: first + 1
     });
     
@@ -176,11 +199,11 @@ const all = async (language, companyId, first, after, { models }) => {
                 id: { [models.Sequelize.Op.in]: jobsIds.map(job => job.id) }
             },
             ...includeForFind(await getLanguageIdByCode(models, language), null, models),
-            order: [['createdAt', 'desc']],
+            order,
         }).then(jobs => ({
             edges: jobs.map(job => ({
                 node: job,
-                cursor: Buffer.from(job.createdAt.toISOString()).toString('base64')
+                cursor: encodeCursor({ id: job.id, date: job.createdAt})
             })),
             pageInfo: {
                 hasNextPage

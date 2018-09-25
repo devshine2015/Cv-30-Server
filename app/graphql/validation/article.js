@@ -9,7 +9,7 @@ module.exports = {
         peopleOrCompany: yup.string().trim().max(1024),
         tags: yup.array().of(yup.string().trim().max(255).required()),
         first: yup.number().positive().integer().moreThan(1).required(),
-        after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(33)
+        after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(108).min(108)
     }),
     feed: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),

@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, validateTeam, validateArticle, throwForbiddenError, encodeCursor, decodeCursor } = require('./common');
 
 const appreciate = async (tagId, articleId, { user, models }) => {
     checkUserAuth(user);
@@ -431,10 +431,15 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, {
         after
     });
 
-    const languageId = await getLanguageIdByCode(models, language);
+    //const languageId = await getLanguageIdByCode(models, language);
+    const languageId = 1;
     const filteredTags = tags ? tags.map(tag => tag.trim().toLowerCase()) : [];
 
     let where, include;
+    const order = [
+        ['createdAt', 'desc'],
+        ['id', 'asc']
+    ];
     if (user && (!peopleOrCompany && !(tags && tags.length))) {
         // Following articles
         where = {
@@ -477,17 +482,36 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, {
     }
 
     if (after) {
-        after = Buffer.from(after, 'base64').toString('ascii').slice(0, 19).replace('T', ' ');
-        where.createdAt = {
-            [models.Sequelize.Op.lt]: after
+        after = decodeCursor(after);
+        where = {
+            ...where,
+            [models.Sequelize.Op.and]: [
+                ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                {
+                    createdAt: {
+                        [models.Sequelize.Op.lte]: after.date
+                    }
+                },
+                {
+                    [models.Sequelize.Op.or]: [{
+                        createdAt: {
+                            [models.Sequelize.Op.ne]: after.date
+                        }
+                    }, {
+                        id: {
+                            [models.Sequelize.Op.gt]: after.id
+                        }
+                    }]
+                }
+            ]
         }
     }
 
     const followingArticlesIds = await models.article.findAll({
         where,
-        attributes: ['id', 'createdAt'],
+        attributes: ['id'],
         include,
-        order: [['createdAt', 'desc']],
+        order,
         limit: first + 1
     });
 
@@ -496,11 +520,11 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, {
         hasNextPage = true;
     }
 
-    return getArticlesByIds(hasNextPage ? followingArticlesIds.slice(0, followingArticlesIds.length -1) : followingArticlesIds, languageId, models, user)
+    return getArticlesByIds(hasNextPage ? followingArticlesIds.slice(0, followingArticlesIds.length -1) : followingArticlesIds, order, languageId, models, user)
         .then(articles => ({
             edges: articles.map(article => ({
                 node: article,
-                cursor: Buffer.from(article.createdAt.toISOString()).toString('base64')
+                cursor: encodeCursor({ id: article.id, date: article.createdAt})
             })),
             pageInfo: {
                 hasNextPage
@@ -549,7 +573,7 @@ const addTagsToQueryParams = (where, include, filteredTags, languageId, models) 
     });
 }
 
-const getArticlesByIds = async (articleIds, languageId, models, user) => {
+const getArticlesByIds = async (articleIds, order, languageId, models, user) => {
     let articles = [];
     let where = {};
     if (articleIds.length) {
@@ -559,7 +583,7 @@ const getArticlesByIds = async (articleIds, languageId, models, user) => {
         articles = await models.article.findAll({
             where,
             ...includeForFind(languageId),
-            order: [['createdAt', 'desc']]
+            order,
         }).then(articles => mapArticles(articles, user));
     }
 

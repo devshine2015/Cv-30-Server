@@ -31,7 +31,7 @@ const server = new ApolloServer({
     ...schema,
     context: async ({req, res}) => ({ ...await getContext(req, res), res }),
     formatError: error => {
-        console.log(error);
+        console.dir(error, { depth: null });
         if (typeof error === "object" && Object.keys(error).indexOf('message') !== -1) {
             if (typeof error.message === 'string') {
                 try {

@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, findOneFromSubQueries, findAllFromSubQueries } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, findOneFromSubQueries, findAllFromSubQueries, encodeCursor, decodeCursor } = require('./common');
 const { companySubQueriesParams, companiesSubQueriesParams } = require('../../sequelize/queries/company');
 
 const handleCompany = async (language, details, { user, models }) => {
@@ -83,18 +83,41 @@ const all = async (language, first, after, { models }) => {
     const languageId = 1;
 
     let where = {};
+    const order = [
+        ['name', 'asc'],
+        ['id', 'asc']
+    ];
 
     if (after) {
-        after = Buffer.from(after, 'base64').toString('ascii');
-        where.name = {
-            [models.Sequelize.Op.gt]: after
+        after = decodeCursor(after);
+        where = {
+            ...where,
+            [models.Sequelize.Op.and]: [
+                ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                {
+                    name: {
+                        [models.Sequelize.Op.gte]: after.name
+                    }
+                },
+                {
+                    [models.Sequelize.Op.or]: [{
+                        name: {
+                            [models.Sequelize.Op.ne]: after.name
+                        }
+                    }, {
+                        id: {
+                            [models.Sequelize.Op.gt]: after.id
+                        }
+                    }]
+                }
+            ]
         }
     }
 
     let companiesIds = await models.company.findAll({
         where,
         attributes: ['id'],
-        order: [['name', 'asc']],
+        order,
         limit: first + 1
     });
     
@@ -108,11 +131,11 @@ const all = async (language, first, after, { models }) => {
             {
                 id: { [models.Sequelize.Op.in]: companiesIds.map(company => company.id) }
             },
-            [['name', 'asc']]
+            order
         ).then(companies => ({
             edges: companies.map(company => ({
                 node: company,
-                cursor: Buffer.from(company.name).toString('base64')
+                cursor: encodeCursor({ id: company.id, name: company.name}).toString('base64')
             })),
             pageInfo: {
                 hasNextPage
