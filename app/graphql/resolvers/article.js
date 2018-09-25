@@ -413,13 +413,16 @@ const article = async (id, language, { user, models }) => {
 }
 
 const all = async (language, { models, user }) => {
-    yupValidation(schema.article.all, { language });
-    return models.article.findAll({
-        where: {
-            ownerId: user.id
-        },
-        ...includeForFind(await getLanguageIdByCode(models, language))
-    }).then(articles => mapArticles(articles, user));
+    if (user) {
+        yupValidation(schema.article.all, { language });
+        return models.article.findAll({
+            where: {
+                ownerId: user.id
+            },
+            ...includeForFind(await getLanguageIdByCode(models, language))
+        }).then(articles => mapArticles(articles, user));
+    }
+    return [];
 }
 
 const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, { user, models }) => {
