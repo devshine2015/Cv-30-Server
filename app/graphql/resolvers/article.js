@@ -444,39 +444,29 @@ const newsFeedArticles = async (language, peopleOrCompany, tags, first, after, {
         ['id', 'asc']
     ];
     if (user && (!peopleOrCompany && !(tags && tags.length))) {
+        const articleOwnerIds = await models.user.findOne({
+            where: {
+                id: user.id
+            },
+            include: [
+                { association: 'followees', attributes: ['id'] }
+            ]
+        }).then(value => [...value.followees.map(f => f.id), user.id]);
+        
         // Following articles
         where = {
-            [models.Sequelize.Op.and]: [{
-                [models.Sequelize.Op.or]: [
-                    { postAs: { [models.Sequelize.Op.in]: ['company', 'team'] } },
-                    {
-                        [models.Sequelize.Op.and]: [
-                            { postAs: 'profile' },
-                            {
-                                [models.Sequelize.Op.or]: [
-                                    { ownerId: { [models.Sequelize.Op.eq]: user.id } },
-                                    { '$author.followers.id$': { [models.Sequelize.Op.eq]: user.id } }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }]
+            [models.Sequelize.Op.or]: [
+                { postAs: { [models.Sequelize.Op.in]: ['company', 'team'] } },
+                {
+                    [models.Sequelize.Op.and]: [
+                        { postAs: 'profile' },
+                        { ownerId: { [models.Sequelize.Op.in]: articleOwnerIds } }
+                    ]
+                }
+            ]
         };
 
-        include = [
-            {
-                association: 'author',
-                attributes: ['id'],
-                include: [
-                    {
-                        association: 'followers',
-                        attributes: ['id']
-                    }
-                ],
-                required: false
-            }
-        ];
+        include = [];
     } else {
         where = { postAs: { [models.Sequelize.Op.ne]: 'landingPage' } };
         include = [];
