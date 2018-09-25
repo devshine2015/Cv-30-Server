@@ -35,5 +35,14 @@ module.exports = `
         experience: Experience
         project: Project
     }
+
+    type ProfilesConnection {
+        edges: [ProfileEdge]!
+        pageInfo: PageInfo!
+    }
+    type ProfileEdge {
+        node: Profile!
+        cursor: String!
+    }
 `;
 

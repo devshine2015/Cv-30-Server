@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, encodeCursor, decodeCursor } = require('./common');
 const { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
 const FroalaEditor = require('../../../node_modules/wysiwyg-editor-node-sdk/lib/froalaEditor.js');
 
@@ -18,39 +18,111 @@ const profile = async (id, language, { user, models }) => {
         return { status: false };
     }
 }
-const all = async (language, { models }) => {
-    yupValidation(schema.user.all, { language });
+const all = async (language, first, after, { models }) => {
+    yupValidation(schema.user.all, {
+        language,
+        first,
+        after
+    });
 
-    const languageId = await getLanguageIdByCode(models, language);
+    //const languageId = await getLanguageIdByCode(models, language);
+    const languageId = 1;
 
-    return models.user.findAll({
-        where: { status: 'active' },
-        include: [
-            { association: 'skills'/*, include: [{ association: 'i18n' }] */},
-            { association: 'values'/*, include: [{ association: 'i18n' }] */},
-            {
-                association: 'ownedCompanies',
-                ...companyAssociationForUserProfile(languageId)
-            },
-            { association: 'profile', include: [{ association: 'salary' }] },
-            { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }/*, { association: 'i18n' }*/] },
-            { association: 'contact' },
-            { association: 'currentExperience' },
-            { association: 'currentProject'/*, include: [{ association: 'i18n', where: { languageId } }]*/ }
-        ]
-    })
-        .then(users => users.map(item => {
-            return {
-                ...item.get(),
-                ...(item.profile ? item.profile.get() : {}),
-                currentPosition: {
-                    experience: item.currentExperience,
-                    // team: item.getCurrentTeams(),
-                    // position: item.getCurrentPosition(),
-                    project: item.currentProject
+    let where = { status: 'active' };
+    const order = [
+        ['firstName', 'asc'],
+        ['lastName', 'asc'],
+        ['id', 'asc']
+    ];
+
+    if (after) {
+        after = decodeCursor(after);
+        const { f: firstName, l: lastName} = after;
+        where = {
+            ...where,
+            [models.Sequelize.Op.and]: [
+                ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                {
+                    firstName: {
+                        [models.Sequelize.Op.gte]: firstName
+                    },
+                    lastName: {
+                        [models.Sequelize.Op.gte]: lastName
+                    }
+                },
+                {
+                    [models.Sequelize.Op.or]: [{
+                        firstName: {
+                            [models.Sequelize.Op.ne]: firstName
+                        },
+                        lastName: {
+                            [models.Sequelize.Op.ne]: lastName
+                        }
+                    }, {
+                        id: {
+                            [models.Sequelize.Op.gt]: after.id
+                        }
+                    }]
                 }
+            ]
+        }
+    }
+
+    let usersIds = await models.user.findAll({
+        where,
+        attributes: ['id'],
+        order,
+        limit: first + 1
+    });
+    
+    const hasNextPage = usersIds.length === first + 1;
+    usersIds = hasNextPage ? usersIds.slice(0, usersIds.length -1) : usersIds;
+
+    if (usersIds && usersIds.length) {
+        return models.user.findAll({
+            where: { 
+                id: { [models.Sequelize.Op.in]: usersIds.map(u => u.id) }
+            },
+            include: [
+                { association: 'skills'/*, include: [{ association: 'i18n' }] */},
+                { association: 'values'/*, include: [{ association: 'i18n' }] */},
+                {
+                    association: 'ownedCompanies',
+                    ...companyAssociationForUserProfile(languageId)
+                },
+                { association: 'profile', include: [{ association: 'salary' }] },
+                { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }/*, { association: 'i18n' }*/] },
+                { association: 'contact' },
+                { association: 'currentExperience' },
+                { association: 'currentProject'/*, include: [{ association: 'i18n', where: { languageId } }]*/ }
+            ],
+            order
+        })
+        .then(users => ({
+            edges: users.map(item => ({
+                node: {
+                    ...item.get({ plain: true }),
+                    ...(item.profile ? item.profile.get() : {}),
+                    currentPosition: {
+                        experience: item.currentExperience,
+                        // team: item.getCurrentTeams(),
+                        // position: item.getCurrentPosition(),
+                        project: item.currentProject
+                    }
+                },
+                cursor: encodeCursor({ id: item.id, f: item.firstName, l: item.lastName}).toString('base64')
+            })),
+            pageInfo: {
+                hasNextPage
             }
-        }))
+        }));
+    }
+    return {
+        edges: [],
+        pageInfo: {
+            hasNextPage: false
+        }
+    };
 };
 
 const deleteProfile = async ({ user, res }) => {
@@ -808,7 +880,7 @@ module.exports = {
     Query: {
         signature: (_, { id }, context) => signature(id, context),
         profile: (_, { id, language }, context) => profile(id, language, context),
-        profiles: (_, { language }, context) => all(language, context),
+        profiles: (_, { language, first, after }, context) => all(language, first, after, context),
         // profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
         // userSkills: (_, __, context) => userResolvers.userSkills(context),
         // userValues: (_, __, context) => userResolvers.userValues(context),

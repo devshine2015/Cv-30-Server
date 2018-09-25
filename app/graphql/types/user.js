@@ -45,7 +45,9 @@ module.exports = `
 		): Profile
 		profiles(
 			language: LanguageCodeType!
-		): [Profile]
+			first: Int!
+			after: String
+		): ProfilesConnection
     }
 
     type Mutation {
