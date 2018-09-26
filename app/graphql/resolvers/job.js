@@ -1,6 +1,6 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
-const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
+const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError, encodeCursor, decodeCursor } = require('./common');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -140,17 +140,82 @@ const job = async (id, language, { user, models }) => {
     });
 }
 
-const all = async (language, companyId, { models }) => {
-    yupValidation(schema.job.all, { language, companyId });
+const all = async (language, companyId, first, after, { models }) => {
+    yupValidation(schema.job.all, { 
+        language,
+        companyId,
+        first,
+        after
+    });
 
     let where = {
         status: 'active'
     };
-    if (companyId) where = { ...where, companyId };
-    return models.job.findAll({
+    const order = [
+        ['createdAt', 'desc'],
+        ['id', 'asc']
+    ];
+    if (companyId) where.companyId = companyId;
+
+    if (after) {
+        after = decodeCursor(after);
+        where = {
+            ...where,
+            [models.Sequelize.Op.and]: [
+                ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                {
+                    createdAt: {
+                        [models.Sequelize.Op.lte]: after.date
+                    }
+                },
+                {
+                    [models.Sequelize.Op.or]: [{
+                        createdAt: {
+                            [models.Sequelize.Op.ne]: after.date
+                        }
+                    }, {
+                        id: {
+                            [models.Sequelize.Op.gt]: after.id
+                        }
+                    }]
+                }
+            ]
+        }
+    }
+
+    let jobsIds = await models.job.findAll({
         where,
-        ...includeForFind(await getLanguageIdByCode(models, language), null, models)
+        attributes: ['id'],
+        order,
+        limit: first + 1
     });
+    
+    const hasNextPage = jobsIds.length === first + 1;
+    jobsIds = hasNextPage ? jobsIds.slice(0, jobsIds.length -1) : jobsIds;
+
+    if (jobsIds && jobsIds.length) {
+        return models.job.findAll({
+            where: {
+                id: { [models.Sequelize.Op.in]: jobsIds.map(job => job.id) }
+            },
+            ...includeForFind(await getLanguageIdByCode(models, language), null, models),
+            order,
+        }).then(jobs => ({
+            edges: jobs.map(job => ({
+                node: job,
+                cursor: encodeCursor({ id: job.id, date: job.createdAt})
+            })),
+            pageInfo: {
+                hasNextPage
+            }
+        }));
+    }
+    return {
+        edges: [],
+        pageInfo: {
+            hasNextPage: false
+        }
+    };
 }
 
 const jobTypes = async (language, { models }) => {
@@ -257,7 +322,7 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 
 module.exports = {
     Query: {
-        jobs: (_, { language, companyId }, context) => all(language, companyId, context),
+        jobs: (_, { language, companyId, first, after }, context) => all(language, companyId, first, after, context),
         job: (_, { id, language }, context) => job(id, language, context),
         jobTypes: (_, { language }, context) => jobTypes(language, context),
         jobBenefits: (_, { }, context) => jobBenefits(context)

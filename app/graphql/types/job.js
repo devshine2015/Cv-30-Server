@@ -69,11 +69,23 @@ module.exports = `
         isPublic: Boolean!
     }
 
+    type JobsConnection {
+        edges: [JobEdge]!
+        pageInfo: PageInfo!
+    }
+
+    type JobEdge {
+        node: Job!
+        cursor: String!
+    }
+
     extend type Query {
         jobs(
             language: LanguageCodeType!
             companyId: String
-		): [Job]
+            first: Int!
+            after: String
+		): JobsConnection
 		job(
 			id: String!
 			language: LanguageCodeType!

@@ -164,14 +164,15 @@ const findOneFromSubQueries = async (subQueries, sequelizeModel, where) => {
     }, {}) ; 
 }
 
-const findAllFromSubQueries = async (subQueries, sequelizeModel, where) => {
+const findAllFromSubQueries = async (subQueries, sequelizeModel, where, order) => {
     const promises = subQueries.map(item => {
         let query = sequelizeModel.findAll({
             where: where ? where : {},
             include: [
                 item.include
             ],
-            attributes: item.allAttributes ? undefined : ['id']
+            attributes: item.allAttributes ? undefined : ['id'],
+            order: order ? order : undefined
         });
         if (item.then) {
             query = query.then(queryResult => queryResult.map(item.then));
@@ -189,6 +190,20 @@ const findAllFromSubQueries = async (subQueries, sequelizeModel, where) => {
     })), []);
 }
 
+const encodeCursor = cursor => {
+    if (typeof cursor !== 'object')
+        throw new Error("Expected json!");
+    
+    return Buffer.from(JSON.stringify(cursor)).toString('base64');
+}
+
+const decodeCursor = cursor => {
+    if (typeof cursor !== 'string')
+        throw new Error("Expected string!");
+    
+    return JSON.parse(Buffer.from(cursor, 'base64').toString('ascii'));
+}
+
 module.exports = {
     checkUserAuth,
     yupValidation,
@@ -201,5 +216,7 @@ module.exports = {
     validateArticle,
     // storeSkills,
     findOneFromSubQueries,
-    findAllFromSubQueries
+    findAllFromSubQueries,
+    encodeCursor,
+    decodeCursor
 }

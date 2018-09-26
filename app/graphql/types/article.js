@@ -29,6 +29,16 @@ module.exports = `
         canVote: Boolean
     }
 
+    type ArticlesConnection {
+        edges: [ArticleEdge]!
+        pageInfo: PageInfo!
+    }
+
+    type ArticleEdge {
+        node: Article!
+        cursor: String!
+    }
+
     extend type Query {
         articles(
 			language: LanguageCodeType!
@@ -41,7 +51,9 @@ module.exports = `
             language: LanguageCodeType!
             peopleOrCompany: String
             tags: [String]
-        ): [Article]
+            first: Int!
+            after: String
+        ): ArticlesConnection
         feedArticles(
             language: LanguageCodeType!
             userId: String
