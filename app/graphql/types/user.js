@@ -5,7 +5,8 @@ module.exports = `
         status: UserStatus!
         nickname: String!
         firstName: String
-        lastName: String
+		lastName: String
+		cvFile: String
         updatedAt: Date!
         createdAt: Date!
 	}
@@ -80,11 +81,28 @@ module.exports = `
 		removeExperience (
 			id: String
 		): StandardResponse
+		setEducation (
+			education: EducationInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeEducation (
+			id: String
+		): StandardResponse
+		setHobbie (
+			hobbie: HobbieInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeHobbie (
+			id: String
+		): StandardResponse
 		handleFollow (
 			details: FollowInput!
 		): StandardResponse
 		setPosition(
 			position: String
+		): StandardResponse
+		setCVFile(
+			cvFile: String
 		): StandardResponse
 		deleteProfile: StandardResponse
 	}

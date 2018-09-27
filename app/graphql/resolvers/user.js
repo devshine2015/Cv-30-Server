@@ -94,6 +94,8 @@ const all = async (language, first, after, { models }) => {
                 { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }/*, { association: 'i18n' }*/] },
                 { association: 'contact' },
                 { association: 'currentExperience' },
+                { association: 'currentExperience' },
+                { association: 'currentExperience' },
                 { association: 'currentProject'/*, include: [{ association: 'i18n', where: { languageId } }]*/ }
             ],
             order
@@ -107,7 +109,9 @@ const all = async (language, first, after, { models }) => {
                         experience: item.currentExperience,
                         // team: item.getCurrentTeams(),
                         // position: item.getCurrentPosition(),
-                        project: item.currentProject
+                        project: item.currentProject,
+                        education: item.currentEducation,
+                        hobbie: item.currentHobbie,
                     }
                 },
                 cursor: encodeCursor({ id: item.id, f: item.firstName, l: item.lastName}).toString('base64')
@@ -584,7 +588,116 @@ const removeExperience = async (id, { user, models }) => {
         return { status: false, error: 'Experience not found' };
     }
 }
+const setEducation = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.user.education, {
+        location,
+        isCurrent,
+        position,
+        company,
+        startDate,
+        endDate,
+        title,
+        description,
+        language,
+        images,
+        videos
+    });
 
+    const languageId = await getLanguageIdByCode(models, language);
+
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        const educationId = id ? id : uuid();
+        await models.education.upsert({
+            id: educationId,
+            userId: user.id,
+            title,
+            description,
+            location,
+            isCurrent,
+            position,
+            company,
+            startDate: new Date(startDate),
+            endDate: endDate ? new Date(endDate) : null,
+        }, { transaction: t });
+        // await models.experienceText.upsert({
+        //     experienceId: experienceId,
+        //     languageId,
+        //     title,
+        //     description
+        // }, { transaction: t });
+        await upsertImages(images, languageId, educationId, user.id, models, t);
+        await upsertVideos(videos, languageId, educationId, user.id, models, t);
+        result = true;
+    });
+    return { status: result };
+}
+
+const removeEducation = async (id, { user, models }) => {
+    checkUserAuth(user);
+
+    if (await models.education.destroy({ where: { id } })) {
+        return { status: true };
+    } else {
+        return { status: false, error: 'Education not found' };
+    }
+}
+const setHobbie = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
+    checkUserAuth(user);
+    yupValidation(schema.user.hobbie, {
+        location,
+        isCurrent,
+        position,
+        company,
+        startDate,
+        endDate,
+        title,
+        description,
+        language,
+        images,
+        videos
+    });
+
+    const languageId = await getLanguageIdByCode(models, language);
+
+    let result = false;
+    await models.sequelize.transaction(async t => {
+        const hobbieId = id ? id : uuid();
+        await models.hobbie.upsert({
+            id: hobbieId,
+            userId: user.id,
+            title,
+            description,
+            location,
+            isCurrent,
+            position,
+            company,
+            startDate: new Date(startDate),
+            endDate: endDate ? new Date(endDate) : null,
+        }, { transaction: t });
+        // await models.experienceText.upsert({
+        //     experienceId: experienceId,
+        //     languageId,
+        //     title,
+        //     description
+        // }, { transaction: t });
+        await upsertImages(images, languageId, hobbieId, user.id, models, t);
+        await upsertVideos(videos, languageId, hobbieId, user.id, models, t);
+        result = true;
+    });
+    return { status: result };
+}
+
+const removeHobbie = async (id, { user, models }) => {
+    checkUserAuth(user);
+
+    if (await models.hobbie.destroy({ where: { id } })) {
+        return { status: true };
+    } else {
+        return { status: false, error: 'Hobbie not found' };
+    }
+}
 const upsertImages = async (images, languageId, sourceId, userId, models, transaction) => {
     if (images && images.length > 0) {
         await Promise.all(images.map(item => models.image.upsert({
@@ -716,6 +829,28 @@ const setPosition = async (position, { user, models }) => {
     return { status: true };
 }
 
+const setCVFile = async (cvFile, { user, models }) => {
+    
+    checkUserAuth(user);
+    yupValidation(schema.user.setCVFile, {
+        cvFile
+    });
+
+    const user_ = await models.user.findOne({
+        where: {
+            id: user.id
+        }
+    });
+    user_.cvFile = cvFile;
+
+    const result = await user_.save();
+    if (result !== user_) {
+        throw new Error(JSON.stringify(result.errors));
+    }
+
+    return { status: true };
+}
+
 const createProfileResponse = async (user, models, languageId) => {
     const promises = profileSubQueriesParams(languageId).map(item => {
         let query = models.user.findOne({
@@ -773,6 +908,12 @@ const profileSubQueriesParams = (languageId) => [
     },
     {
         include: { association: 'projects', include: [/*{ association: 'i18n' }, */{ association: 'videos' }, { association: 'images' }] }
+    },
+    {
+        include: { association: 'educations', include: [/*{ association: 'i18n' }, */{ association: 'videos' }, { association: 'images' }] }
+    },
+    {
+        include: { association: 'hobbies', include: [/*{ association: 'i18n' }, */{ association: 'videos' }, { association: 'images' }] }
     },
     {
         include: { association: 'story'/*, include: [{ association: 'i18n' }] */}
@@ -904,9 +1045,18 @@ module.exports = {
         setExperience: (_, { experience, language }, context) => setExperience(experience, language, context),
         removeExperience: (_, { id }, context) => removeExperience(id, context),
 
+        setEducation: (_, { education, language }, context) => setEducation(education, language, context),
+        removeEducation: (_, { id }, context) => removeEducation(id, context),
+
+        setHobbie: (_, { hobbie, language }, context) => setHobbie(hobbie, language, context),
+        removeHobbie: (_, { id }, context) => removeHobbie(id, context),
+
         handleFollow: (_, { details }, context) => handleFollow(details, context),
 
         setPosition: (_, { position }, context) => setPosition(position, context),
+
+        setCVFile: (_, { cvFile }, context) => setCVFile(cvFile, context),
+
         deleteProfile: (_, { }, context) => deleteProfile(context)
     }
 };

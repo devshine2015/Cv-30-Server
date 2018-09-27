@@ -40,6 +40,7 @@ module.exports = {
 				type: Sequelize.STRING(100),
 				field: 'cover_background'
 			},
+			
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,
