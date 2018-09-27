@@ -1,11 +1,14 @@
-module.exports = {
-    auth: require('./auth'),
-    user: require('./user'),
-    article: require('./article'),
-    company: require('./company'),
-    job: require('./job'),
-    team: require('./team'),
-    landingPage: require('./landingPage'),
-    shallowUser: require('./shallowUser'),
-    newsFeed: require('./newsFeed'),
-};
+const glob = require('glob');
+const path = require('path');
+
+const createValidationSchema = () => {
+	const files = glob.sync(`${__dirname}/!(*.test|index|common).js`);
+	return files.map(file => ({
+        [path.basename(file, '.js')]: require(`./${path.basename(file, '.js')}`)
+    })).reduce((acc, item) => ({
+        ...acc,
+        ...item
+    }), {});
+}
+
+module.exports = createValidationSchema();
