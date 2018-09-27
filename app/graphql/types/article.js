@@ -59,7 +59,9 @@ module.exports = `
             userId: String
             companyId: String
             teamId: String
-        ): [Article]
+            first: Int!
+            after: String
+        ): ArticlesConnection
     }
 
     input ArticleInput {
