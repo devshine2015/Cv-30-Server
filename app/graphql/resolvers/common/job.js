@@ -6,7 +6,7 @@ const all = async (language, companyId, status, first, after, { user, models }) 
         if (!companyId) forbidden = true;
 
         if (user) {
-            const companyOk = await validateCompany(jobDetails.companyId, user, models);
+            const companyOk = await validateCompany(companyId, user, models);
             if (companyOk !== true) forbidden = true;
         }
     }
