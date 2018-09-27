@@ -3,7 +3,7 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface.addColumn(
-			'hobbie',
+			'hobby',
 			'title',
 			{
 				allowNull: true,
@@ -13,7 +13,7 @@ module.exports = {
 		)
 		.then(() =>
 			queryInterface.addColumn(
-				'hobbie',
+				'hobby',
 				'description',
 				{
 					allowNull: true,
@@ -25,8 +25,8 @@ module.exports = {
 	},
 	down: (queryInterface, Sequelize) => {
 		return [
-			queryInterface.removeColumn('hobbie', 'title'),
-			queryInterface.removeColumn('hobbie', 'description')
+			queryInterface.removeColumn('hobby', 'title'),
+			queryInterface.removeColumn('hobby', 'description')
 		];
 	}
 };

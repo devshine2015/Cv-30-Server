@@ -112,12 +112,12 @@ module.exports = (Sequelize, DataTypes) => {
         User.hasMany(models.experience, { as: 'experience', foreignKey: 'user_id' });
         User.hasMany(models.project, { as: 'projects', foreignKey: 'user_id' });
         User.hasMany(models.education, { as: 'educations', foreignKey: 'user_id' });
-        User.hasMany(models.hobbie, { as: 'hobbies', foreignKey: 'user_id' });
+        User.hasMany(models.hobby, { as: 'hobbies', foreignKey: 'user_id' });
         User.hasOne(models.contact, { as: 'contact', foreignKey: 'user_id' });
         User.hasOne(models.experience, { as: 'currentExperience', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.project, { as: 'currentProject', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.education, { as: 'currentEducation', foreignKey: 'user_id', scope: { is_current: true } });
-        User.hasOne(models.hobbie, { as: 'currentHobbie', foreignKey: 'user_id', scope: { is_current: true } });
+        User.hasOne(models.hobby, { as: 'currentHobby', foreignKey: 'user_id', scope: { is_current: true } });
         User.hasOne(models.story, { as: 'story', foreignKey: 'user_id' });
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followers', foreignKey: 'user_id' });
         User.belongsToMany(models.user, { through: 'user_followers', as: 'followees', foreignKey: 'follower_id' });

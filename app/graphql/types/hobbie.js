@@ -1,5 +1,5 @@
 module.exports = `
-    type Hobbie {
+    type Hobby {
         id: String
         position: String
         company: String
@@ -13,7 +13,7 @@ module.exports = `
         images: [Image]
     }
 
-    input HobbieInput {
+    input HobbyInput {
         id: String
         location: String
         isCurrent: Boolean
@@ -28,7 +28,7 @@ module.exports = `
     }
 `;
 
-`type HobbieText {
+`type HobbyText {
     title: String
     description: String
 }`;

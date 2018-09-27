@@ -11,7 +11,7 @@ module.exports = `
         experience: [Experience]
         projects: [Project]
         educations: [Education]
-        hobbies: [Hobbie]
+        hobbies: [Hobby]
         contact: Contact
         hasAvatar: Boolean
         avatarContentType: ImageType
@@ -36,7 +36,7 @@ module.exports = `
     type CurrentPosition {
         experience: Experience
         project: Project
-        hobbie: Hobbie
+        hobby: Hobby
         education: Education
     }
 

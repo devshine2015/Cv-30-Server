@@ -94,8 +94,8 @@ const all = async (language, first, after, { models }) => {
                 { association: 'aboutMeArticles', include: [{ association: 'featuredImage' }/*, { association: 'i18n' }*/] },
                 { association: 'contact' },
                 { association: 'currentExperience' },
-                { association: 'currentExperience' },
-                { association: 'currentExperience' },
+                { association: 'currentEducation' },
+                { association: 'currentHobby' },
                 { association: 'currentProject'/*, include: [{ association: 'i18n', where: { languageId } }]*/ }
             ],
             order
@@ -111,7 +111,7 @@ const all = async (language, first, after, { models }) => {
                         // position: item.getCurrentPosition(),
                         project: item.currentProject,
                         education: item.currentEducation,
-                        hobbie: item.currentHobbie,
+                        hobby: item.currentHobby,
                     }
                 },
                 cursor: encodeCursor({ id: item.id, f: item.firstName, l: item.lastName}).toString('base64')
@@ -643,9 +643,9 @@ const removeEducation = async (id, { user, models }) => {
         return { status: false, error: 'Education not found' };
     }
 }
-const setHobbie = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
+const setHobby = async ({ id, location, isCurrent, position, company, startDate, endDate, title, description, images, videos }, language, { user, models }) => {
     checkUserAuth(user);
-    yupValidation(schema.user.hobbie, {
+    yupValidation(schema.user.hobby, {
         location,
         isCurrent,
         position,
@@ -663,9 +663,9 @@ const setHobbie = async ({ id, location, isCurrent, position, company, startDate
 
     let result = false;
     await models.sequelize.transaction(async t => {
-        const hobbieId = id ? id : uuid();
-        await models.hobbie.upsert({
-            id: hobbieId,
+        const hobbyId = id ? id : uuid();
+        await models.hobby.upsert({
+            id: hobbyId,
             userId: user.id,
             title,
             description,
@@ -682,20 +682,20 @@ const setHobbie = async ({ id, location, isCurrent, position, company, startDate
         //     title,
         //     description
         // }, { transaction: t });
-        await upsertImages(images, languageId, hobbieId, user.id, models, t);
-        await upsertVideos(videos, languageId, hobbieId, user.id, models, t);
+        await upsertImages(images, languageId, hobbyId, user.id, models, t);
+        await upsertVideos(videos, languageId, hobbyId, user.id, models, t);
         result = true;
     });
     return { status: result };
 }
 
-const removeHobbie = async (id, { user, models }) => {
+const removeHobby = async (id, { user, models }) => {
     checkUserAuth(user);
 
-    if (await models.hobbie.destroy({ where: { id } })) {
+    if (await models.hobby.destroy({ where: { id } })) {
         return { status: true };
     } else {
-        return { status: false, error: 'Hobbie not found' };
+        return { status: false, error: 'Hobby not found' };
     }
 }
 const upsertImages = async (images, languageId, sourceId, userId, models, transaction) => {
@@ -1048,8 +1048,8 @@ module.exports = {
         setEducation: (_, { education, language }, context) => setEducation(education, language, context),
         removeEducation: (_, { id }, context) => removeEducation(id, context),
 
-        setHobbie: (_, { hobbie, language }, context) => setHobbie(hobbie, language, context),
-        removeHobbie: (_, { id }, context) => removeHobbie(id, context),
+        setHobby: (_, { hobby, language }, context) => setHobby(hobby, language, context),
+        removeHobby: (_, { id }, context) => removeHobby(id, context),
 
         handleFollow: (_, { details }, context) => handleFollow(details, context),
 

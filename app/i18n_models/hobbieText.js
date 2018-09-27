@@ -1,14 +1,14 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
-	var hobbieText = Sequelize.define('hobbieText', {
-		hobbieId: {
+	var hobbyText = Sequelize.define('hobbyText', {
+		hobbyId: {
 			allowNull: false,
 			primaryKey: true,
 			type: DataTypes.UUID,
 			validate: {
                 isUUID: 4
             },
-			field: 'hobbie_id'
+			field: 'hobby_id'
 		},
 		languageId: {
 			primaryKey: true,
@@ -36,15 +36,15 @@ module.exports = (Sequelize, DataTypes) => {
 		updatedAt: 'updated_at',
 		createdAt: 'created_at',
 		indexes: [
-			{ fields: ['hobbie_id'] },
+			{ fields: ['hobby_id'] },
 			{ fields: ['language_id'] }
 		],
 		freezeTableName: true,
-		tableName: 'hobbie_i18n'
+		tableName: 'hobby_i18n'
 	});
-	hobbieText.associate = function(models) {
-		hobbieText.belongsTo(models.hobbie, { as: 'hobbie' });
-		hobbieText.belongsTo(models.language, { as: 'language' });
+	hobbyText.associate = function(models) {
+		hobbyText.belongsTo(models.hobby, { as: 'hobby' });
+		hobbyText.belongsTo(models.language, { as: 'language' });
 	};
-	return hobbieText;
+	return hobbyText;
 };

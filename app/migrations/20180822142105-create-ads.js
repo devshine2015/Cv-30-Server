@@ -28,7 +28,7 @@ module.exports = {
 			}),
 
 			queryInterface.changeColumn('images', 'source_type', {
-				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project','education', 'hobbie', 'ad')
+				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project','education', 'hobby', 'ad')
 			})
 		]
 	},
@@ -36,7 +36,7 @@ module.exports = {
 		return [
 			queryInterface.dropTable('ads'),
 			queryInterface.changeColumn('images', 'source_type', {
-				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project', 'education', 'hobbie')
+				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project', 'education', 'hobby')
 			})
 		]
 	}

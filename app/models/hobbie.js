@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (Sequelize, DataTypes) => {
-	var Hobbie = Sequelize.define('hobbie', {
+	var Hobby = Sequelize.define('hobby', {
 		id: {
 			allowNull: false,
 			primaryKey: true,
@@ -74,14 +74,14 @@ module.exports = (Sequelize, DataTypes) => {
 				// { fields: ['user_id', 'location_id'] }
 			],
 			freezeTableName: true,
-			tableName: 'hobbie'
+			tableName: 'hobby'
 		});
-        Hobbie.associate = models => {
-            Hobbie.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
+        Hobby.associate = models => {
+            Hobby.belongsTo(models.user, { as: 'owner', foreignKey: 'user_id' });
 		// Experience.hasMany(models.experienceText, { as: 'i18n', foreignKey: 'experience_id' });
 		// Experience.belongsTo(models.location, { as: 'location' });
-		Hobbie.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
-		Hobbie.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
+		Hobby.hasMany(models.video, { as: 'videos', foreignKey: 'source_id' });
+		Hobby.hasMany(models.image, { as: 'images', foreignKey: 'source_id' });
 	};
-	return Hobbie;
+	return Hobby;
 };

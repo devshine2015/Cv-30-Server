@@ -5,7 +5,7 @@ const uuid = require('uuidv4');
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
-		.createTable('hobbie', {
+		.createTable('hobby', {
 			id: {
 				allowNull: false,
 				type: Sequelize.UUID,
@@ -67,13 +67,13 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
 			freezeTableName: true,
-			tableName: 'hobbie'
+			tableName: 'hobby'
 		})
-		.then(() => queryInterface.addIndex('hobbie', { fields: ['user_id'] }));
-		// .then(() => queryInterface.addIndex('hobbie', { fields: ['location_id'] }))
-		// .then(() => queryInterface.addIndex('hobbie', { fields: ['user_id', 'location_id'] }));
+		.then(() => queryInterface.addIndex('hobby', { fields: ['user_id'] }));
+		// .then(() => queryInterface.addIndex('hobby', { fields: ['location_id'] }))
+		// .then(() => queryInterface.addIndex('hobby', { fields: ['user_id', 'location_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
-    	return queryInterface.dropTable('hobbie');
+    	return queryInterface.dropTable('hobby');
 	}
 };

@@ -83,7 +83,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         })),
         videos: yup.array().of(yup.object().shape({
@@ -92,7 +92,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         }))
     }),
@@ -122,7 +122,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|hobbie|education)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|hobby|education)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         })),
         videos: yup.array().of(yup.object().shape({
@@ -131,7 +131,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         }))
     }),
@@ -161,7 +161,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         })),
         videos: yup.array().of(yup.object().shape({
@@ -170,20 +170,20 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         }))
     }),
-    hobbie: yup.object().shape({
+    hobby: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         location: yup.string().trim().max(255).required('Please enter a location'),
         isCurrent: yup.boolean(),
         position: yup.string()
-            .max(255, 'Hobbie position cannot be longer than 255 chars')
+            .max(255, 'Hobby position cannot be longer than 255 chars')
             .required(),
         company: yup.string()
             .required('Company cannot be null')
-            .max(255, 'Hobbie company cannot be longer than 255 chars'),
+            .max(255, 'Hobby company cannot be longer than 255 chars'),
         startDate: yup.date().required('Please provide a start date.'),
         endDate: yup.date().when('isCurrent', {
             is: true,
@@ -191,7 +191,7 @@ module.exports = {
             otherwise: yup.date().required('Please select an end date.')
         }),
         title: yup.string().trim()
-            .max(255, 'Hobbie title cannot be longer than 255 chars')
+            .max(255, 'Hobby title cannot be longer than 255 chars')
             .nullable(),
         description: yup.string().nullable(),
         images: yup.array().of(yup.object().shape({
@@ -200,7 +200,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         })),
         videos: yup.array().of(yup.object().shape({
@@ -209,7 +209,7 @@ module.exports = {
             description: yup.string().trim(),
             isFeatured: yup.boolean(),
             source: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
-            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobbie)/, { excludeEmptyString: true }),
+            sourceType: yup.string().matches(/(article|profile|profile_cover|company|company_cover|job|team|experience|project|education|hobby)/, { excludeEmptyString: true }),
             path: yup.string().trim().max(255)
         }))
     }),

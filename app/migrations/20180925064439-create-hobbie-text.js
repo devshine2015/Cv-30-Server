@@ -2,15 +2,15 @@
 module.exports = {
 	up: (queryInterface, Sequelize) => {
 		return queryInterface
-		.createTable('hobbie_i18n', {
-			hobbieId: {
+		.createTable('hobby_i18n', {
+			hobbyId: {
 				allowNull: false,
 				primaryKey: true,
 				type: Sequelize.UUID,
                 validate: {
                     isUUID: 4
 				},
-				field: 'hobbie_id'
+				field: 'hobby_id'
 			},
 			languageId: {
 				primaryKey: true,
@@ -42,12 +42,12 @@ module.exports = {
 			updatedAt: 'updated_at',
 			createdAt: 'created_at',
 			freezeTableName: true,
-			tableName: 'hobbie_i18n'
+			tableName: 'hobby_i18n'
 		})
-		.then(() => queryInterface.addIndex('hobbie_i18n', { fields: ['hobbie_id'] }))
-		.then(() => queryInterface.addIndex('hobbie_i18n', { fields: ['language_id'] }));
+		.then(() => queryInterface.addIndex('hobby_i18n', { fields: ['hobby_id'] }))
+		.then(() => queryInterface.addIndex('hobby_i18n', { fields: ['language_id'] }));
 	},
 	down: (queryInterface, Sequelize) => {
-		return queryInterface.dropTable('hobbie_i18n');
+		return queryInterface.dropTable('hobby_i18n');
 	}
 };

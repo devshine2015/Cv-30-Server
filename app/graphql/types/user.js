@@ -88,11 +88,11 @@ module.exports = `
 		removeEducation (
 			id: String
 		): StandardResponse
-		setHobbie (
-			hobbie: HobbieInput!
+		setHobby (
+			hobby: HobbyInput!
 			language: LanguageCodeType!
 		): StandardResponse
-		removeHobbie (
+		removeHobby (
 			id: String
 		): StandardResponse
 		handleFollow (
