@@ -16,7 +16,7 @@ module.exports = `
         location: String
         tags: [Tag]
         faqs: [Faq]
-        jobs: [Job]
+        recentJobs: [Job]
         teams: [Team]
         hasLogo: Boolean
         logoContentType: ImageType

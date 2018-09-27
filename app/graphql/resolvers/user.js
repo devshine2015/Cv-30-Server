@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, encodeCursor, decodeCursor } = require('./common');
-const { associationForUserProfile: companyAssociationForUserProfile } = require("../../sequelize/queries/company");
+const { associationForUserProfile: companyAssociationForUserProfile } = require("./common/company");
 const FroalaEditor = require('../../../node_modules/wysiwyg-editor-node-sdk/lib/froalaEditor.js');
 
 const profile = async (id, language, { user, models }) => {

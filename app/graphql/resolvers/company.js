@@ -1,7 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, findOneFromSubQueries, findAllFromSubQueries, encodeCursor, decodeCursor } = require('./common');
-const { companySubQueriesParams, companiesSubQueriesParams } = require('../../sequelize/queries/company');
+const { companySubQueriesParams, companiesSubQueriesParams } = require('./common/company');
 
 const handleCompany = async (language, details, { user, models }) => {
     checkUserAuth(user);

@@ -83,6 +83,7 @@ module.exports = `
         jobs(
             language: LanguageCodeType!
             companyId: String
+            status: String
             first: Int!
             after: String
 		): JobsConnection
