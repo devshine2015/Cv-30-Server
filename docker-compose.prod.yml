@@ -1,16 +1,16 @@
 version: '3'
 services:
-  proxy:
-    image: cv30:proxy
-    build:
-      context: ./
-      dockerfile: proxy.prod.dockerfile
-    networks:
-      - wowzaaa
-    ports:
-      - 80:80
-    depends_on:
-      - app
+  # proxy:
+  #   image: cv30:proxy
+  #   build:
+  #     context: ./
+  #     dockerfile: proxy.prod.dockerfile
+  #   networks:
+  #     - wowzaaa
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - app
   app:
     image: cv30:api
     build:
@@ -34,8 +34,14 @@ services:
       AWS_BUCKET: "${AWS_BUCKET}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
-    restart: always
-    networks:
-      - wowzaaa
+    # restart: always
+    # networks:
+    #   - wowzaaa
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: cv30-production
+        awslogs-region: eu-west-1
+        awslogs-stream-prefix: cv30-prod
 networks:
   wowzaaa:

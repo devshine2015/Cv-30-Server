@@ -14,16 +14,16 @@ services:
       MYSQL_USER: "${DB_USER}"
     ports:
       - "3306:3306"
-  proxy:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    networks:
-      - wowzaaa
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - app
+  # proxy:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - wowzaaa
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - app
   app:
     build:
       context: ./
@@ -47,6 +47,8 @@ services:
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
     restart: always
+    ports:
+      - "80:4000"
     networks:
       - wowzaaa
     volumes:
