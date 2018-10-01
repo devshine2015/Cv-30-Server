@@ -33,7 +33,7 @@ module.exports = {
 			},
 			sourceType: {
 				allowNull: false,
-				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project'),
+				type: Sequelize.ENUM('article', 'profile', 'profile_cover', 'company', 'company_cover', 'job', 'team', 'experience', 'project', 'education', 'hobby'),
 				field: 'source_type'
 			},
 			isFeatured: {

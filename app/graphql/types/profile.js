@@ -10,6 +10,8 @@ module.exports = `
         values: [Value]
         experience: [Experience]
         projects: [Project]
+        educations: [Education]
+        hobbies: [Hobby]
         contact: Contact
         hasAvatar: Boolean
         avatarContentType: ImageType
@@ -34,6 +36,17 @@ module.exports = `
     type CurrentPosition {
         experience: Experience
         project: Project
+        hobby: Hobby
+        education: Education
+    }
+
+    type ProfilesConnection {
+        edges: [ProfileEdge]!
+        pageInfo: PageInfo!
+    }
+    type ProfileEdge {
+        node: Profile!
+        cursor: String!
     }
 `;
 

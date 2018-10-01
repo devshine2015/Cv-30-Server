@@ -7,7 +7,9 @@ module.exports = {
     newsFeedArticles: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
         peopleOrCompany: yup.string().trim().max(1024),
-        tags: yup.array().of(yup.string().trim().max(255).required())
+        tags: yup.array().of(yup.string().trim().max(255).required()),
+        first: yup.number().positive().integer().moreThan(1).required(),
+        after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(108).min(108)
     }),
     feed: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
@@ -22,6 +24,8 @@ module.exports = {
             then: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i),
             otherwise: yup.string().oneOf([undefined, null], "Only one of userId, companyId, teamId can be set")
         }),
+        first: yup.number().positive().integer().moreThan(1).required(),
+        after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(108).min(108)
     }),
     one: yup.object().shape({
         id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),

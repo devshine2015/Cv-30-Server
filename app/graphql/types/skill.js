@@ -1,7 +1,11 @@
 module.exports = `
     type Skill {
         id: Int
-        title: String
+        key: String
+    }
+
+    extend type Query {
+        skills: [Skill]
     }
 `;
 

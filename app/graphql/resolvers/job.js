@@ -1,6 +1,7 @@
 const uuid = require('uuidv4');
 const schema = require('../validation');
 const { checkUserAuth, yupValidation, getLanguageIdByCode, validateCompany, throwForbiddenError } = require('./common');
+const { all: allJobs, includeForFind } = require('./common/job');
 
 const handleJob = async (language, jobDetails, { user, models }) => {
     checkUserAuth(user);
@@ -48,23 +49,6 @@ const handleJob = async (language, jobDetails, { user, models }) => {
 
         job = await models.job.findOne({
             where: { id: jobDetails.id },
-            include: [{
-                association: 'skills',
-                attributes: ['id', 'title'],
-                // include: [
-                //     {
-                //         association: 'i18n',
-                //         where: { languageId },
-                //         attributes: ['title']
-                //     }
-                // ]
-            }, {
-                association: 'jobTypes',
-                attributes: ['id'],
-            }, {
-                association: 'jobBenefits',
-                attributes: ['id'],
-            }],
             attributes: ['id'],
             transaction: t
         });
@@ -77,26 +61,37 @@ const handleJob = async (language, jobDetails, { user, models }) => {
         if (jobDetails.skills) {
             let dbSkills = await models.skill.findAll({
                 where: {
-                    title: {
+                    id: {
                         [models.Sequelize.Op.in]: jobDetails.skills
                     }
                 },
                 transaction: t
             });
-            const newSkills = jobDetails.skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
-            if (newSkills.length) {
-                await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
-                const newDbSkills = await models.skill.findAll({
-                    where: {
-                        title: {
-                            [models.Sequelize.Op.in]: newSkills
-                        }
-                    },
-                    transaction: t
-                });
-                dbSkills = dbSkills.concat(newDbSkills);
-            }
+    
             await job.setSkills(dbSkills, { transaction: t });
+
+            // let dbSkills = await models.skill.findAll({
+            //     where: {
+            //         title: {
+            //             [models.Sequelize.Op.in]: jobDetails.skills
+            //         }
+            //     },
+            //     transaction: t
+            // });
+            // const newSkills = jobDetails.skills.filter(skill => !dbSkills.filter(dbSkill => dbSkill.title == skill).length);
+            // if (newSkills.length) {
+            //     await models.skill.bulkCreate(newSkills.map(title => ({ title })), { transaction: t });
+            //     const newDbSkills = await models.skill.findAll({
+            //         where: {
+            //             title: {
+            //                 [models.Sequelize.Op.in]: newSkills
+            //             }
+            //         },
+            //         transaction: t
+            //     });
+            //     dbSkills = dbSkills.concat(newDbSkills);
+            // }
+            // await job.setSkills(dbSkills, { transaction: t });
 
             // const { createdSkills, existingSkills, associatedSkillsToRemove } = await storeSkills(jobDetails.skills, job.skills, languageId, models, t);
 
@@ -146,17 +141,17 @@ const job = async (id, language, { user, models }) => {
     });
 }
 
-const all = async (language, companyId, { models }) => {
-    yupValidation(schema.job.all, { language, companyId });
-
-    let where = {
-        status: 'active'
-    };
-    if (companyId) where = { ...where, companyId };
-    return models.job.findAll({
-        where,
-        ...includeForFind(await getLanguageIdByCode(models, language), null, models)
+const all = async(language, companyId, status, first, after, context) => {
+    if (!status) status = 'active';
+    yupValidation(schema.job.all, { 
+        language,
+        companyId,
+        status,
+        first,
+        after
     });
+
+    return allJobs(language, companyId, status, first, after, context);
 }
 
 const jobTypes = async (language, { models }) => {
@@ -175,78 +170,6 @@ const jobBenefits = async ({ models }) => {
     return models.jobBenefit.findAll({});
 }
 
-const includeForFind = (languageId, userId, models) => {
-    return {
-        include: [
-            // { association: 'i18n', where: { languageId } },
-            { association: 'team' },
-            {
-                association: 'company',
-                include: [
-                    // {
-                    //     association: 'i18n', where: { languageId }
-                    // },
-                    // {
-                    //     association: 'officeArticles',
-                    //     include: [
-                    //         { association: 'featuredImage', include: [{ association: 'i18n', where: { languageId } }] },
-                    //         { association: 'i18n', where: { languageId } },
-                    //         { association: 'images', include: [{ association: 'i18n', where: { languageId } }] },
-                    //         { association: 'videos', include: [{ association: 'i18n', where: { languageId } }] }
-                    //     ]
-                    // },
-                    {
-                        association: 'faqs',
-                        // include: [
-                        //     { association: 'i18n', where: { languageId } }
-                        // ]
-                    },
-                    { association: 'owner' }
-                ]
-            }, {
-                association: 'applicants',
-                // include: [
-                //     { association: 'skills', include: [{ association: 'i18n', where: { languageId } }] },
-                //     { association: 'values', include: [{ association: 'i18n', where: { languageId } }] },
-                //     { association: 'profile', include: [{ association: 'salary' }] },
-                //     { association: 'articles' },
-                //     { association: 'experience', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
-                //     { association: 'projects', include: [{ association: 'i18n', where: { languageId } }, { association: 'videos' }, { association: 'images' }] },
-                //     { association: 'story', include: [{ association: 'i18n', where: { languageId } }] },
-                //     { association: 'contact' }
-                // ]
-            }, {
-                association: 'jobTypes',
-                // include: [
-                //     { association: 'i18n', where: { languageId } }
-                // ]
-            }, {
-                association: 'salary',
-                attributes: ['isPublic', 'amountMin', 'amountMax', 'currency'],
-                required: false,
-                where: {
-                    [models.Sequelize.Op.or]: [
-                        { isPublic: { [models.Sequelize.Op.eq]: true } },
-                        { '$company.owner.id$': { [models.Sequelize.Op.eq]: userId } }
-                    ]
-                }
-            }, {
-                association: 'activityField',
-                // include: [
-                //     { association: 'i18n', where: { languageId } }
-                // ]
-            }, {
-                association: 'skills',
-                // include: [
-                //     { association: 'i18n', where: { languageId } }
-                // ]
-            }, {
-                association: 'jobBenefits'
-            }
-        ]
-    }
-}
-
 const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
     checkUserAuth(user);
     yupValidation(schema.job.handleApplyToJob, { jobId, isApplying });
@@ -263,7 +186,7 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 
 module.exports = {
     Query: {
-        jobs: (_, { language, companyId }, context) => all(language, companyId, context),
+        jobs: (_, { language, companyId, status, first, after }, context) => all(language, companyId, status, first, after, context),
         job: (_, { id, language }, context) => job(id, language, context),
         jobTypes: (_, { language }, context) => jobTypes(language, context),
         jobBenefits: (_, { }, context) => jobBenefits(context)

@@ -12,6 +12,8 @@ module.exports = `
         team
         experience
         project
+        education
+        hobby
         ad
     }
     enum VideoTarget {

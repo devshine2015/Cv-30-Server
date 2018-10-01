@@ -5,7 +5,8 @@ module.exports = `
         status: UserStatus!
         nickname: String!
         firstName: String
-        lastName: String
+		lastName: String
+		cvFile: String
         updatedAt: Date!
         createdAt: Date!
 	}
@@ -45,7 +46,9 @@ module.exports = `
 		): Profile
 		profiles(
 			language: LanguageCodeType!
-		): [Profile]
+			first: Int!
+			after: String
+		): ProfilesConnection
     }
 
     type Mutation {
@@ -62,7 +65,7 @@ module.exports = `
 			language: LanguageCodeType!
 		): StandardResponse
 		setSkills (
-			skills: [String!]!
+			skills: [Int]!
 			language: LanguageCodeType!
 		): StandardResponse
 		setContact ( contact: ContactInput ): StandardResponse
@@ -78,11 +81,28 @@ module.exports = `
 		removeExperience (
 			id: String
 		): StandardResponse
+		setEducation (
+			education: EducationInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeEducation (
+			id: String
+		): StandardResponse
+		setHobby (
+			hobby: HobbyInput!
+			language: LanguageCodeType!
+		): StandardResponse
+		removeHobby (
+			id: String
+		): StandardResponse
 		handleFollow (
 			details: FollowInput!
 		): StandardResponse
 		setPosition(
 			position: String
+		): StandardResponse
+		setCVFile(
+			cvFile: String
 		): StandardResponse
 		deleteProfile: StandardResponse
 	}

@@ -16,7 +16,7 @@ module.exports = `
         location: String
         tags: [Tag]
         faqs: [Faq]
-        jobs: [Job]
+        recentJobs: [Job]
         teams: [Team]
         hasLogo: Boolean
         logoContentType: ImageType
@@ -31,7 +31,7 @@ module.exports = `
         name: String
         headline: String
         description: String
-        industry: String
+        industryId: Int
         activityField: String
         noOfEmployees: String
         location: String
@@ -63,11 +63,23 @@ module.exports = `
         answer: String
         remove: Boolean
     }
+
+    type CompaniesConnection {
+        edges: [CompanyEdge]!
+        pageInfo: PageInfo!
+    }
+
+    type CompanyEdge {
+        node: Company!
+        cursor: String!
+    }
     
     extend type Query {
         companies(
-			language: LanguageCodeType!
-		): [Company]
+            language: LanguageCodeType!
+            first: Int!
+            after: String
+		): CompaniesConnection
 		company(
 			id: String!
 			language: LanguageCodeType!
