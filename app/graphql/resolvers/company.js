@@ -120,6 +120,7 @@ const all = async (language, first, after, { models }) => {
         order,
         limit: first + 1
     });
+    console.log(companiesIds);
     
     const hasNextPage = companiesIds.length === first + 1;
     companiesIds = hasNextPage ? companiesIds.slice(0, companiesIds.length -1) : companiesIds;
