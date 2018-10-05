@@ -30,3 +30,4 @@ benchmarks/graphs
 
 .env
 /dist
+credentials

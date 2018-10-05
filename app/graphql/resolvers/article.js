@@ -583,45 +583,97 @@ const getArticlesByIds = async (articleIds, order, languageId, models, user) => 
     return articles;
 }
 
-const feedArticles = async (language, userId, companyId, teamId, { user, models }) => {
-    yupValidation(schema.article.feed, { language, userId, companyId, teamId });
+const feedArticles = async (language, userId, companyId, teamId, first, after, { user, models }) => {
+    yupValidation(schema.article.feed, { language, userId, companyId, teamId, first, after });
 
-    const languageId = await getLanguageIdByCode(models, language);
+    //const languageId = await getLanguageIdByCode(models, language);
+    const languageId = 1;
+
+    let where;
+    
+    const order = [
+        ['createdAt', 'desc'],
+        ['id', 'asc']
+    ];
 
     if (userId) {
-        return models.article.findAll({
-            where: {
-                ownerId: userId,
-                postAs: 'profile'
-            },
-            ...includeForFind(languageId),
-            order: [['createdAt', 'desc']]
-        }).then(articles => mapArticles(articles, user));
+        where = {
+            ownerId: userId,
+            postAs: 'profile'
+        };
     }
 
     if (companyId) {
-        return models.article.findAll({
-            where: {
-                postAs: 'company',
-                postingCompanyId: companyId
-            },
-            ...includeForFind(languageId),
-            order: [['createdAt', 'desc']]
-        }).then(articles => mapArticles(articles, user));
+        where = {
+            postAs: 'company',
+            postingCompanyId: companyId
+        };
     }
 
     if (teamId) {
-        return models.article.findAll({
-            where: {
-                postAs: 'team',
-                postingTeamId: teamId
-            },
-            ...includeForFind(languageId),
-            order: [['createdAt', 'desc']]
-        }).then(articles => mapArticles(articles, user));
+        where = {
+            postAs: 'team',
+            postingTeamId: teamId
+        };
     }
 
-    return [];
+    if (where) {
+        if (after) {
+            after = decodeCursor(after);
+            where = {
+                ...where,
+                [models.Sequelize.Op.and]: [
+                    ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+                    {
+                        createdAt: {
+                            [models.Sequelize.Op.lte]: after.date
+                        }
+                    },
+                    {
+                        [models.Sequelize.Op.or]: [{
+                            createdAt: {
+                                [models.Sequelize.Op.ne]: after.date
+                            }
+                        }, {
+                            id: {
+                                [models.Sequelize.Op.gt]: after.id
+                            }
+                        }]
+                    }
+                ]
+            }
+        }
+
+        const feedArticlesIds = await models.article.findAll({
+            where,
+            attributes: ['id'],
+            order,
+            limit: first + 1
+        });
+    
+        let hasNextPage = false;
+        if (feedArticlesIds.length === first + 1) {
+            hasNextPage = true;
+        }
+    
+        return getArticlesByIds(hasNextPage ? feedArticlesIds.slice(0, feedArticlesIds.length -1) : feedArticlesIds, order, languageId, models, user)
+            .then(articles => ({
+                edges: articles.map(article => ({
+                    node: article,
+                    cursor: encodeCursor({ id: article.id, date: article.createdAt})
+                })),
+                pageInfo: {
+                    hasNextPage
+                }
+        }));
+    }
+    
+    return {
+        edges: [],
+        pageInfo: {
+            hasNextPage: false
+        }
+    };
 }
 
 const mapArticles = (articles, user) => articles.map(article => mapArticle(article, user));
@@ -684,7 +736,7 @@ module.exports = {
         articles: (_, { language }, context) => all(language, context),
         article: (_, { id, language }, context) => article(id, language, context),
         newsFeedArticles: (_, { language, peopleOrCompany, tags, first, after }, context) => newsFeedArticles(language, peopleOrCompany, tags, first, after, context),
-        feedArticles: (_, { language, userId, companyId, teamId, }, context) => feedArticles(language, userId, companyId, teamId, context),
+        feedArticles: (_, { language, userId, companyId, teamId, first, after }, context) => feedArticles(language, userId, companyId, teamId, first, after, context),
     },
     Mutation: {
         appreciate: (_, { tagId, articleId }, context) => appreciate(tagId, articleId, context),

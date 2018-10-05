@@ -21,11 +21,19 @@ const commonCompanySubQueriesParams = (languageId) => [
     {
         include: {
             association: 'jobs',
+            where: {
+                status: 'active'
+            },
+            order: [['createdAt', 'desc']],
             include: [
                 // { association: 'i18n', where: { languageId } },
                 { association: 'team' }
-            ]
-        }
+            ],
+            limit: 5
+        },
+        then: (company) => ({
+            recentJobs: company.jobs
+        })
     },
     {
         include: {

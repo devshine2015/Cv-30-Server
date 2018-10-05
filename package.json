@@ -9,7 +9,12 @@
     "upd": "docker-compose up -d",
     "down": "docker-compose down",
     "test": "jest --watch --verbose",
-    "live": "docker-compose -f docker-compose.prod.yml up --build -d"
+    "live": "docker-compose -f docker-compose.prod.yml up --build -d",
+    "setup_ecs_exec_role": "set AWS_SHARED_CREDENTIALS_FILE=./credentials && aws iam --region eu-west-1 create-role --role-name ecsTaskExecutionRole --assume-role-policy-document file://aws/task-execution-assume-role.json && aws iam --region eu-west-1 attach-role-policy --role-name ecsTaskExecutionRole --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+    "setup_ecs_cluster": "set AWS_SHARED_CREDENTIALS_FILE=./credentials && ecs-cli configure --cluster CV30-Production --region eu-west-1 --default-launch-type FARGATE --config-name CV30-Production && ecs-cli up",
+    "setup_ecs_sg": "set AWS_SHARED_CREDENTIALS_FILE=./credentials && aws ec2 create-security-group --group-name \"cv30-ecs-production-sg\" --description \"CV30 Production security group\" --vpc-id ",
+    "allow_inbound": "set AWS_SHARED_CREDENTIALS_FILE=./credentials && aws ec2 authorize-security-group-ingress --group-id  --protocol tcp --port 80 --cidr 0.0.0.0/0",
+    "create-ecr-repo": "set AWS_SHARED_CREDENTIALS_FILE=./credentials && aws ecr create-repository --repository-name cv30-production"
   },
   "repository": {
     "type": "git",
