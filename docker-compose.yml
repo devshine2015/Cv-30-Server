@@ -9,7 +9,9 @@ services:
     volumes:
       - cv30DB:/var/lib/mysql
     environment:
+      MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
       MYSQL_DATABASE: "${DB_DATABASE}"
       MYSQL_USER: "${DB_USER}"
     ports:
@@ -46,9 +48,9 @@ services:
       AWS_BUCKET: "${AWS_BUCKET}"
       AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
       AWS_SECRET_KEY: "${AWS_SECRET_KEY}"
-    restart: always
     ports:
       - "80:4000"
+    restart: always
     networks:
       - wowzaaa
     volumes:
