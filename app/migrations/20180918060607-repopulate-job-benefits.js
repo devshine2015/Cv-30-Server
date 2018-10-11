@@ -7,7 +7,7 @@ module.exports = {
 			created_at: date,
 			updated_at: date
 		};
-		const jobBenefits = ['event-tickets', 'children-care', 'private-clinic', 'coaching', 'coffee', 'commuting-subsidy', 'company-car', 'company-laptop', 'company-phone', 'dentist', 'disability-insurance', 'elder-care', 'family-benefits', 'free-books', 'games', 'gym-membership', 'housing', 'international-experiences', 'life-inisurance', 'meal-coupons', 'one-day-off', 'paid-maternity', 'paid-vacations', 'playground', 'professional-dev-program', 'profit-sharing', 'flexible-working-hours', 'relax-area', 'relocation-expenses', 'sabatic-leave', 'snacks', 'stock-option', 'team-bonding-events', 'trainings', 'tuition-reimbursment'];
+		const jobBenefits = ['event-tickets', 'children-care', 'private-clinic', 'coaching', 'coffee', 'commuting-subsidy', 'company-car', 'company-laptop', 'company-phone', 'dentist', 'disability-insurance', 'elder-care', 'family-benefits', 'free-books', 'games', 'gym-membership', 'housing', 'international-experiences', 'life-insurance', 'meal-coupons', 'one-day-off', 'paid-maternity', 'paid-vacations', 'playground', 'professional-dev-program', 'profit-sharing', 'flexible-working-hours', 'relax-area', 'relocation-expenses', 'sabatic-leave', 'snacks', 'stock-option', 'team-bonding-events', 'trainings', 'tuition-reimbursment'];
 		return queryInterface.dropTable('job_benefits')
 		.then(() => queryInterface.createTable('job_benefits', {
 			id: {
