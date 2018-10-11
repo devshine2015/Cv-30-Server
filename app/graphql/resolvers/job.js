@@ -141,17 +141,20 @@ const job = async (id, language, { user, models }) => {
     });
 }
 
-const all = async(language, companyId, status, first, after, context) => {
-    if (!status) status = 'active';
+const all = async(language, filter, first, after, context) => {
+    filter = {
+        status: 'active',
+        ...(filter || {}),
+    };
+
     yupValidation(schema.job.all, { 
         language,
-        companyId,
-        status,
+        filter,
         first,
         after
     });
 
-    return allJobs(language, companyId, status, first, after, context);
+    return allJobs(language, filter, first, after, context);
 }
 
 const jobTypes = async (language, { models }) => {
@@ -186,7 +189,7 @@ const handleApplyToJob = async (jobId, isApplying, { user, models }) => {
 
 module.exports = {
     Query: {
-        jobs: (_, { language, companyId, status, first, after }, context) => all(language, companyId, status, first, after, context),
+        jobs: (_, { language, filter, first, after }, context) => all(language, filter, first, after, context),
         job: (_, { id, language }, context) => job(id, language, context),
         jobTypes: (_, { language }, context) => jobTypes(language, context),
         jobBenefits: (_, { }, context) => jobBenefits(context)

@@ -79,11 +79,31 @@ module.exports = `
         cursor: String!
     }
 
+    input JobCompensationFilterInput {
+        amountMin: Float!
+        amountMax: Float!
+        currency: Currency!
+    }
+
+    input JobsFilterInput {
+        companyId: String
+        status: String
+        title: String
+        location: String
+        companyName: String
+        jobTypes: [Int]
+        salary: JobCompensationFilterInput
+        skills: [Int]
+        benefits: [Int]
+        teamId: String
+        industryId: Int
+        companyTypes: [Int]
+    }
+
     extend type Query {
         jobs(
             language: LanguageCodeType!
-            companyId: String
-            status: String
+            filter: JobsFilterInput
             first: Int!
             after: String
 		): JobsConnection
