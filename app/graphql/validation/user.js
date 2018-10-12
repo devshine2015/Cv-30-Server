@@ -3,6 +3,14 @@ const yup = require('yup');
 module.exports = {
     all: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
+        filter: yup.object().shape({
+            name: yup.string().trim().max(255),
+            location: yup.string().trim().max(255),
+            skills: yup.array().of(yup.number().positive().integer()),
+            values: yup.array().of(yup.number().positive().integer()),
+            companyName: yup.string().trim().max(255),
+            isProfileVerified: yup.boolean()
+        }),
         first: yup.number().positive().integer().moreThan(1).required(),
         after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(1024)
     }),

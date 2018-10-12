@@ -38,6 +38,15 @@ module.exports = `
         isFollowing: Boolean!
 	}
 
+	input ProfilesFilterInput {
+		name: String
+		location: String
+		skills: [Int]
+		values: [Int]
+		companyName: String
+		isProfileVerified: Boolean
+	}
+
     type Query {
 		signature(id: String!): Signature
         profile(
@@ -46,6 +55,7 @@ module.exports = `
 		): Profile
 		profiles(
 			language: LanguageCodeType!
+			filter: ProfilesFilterInput
 			first: Int!
 			after: String
 		): ProfilesConnection
