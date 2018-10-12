@@ -1,6 +1,10 @@
-const checkUserAuth = (user) => {
+const checkUserAuth = (user, options = {}) => {
     if (!user)
         throwForbiddenError();
+
+    if (options) {
+        if (options.checkGod && !user.god) throwForbiddenError();
+    }
 }
 
 const throwForbiddenError = () => {

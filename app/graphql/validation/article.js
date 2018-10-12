@@ -88,6 +88,9 @@ module.exports = {
     removeArticle: yup.object().shape({
         id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required()
     }),
+    removeLandingPageArticle: yup.object().shape({
+        id: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required()
+    }),
     appreciate: yup.object().shape({
         tagId: yup.number().integer().required(),
         articleId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required()

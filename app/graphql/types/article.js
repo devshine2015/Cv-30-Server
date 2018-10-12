@@ -115,6 +115,9 @@ module.exports = `
         removeArticle (
             id: String!
         ): StandardResponse
+        removeLandingPageArticle (
+            id: String!
+        ): StandardResponse
     }
 `;
 
