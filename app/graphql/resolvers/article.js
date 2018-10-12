@@ -223,6 +223,29 @@ const removeArticle = async (id, { user, models }) => {
     return { status: false };
 }
 
+const removeLandingPageArticle = async (id, { user, models }) => {
+    checkUserAuth(user, { checkGod: true });
+    yupValidation(schema.article.removeLandingPageArticle, {
+        id
+    });
+
+    const foundArticle = await models.article.findOne({ where: { id } });
+    if (!foundArticle) return { status: false, error: 'Article not found' };
+    if (foundArticle.postAs !== 'landingPage') return { status: false, error: 'Not a landing page article'};
+
+    let result = false;
+    await models.sequelize.transaction(async transaction => {
+        await models.image.destroy({ where: { sourceId: id, sourceType: 'article'}, transaction });
+        await models.video.destroy({ where: { sourceId: id, sourceType: 'article'}, transaction });
+
+        await models.article.destroy({ where: { id } });
+
+        result = true;
+    })
+
+    return { status: result };
+}
+
 const storeArticleTags = async (tags, articleId, languageId, user, models, t) => {
     await models.sequelize.transaction(async transaction => {
         const article = await models.article.findOne({ where: { id: articleId } }, { transaction });
@@ -742,7 +765,8 @@ module.exports = {
         appreciate: (_, { tagId, articleId }, context) => appreciate(tagId, articleId, context),
         handleArticle: (_, { language, article, options }, context) => handleArticle(language, article, options, context),
         handleArticleTags: (_, { language, details }, context) => handleArticleTags(language, details, context),
-        removeArticle: (_, { id }, context) => removeArticle(id, context)
+        removeArticle: (_, { id }, context) => removeArticle(id, context),
+        removeLandingPageArticle: (_, { id }, context) => removeLandingPageArticle(id, context)
     }
 };
 

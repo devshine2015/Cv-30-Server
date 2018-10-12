@@ -1,7 +1,10 @@
 const { getLanguageIdByCode, encodeCursor, decodeCursor, validateCompany } = require('./common');
 
-const all = async (language, companyId, status, first, after, { user, models }) => {
+const all = async (language, filter, first, after, { user, models }) => {
     let forbidden = false;
+    //const languageId = await getLanguageIdByCode(models, language);
+    const languageId = 1;
+    const { companyId, status, title, location, companyName, jobTypes, salary, skills, benefits, teamId, industryId, companyTypes } = filter || {};
     if (status !== 'active') {
         if (!companyId) forbidden = true;
 
@@ -23,6 +26,66 @@ const all = async (language, companyId, status, first, after, { user, models }) 
     let where = {
         status
     };
+    let include = [];
+    let includeCompany = false;
+    if (title && title.length > 0) {
+        where.title = { [models.Sequelize.Op.like]: `%${title}%` };
+    }
+    if (location && location.length > 0) {
+        where.location = location;
+    }
+    if (companyName && companyName.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$company.name$': { [models.Sequelize.Op.like]: `%${companyName}%` } }
+        ];
+        includeCompany = true;
+    }
+    if (jobTypes && jobTypes.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$jobTypes.Id$': { [models.Sequelize.Op.in]: jobTypes } }
+        ];
+        include = [
+            ...include,
+            { association: 'jobTypes' }
+        ];
+    }
+    if (skills && skills.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$skills.Id$': { [models.Sequelize.Op.in]: skills } }
+        ];
+        include = [
+            ...include,
+            { association: 'skills' }
+        ];
+    }
+    if (benefits && benefits.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$jobBenefits.Id$': { [models.Sequelize.Op.in]: benefits } }
+        ];
+        include = [
+            ...include,
+            { association: 'jobBenefits' }
+        ];
+    }
+    if (industryId) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$company.industry_Id$': industryId }
+        ];
+        includeCompany = true;
+    }
+
+    if (includeCompany) {
+        include = [
+            ...include,
+            { association: 'company'}
+        ];
+    }
+
     const order = [
         ['createdAt', 'desc'],
         ['id', 'asc']
@@ -56,7 +119,9 @@ const all = async (language, companyId, status, first, after, { user, models }) 
     }
 
     let jobsIds = await models.job.findAll({
+        subQuery: false,
         where,
+        include,
         attributes: ['id'],
         order,
         limit: first + 1
@@ -70,7 +135,7 @@ const all = async (language, companyId, status, first, after, { user, models }) 
             where: {
                 id: { [models.Sequelize.Op.in]: jobsIds.map(job => job.id) }
             },
-            ...includeForFind(await getLanguageIdByCode(models, language), null, models),
+            ...includeForFind(languageId, null, models),
             order,
         }).then(jobs => ({
             edges: jobs.map(job => ({
