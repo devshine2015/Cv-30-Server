@@ -18,17 +18,61 @@ const profile = async (id, language, { user, models }) => {
         return { status: false };
     }
 }
-const all = async (language, first, after, { models }) => {
+const all = async (language, filter, first, after, { models }) => {
     yupValidation(schema.user.all, {
         language,
+        filter,
         first,
         after
     });
+
+    const { name, location, skills, values, companyName } = filter || {}
 
     //const languageId = await getLanguageIdByCode(models, language);
     const languageId = 1;
 
     let where = { status: 'active' };
+    let include = [];
+    if (name && name.length > 0) {
+        where[models.Sequelize.Op.or] = [
+            { firstName: { [models.Sequelize.Op.like]: `%${name}%` } },
+            { lastName: { [models.Sequelize.Op.like]: `%${name}%` } }
+        ];
+    }
+    // if (location && location.length > 0) {
+    //     where.location = location;
+    // }
+    if (skills && skills.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$skills.Id$': { [models.Sequelize.Op.in]: skills } }
+        ];
+        include = [
+            ...include,
+            { association: 'skills' }
+        ];
+    }
+    if (values && values.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$values.Id$': { [models.Sequelize.Op.in]: values } }
+        ];
+        include = [
+            ...include,
+            { association: 'values' }
+        ];
+    }
+    if (companyName && companyName.length > 0) {
+        where[models.Sequelize.Op.and] = [
+            ...(where[models.Sequelize.Op.and] ? where[models.Sequelize.Op.and] : []),
+            { '$ownedCompanies.name$': { [models.Sequelize.Op.like]: `%${companyName}%` } }
+        ];
+        include = [
+            ...include,
+            { association: 'ownedCompanies'}
+        ];
+    }
+
     const order = [
         ['firstName', 'asc'],
         ['lastName', 'asc'],
@@ -69,7 +113,9 @@ const all = async (language, first, after, { models }) => {
     }
 
     let usersIds = await models.user.findAll({
+        subQuery: false,
         where,
+        include,
         attributes: ['id'],
         order,
         limit: first + 1
@@ -1021,7 +1067,7 @@ module.exports = {
     Query: {
         signature: (_, { id }, context) => signature(id, context),
         profile: (_, { id, language }, context) => profile(id, language, context),
-        profiles: (_, { language, first, after }, context) => all(language, first, after, context),
+        profiles: (_, { language, filter, first, after }, context) => all(language, filter, first, after, context),
         // profileFeaturedArticles: (_, __, context) => userResolvers.profileFeaturedArticles(context),
         // userSkills: (_, __, context) => userResolvers.userSkills(context),
         // userValues: (_, __, context) => userResolvers.userValues(context),

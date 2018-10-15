@@ -72,12 +72,15 @@ const company = async (id, language, { models }) => {
     );
 }
 
-const all = async (language, first, after, { models }) => {
+const all = async (language, filter, first, after, { models }) => {
     yupValidation(schema.company.all, {
         language,
+        filter,
         first,
         after
     });
+
+    const { name, location, industryId, teamId } = filter || {};
 
     //const languageId = await getLanguageIdByCode(models, language);
     const languageId = 1;
@@ -87,6 +90,16 @@ const all = async (language, first, after, { models }) => {
         ['name', 'asc'],
         ['id', 'asc']
     ];
+
+    if (name && name.length > 0) {
+        where.name = { [models.Sequelize.Op.like]: `%${name}%` };
+    }
+    if (location && location.length > 0) {
+        where.location = location;
+    }
+    if (industryId) {
+        where.industryId = industryId;
+    }
 
     if (after) {
         after = decodeCursor(after);
@@ -262,7 +275,7 @@ const removeTag = async (id, companyId, { user, models }) => {
 
 module.exports = {
     Query: {
-        companies: (_, { language, first, after }, context) => all(language, first, after, context),
+        companies: (_, { language, filter, first, after }, context) => all(language, filter, first, after, context),
         company: (_, { id, language }, context) => company(id, language, context)
     },
     Mutation: {

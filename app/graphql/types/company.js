@@ -73,10 +73,18 @@ module.exports = `
         node: Company!
         cursor: String!
     }
+
+    input CompaniesFilterInput {
+        name: String
+        location: String
+        industryId: Int
+        teamId: String
+    }
     
     extend type Query {
         companies(
             language: LanguageCodeType!
+            filter: CompaniesFilterInput
             first: Int!
             after: String
 		): CompaniesConnection

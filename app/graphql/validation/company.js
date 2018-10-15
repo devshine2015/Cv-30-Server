@@ -3,6 +3,12 @@ const yup = require('yup');
 module.exports = {
     all: yup.object().shape({
         language: yup.string().required().matches(/(en|ro)/, { excludeEmptyString: true }),
+        filter: yup.object().shape({
+            name: yup.string().trim().max(255),
+            location: yup.string().trim().max(255),
+            industryId: yup.number().positive().integer(),
+            teamId: yup.string().trim().matches(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
+        }),
         first: yup.number().positive().integer().moreThan(1).required(),
         after: yup.string().trim().matches(/^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/i).max(1024)
     }),
